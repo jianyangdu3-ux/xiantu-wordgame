@@ -64,7 +64,9 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .btn-red { background: linear-gradient(135deg, var(--red-deep), var(--red-bright)); color: #fff; box-shadow: 0 2px 8px rgba(46, 125, 107, 0.3); }
 .btn:active { transform: scale(0.97); }
 .feature-highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
-.feature-item { background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); }
+.feature-item { background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); cursor: pointer; transition: all .2s; }
+.feature-item:hover { border-color: var(--gold); background: rgba(217,168,111,0.04); transform: translateY(-2px); }
+.feature-item:active { transform: translateY(0); }
 .feature-item .fi-icon { font-size: 28px; margin-bottom: 6px; }
 .feature-item .fi-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
 .feature-item .fi-desc { font-size: 11px; color: var(--text-light); }
@@ -512,10 +514,10 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <div id="chapter-list-container"></div>
   </div>
   <div class="feature-highlights">
-    <div class="feature-item"><div class="fi-icon">📖</div><div class="fi-title">剧情悟词</div><div class="fi-desc">仙途历险，记得更牢</div></div>
-    <div class="feature-item"><div class="fi-icon">🔄</div><div class="fi-title">词库全本</div><div class="fi-desc">5491 考研词，A-Z 检索</div></div>
-    <div class="feature-item"><div class="fi-icon">💎</div><div class="fi-title">道心相印</div><div class="fi-desc">你即主角，更有动力</div></div>
-    <div class="feature-item"><div class="fi-icon">🎮</div><div class="fi-title">抉择机缘</div><div class="fi-desc">每段剧情由你定</div></div>
+    <div class="feature-item" onclick="switchTab('read');setCurrentChapter(1)"><div class="fi-icon">📖</div><div class="fi-title">剧情悟词</div><div class="fi-desc">仙途历险，记得更牢</div></div>
+    <div class="feature-item" onclick="switchTab('vocab')"><div class="fi-icon">🔄</div><div class="fi-title">词库全本</div><div class="fi-desc">5491 考研词，A-Z 检索</div></div>
+    <div class="feature-item" onclick="switchTab('cards')"><div class="fi-icon">💎</div><div class="fi-title">道心相印</div><div class="fi-desc">你即主角，更有动力</div></div>
+    <div class="feature-item" onclick="switchTab('read');setCurrentChapter(1)"><div class="fi-icon">🎮</div><div class="fi-title">抉择机缘</div><div class="fi-desc">每段剧情由你定</div></div>
   </div>
 </div>
 
