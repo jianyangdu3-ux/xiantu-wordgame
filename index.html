@@ -25,6 +25,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .tab-item .tab-icon { font-size: 22px; margin-bottom: 2px; }
 .tab-item .tab-label { font-weight: 500; }
 .page { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+.page-version { text-align: center; font-size: 10px; color: rgba(0,0,0,0.28); padding: 4px 16px 6px; letter-spacing: 0.5px; }
 .page.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .progress-overview { background: var(--bg-card); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px var(--shadow); }
@@ -64,7 +65,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .btn-red { background: linear-gradient(135deg, var(--red-deep), var(--red-bright)); color: #fff; box-shadow: 0 2px 8px rgba(46, 125, 107, 0.3); }
 .btn:active { transform: scale(0.97); }
 .feature-highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
-.feature-item { background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); cursor: pointer; transition: all .2s; }
+.feature-item { background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); cursor: pointer; transition: all .2s; touch-action: manipulation; -webkit-tap-highlight-color: rgba(201,169,110,0.25); user-select: none; }
 .feature-item:hover { border-color: var(--gold); background: rgba(217,168,111,0.04); transform: translateY(-2px); }
 .feature-item:active { transform: translateY(0); }
 .feature-item .fi-icon { font-size: 28px; margin-bottom: 6px; }
@@ -598,6 +599,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <p style="text-align:center;font-size:12px;color:rgba(234,240,241,0.5);margin-top:16px">非是诸词皆须死记！精选 5491 个考研核心词，化入仙途，反复历劫，根基更牢！</p>
   </div>
 </div>
+
+<div class="page-version">仙途十二阶 v18 · 若页面异常请长按链接在浏览器打开</div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
