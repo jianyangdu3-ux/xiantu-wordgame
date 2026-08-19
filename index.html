@@ -405,6 +405,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 
 /* 道之试炼（抉择前考词） */
 .choice-trial { margin-top: 14px; padding: 14px; background: rgba(40,30,20,.35); border: 1px solid rgba(212,175,107,.3); border-radius: 14px; }
+.choice-glow { animation: choiceGlow 1.8s ease; }
+@keyframes choiceGlow { 0%,100% { box-shadow: 0 0 0 rgba(212,175,107,0); } 25% { box-shadow: 0 0 26px 6px rgba(212,175,107,.7); } 60% { box-shadow: 0 0 12px 2px rgba(212,175,107,.4); } }
 .trial-word { font-size: 22px; font-weight: 800; color: #fff5e0; text-align: center; margin: 6px 0; }
 .trial-q { text-align: center; font-size: 13px; color: #e9d7ad; margin: 8px 0 10px; }
 .trial-opt { margin-bottom: 8px; }
@@ -517,7 +519,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <div class="feature-item" onclick="switchTab('read');setCurrentChapter(1)"><div class="fi-icon">📖</div><div class="fi-title">剧情悟词</div><div class="fi-desc">仙途历险，记得更牢</div></div>
     <div class="feature-item" onclick="switchTab('vocab')"><div class="fi-icon">🔄</div><div class="fi-title">词库全本</div><div class="fi-desc">5491 考研词，A-Z 检索</div></div>
     <div class="feature-item" onclick="switchTab('cards')"><div class="fi-icon">💎</div><div class="fi-title">道心相印</div><div class="fi-desc">你即主角，更有动力</div></div>
-    <div class="feature-item" onclick="switchTab('read');setCurrentChapter(1)"><div class="fi-icon">🎮</div><div class="fi-title">抉择机缘</div><div class="fi-desc">每段剧情由你定</div></div>
+    <div class="feature-item" onclick="goToChoiceSpot()"><div class="fi-icon">🎮</div><div class="fi-title">抉择机缘</div><div class="fi-desc">每段剧情由你定</div></div>
   </div>
 </div>
 
@@ -1435,6 +1437,26 @@ function setCurrentChapter(chId) {
   const sc = document.getElementById('story-content');
   if (sc) sc.style.setProperty('--story-bg', `url('${coverUrl}')`);
   renderStoryContent();
+}
+
+/* 抉择机缘：跳到第一个尚未抉择的章节，定位到道之抉择并高亮提示 */
+function goToChoiceSpot() {
+  let target = 1;
+  for (let i = 0; i < STORY_SECTIONS.length; i++) {
+    const sec = STORY_SECTIONS[i];
+    if (sec && sec.choices && sec.choices.length && state.madeChoices['sec' + i] === undefined) { target = i + 1; break; }
+  }
+  switchTab('read');
+  setCurrentChapter(target);
+  setTimeout(() => {
+    const block = document.querySelector('#sec-' + (target - 1) + ' .choice-trial, #sec-' + (target - 1) + ' .choice-block');
+    if (block) {
+      block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      block.classList.add('choice-glow');
+      setTimeout(() => block.classList.remove('choice-glow'), 1800);
+    }
+    showToast('✦ 此处即本章道之抉择');
+  }, 150);
 }
 
 function renderStorySections() {
