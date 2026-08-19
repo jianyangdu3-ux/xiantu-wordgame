@@ -1,0 +1,6 @@
+# 项目内部文件，不部署到 GitHub Pages
+.workbuddy/
+vocab_raw.json
+仙途十二阶_扫码玩.png
+仙途十二阶_离线版.zip
+.DS_Store

@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>仙途十二阶 | 修仙逆袭考研单词</title>
+<style>
+:root {
+  --bg-primary: #EAF0F1; --bg-card: #FBFEFE; --bg-dark: #0E2A2A;
+  --red-deep: #2E7D6B; --red-bright: #3FA088; --gold: #C9A96E;
+  --gold-light: #E8D5A8; --gold-dark: #8B7335; --text-primary: #1F3A36;
+  --text-secondary: #5A726E; --text-light: #8FA39E; --border-color: #C7D8D4;
+  --shadow: rgba(20, 50, 45, 0.12);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+.app-container { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; background: var(--bg-primary); padding-bottom: 70px; }
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-primary); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color); }
+.top-bar h1 { font-size: 17px; font-weight: 600; letter-spacing: 2px; }
+.top-bar .subtitle { font-size: 11px; color: var(--text-secondary); text-align: center; }
+.top-bar .menu-btn { width: 32px; height: 32px; border-radius: 50%; background: none; border: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text-secondary); }
+.tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--bg-card); border-top: 1px solid var(--border-color); display: flex; z-index: 200; }
+.tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 8px 0 6px; cursor: pointer; transition: all 0.2s; border: none; background: none; font-size: 11px; color: var(--text-light); }
+.tab-item.active { color: var(--red-deep); }
+.tab-item .tab-icon { font-size: 22px; margin-bottom: 2px; }
+.tab-item .tab-label { font-weight: 500; }
+.page { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.progress-overview { background: var(--bg-card); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px var(--shadow); }
+.progress-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+.stat-item .stat-num { font-size: 24px; font-weight: 700; color: var(--red-deep); }
+.stat-item .stat-label { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.rank-circle-container { display: flex; align-items: center; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-color); }
+.rank-circle { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-primary); flex-shrink: 0; }
+.rank-circle .rank-num { font-size: 28px; font-weight: 700; color: var(--red-deep); line-height: 1; }
+.rank-circle .rank-total { font-size: 11px; color: var(--text-light); }
+.rank-info .rank-title { font-size: 22px; font-weight: 700; color: var(--red-deep); }
+.rank-info .rank-next { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.mini-stat { border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 8px; text-align: center; background: var(--bg-card); }
+.mini-stat .ms-label { font-size: 11px; color: var(--text-light); }
+.mini-stat .ms-num { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.mini-stat.mastered .ms-num { color: var(--gold-dark); }
+.mini-stat.review .ms-num { color: #6B5B95; }
+.mini-stat.remaining .ms-num { color: var(--red-deep); }
+.chapter-list { margin-top: 16px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-header h2 { font-size: 16px; font-weight: 600; }
+.section-header .view-all { font-size: 13px; color: var(--text-light); cursor: pointer; }
+.chapter-card { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px var(--shadow); position: relative; overflow: hidden; border-left: 4px solid var(--red-deep); }
+.chapter-card.locked { border-left-color: var(--text-light); opacity: 0.7; }
+.chapter-card .ch-badge { position: absolute; top: 12px; right: 12px; font-size: 11px; padding: 3px 10px; border: 1px solid var(--gold); border-radius: 12px; color: var(--gold-dark); background: transparent; }
+.chapter-card .ch-badge.done { background: var(--gold-light); color: var(--gold-dark); }
+.chapter-card .ch-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.chapter-card .ch-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+.ch-progress-bar { height: 6px; background: #DCE8E5; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+.ch-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 3px; transition: width 0.5s ease; }
+.ch-progress-text { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); }
+.ch-actions { display: flex; gap: 10px; margin-top: 12px; }
+.btn { flex: 1; padding: 10px 16px; border-radius: 20px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; }
+.btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+.btn-primary { background: linear-gradient(135deg, #C9A050, #E0C078); color: #3D2914; box-shadow: 0 2px 8px rgba(201, 160, 80, 0.3); }
+.btn-red { background: linear-gradient(135deg, var(--red-deep), var(--red-bright)); color: #fff; box-shadow: 0 2px 8px rgba(46, 125, 107, 0.3); }
+.btn:active { transform: scale(0.97); }
+.feature-highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+.feature-item { background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); }
+.feature-item .fi-icon { font-size: 28px; margin-bottom: 6px; }
+.feature-item .fi-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.feature-item .fi-desc { font-size: 11px; color: var(--text-light); }
+.reader-page { padding: 0 !important; }
+.reader-nav { display: flex; align-items: center; padding: 12px 16px; gap: 12px; border-bottom: 1px solid var(--border-color); background: var(--bg-card); position: sticky; top: 44px; z-index: 50; }
+.reader-nav .back-btn { font-size: 20px; cursor: pointer; color: var(--text-secondary); background: none; border: none; }
+.reader-nav .reader-title { flex: 1; font-size: 14px; font-weight: 600; }
+.reader-nav .reader-progress { font-size: 12px; color: var(--text-light); white-space: nowrap; }
+.story-section-num { display: flex; gap: 8px; padding: 12px 16px 8px; flex-wrap: wrap; }
+.sec-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; border: 2px solid var(--border-color); color: var(--text-light); background: var(--bg-card); cursor: pointer; }
+.sec-dot.active { border-color: var(--red-deep); background: var(--red-deep); color: #fff; }
+.sec-dot.done { border-color: var(--gold); color: var(--gold-dark); }
+.story-content { padding: 8px 20px 24px; line-height: 2; font-size: 15.5px; color: var(--text-primary); }
+.story-content::before { content:''; position:absolute; inset:0; background-image: var(--story-bg, none); background-size: cover; background-position: center; background-attachment: fixed; opacity: .13; filter: blur(2px) saturate(1.1); z-index: -1; border-radius: 12px; mix-blend-mode: multiply; }
+.story-chapter-label { font-size: 12px; color: var(--red-deep); font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; }
+.story-section-title { font-size: 22px; font-weight: 700; text-align: center; margin: 16px 0 20px; letter-spacing: 4px; }
+.story-text p { margin-bottom: 16px; text-indent: 2em; }
+.vocab-word { color: var(--red-deep); font-weight: 600; cursor: pointer; border-bottom: 2px dashed var(--red-deep); padding: 0 2px; transition: all 0.15s; position: relative; }
+.vocab-word:hover { background: rgba(46, 125, 107, 0.08); }
+.vocab-word.learned { color: var(--gold-dark); border-bottom-color: var(--gold); }
+.choice-block { margin: 20px 0 8px; padding: 16px; background: linear-gradient(135deg, #F0F7F5, #E2EFEB); border: 1px solid var(--gold); border-radius: 12px; }
+.choice-block .cb-title { font-size: 13px; font-weight: 700; color: var(--gold-dark); margin-bottom: 4px; letter-spacing: 1px; }
+.choice-block .cb-sub { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+.choice-btn { display: block; width: 100%; padding: 12px 14px; margin-bottom: 8px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 14px; text-align: left; cursor: pointer; transition: all 0.2s; color: var(--text-primary); }
+.choice-btn:hover { border-color: var(--red-deep); }
+.choice-btn:disabled { opacity: 0.5; cursor: default; }
+.choice-btn.chosen { border-color: var(--gold); background: var(--gold-light); }
+.word-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
+.word-modal-overlay.show { display: flex; }
+.word-modal { width: 100%; max-width: 430px; background: var(--bg-card); border-radius: 20px 20px 0 0; padding: 24px 20px 32px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.word-modal-handle { width: 36px; height: 4px; background: var(--border-color); border-radius: 2px; margin: 0 auto 16px; }
+.wm-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.wm-icon { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #D6EAE5, #BFDCD6); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: var(--red-deep); flex-shrink: 0; }
+.wm-word-info { flex: 1; }
+.wm-word { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+.wm-phonetic { font-size: 14px; color: var(--text-light); font-style: italic; margin-top: 2px; }
+.wm-speak-btn { flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--gold); background: var(--gold-light); color: var(--gold-dark); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform .12s ease; }
+.wm-speak-btn:active { transform: scale(0.9); }
+.wm-speak-btn:hover { box-shadow: 0 0 0 4px rgba(212,175,55,0.18); }
+.wm-mastered-btn { padding: 4px 12px; border: 1px solid var(--border-color); border-radius: 14px; font-size: 12px; background: none; cursor: pointer; color: var(--text-secondary); white-space: nowrap; }
+.wm-mastered-btn.done { background: var(--gold-light); color: var(--gold-dark); border-color: var(--gold); }
+.wm-context-label { font-size: 12px; color: var(--red-deep); font-weight: 600; margin-bottom: 4px; }
+.wm-context-meaning { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+.wm-full-meaning { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 16px; }
+.wm-example { background: var(--bg-primary); border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; font-size: 13px; line-height: 1.8; color: var(--text-secondary); }
+.wm-example .ex-sentence { margin-bottom: 4px; }
+.wm-example .ex-translate { font-size: 12px; color: var(--text-light); }
+.wm-difficulty { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-light); margin-bottom: 16px; }
+.wm-difficulty .star { color: var(--gold); }
+.wm-collection-hint { border: 1px dashed var(--gold); border-radius: 10px; padding: 12px; text-align: center; font-size: 13px; color: var(--gold-dark); margin-bottom: 16px; }
+.wm-actions { display: flex; gap: 10px; margin-top: 8px; }
+.quiz-mode-toggle { display: flex; gap: 8px; margin-bottom: 16px; justify-content: center; }
+.qm-btn { padding: 6px 16px; border-radius: 16px; font-size: 12px; border: 1px solid var(--border-color); background: none; cursor: pointer; color: var(--text-secondary); }
+.quiz-mode-toggle .qm-btn.active { background: var(--red-deep); color: #fff; border-color: var(--red-deep); }
+.quiz-container { padding: 0 !important; }
+.quiz-header { text-align: center; padding: 24px 16px 16px; }
+.quiz-score-display { font-size: 48px; font-weight: 700; color: var(--red-deep); }
+.quiz-score-total { font-size: 18px; color: var(--text-light); }
+.quiz-progress-bar { height: 8px; background: #DCE8E5; border-radius: 4px; margin: 16px 16px 0; overflow: hidden; }
+.quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--red-deep), var(--red-bright)); border-radius: 4px; transition: width 0.4s ease; }
+.quiz-question-area { padding: 24px 16px; text-align: center; }
+.qq-type { font-size: 13px; color: var(--red-deep); font-weight: 600; margin-bottom: 12px; letter-spacing: 1px; }
+.qq-word { font-size: 36px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.qq-speaker { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--gold); background: transparent; color: var(--gold); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
+.qq-speaker:active { transform: scale(.9); background: rgba(212,175,55,.15); }
+.qq-hint { font-size: 13px; color: var(--text-light); }
+.quiz-options { padding: 0 16px 24px; }
+.q-option { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--bg-card); margin-bottom: 10px; font-size: 15px; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+.q-option .opt-label { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
+.q-option:hover { border-color: var(--gold); }
+.q-option.selected { border-color: var(--red-deep); background: rgba(46,125,107,0.04); }
+.q-option.correct { border-color: #4A9D5E; background: rgba(74,157,94,0.06); }
+.q-option.wrong { border-color: var(--red-bright); background: rgba(63,160,136,0.06); }
+.q-option.correct .opt-label { border-color: #4A9D5E; color: #4A9D5E; }
+.q-option.wrong .opt-label { border-color: var(--red-bright); color: var(--red-bright); }
+.quiz-input-area { padding: 24px 16px; }
+.qi-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 18px; text-align: center; outline: none; transition: border-color 0.2s; background: var(--bg-card); }
+.qi-input:focus { border-color: var(--red-deep); }
+.collection-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+.col-tab { padding: 6px 16px; border-radius: 16px; font-size: 13px; border: 1px solid var(--border-color); background: none; cursor: pointer; white-space: nowrap; color: var(--text-secondary); }
+.col-tab.active { background: var(--red-deep); color: #fff; border-color: var(--red-deep); }
+.collection-count { font-size: 13px; color: var(--text-light); margin-bottom: 16px; }
+.cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.card-item { aspect-ratio: 3/4; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+.card-item:active { transform: scale(0.96); }
+.card-item.ssr { background: linear-gradient(145deg, #2E7D6B, #3FA088, #2E7D6B); color: #fff; border: 2px solid #D4A847; }
+.card-item.sr { background: linear-gradient(145deg, #3A5D7A, #5B7DA7, #3A5D7A); color: #fff; border: 2px solid #7BA0C4; }
+.card-item.r { background: linear-gradient(145deg, #2D6A5A, #3FA088, #2D6A5A); color: #fff; border: 2px solid #6AB0A0; }
+.card-rarity { position: absolute; top: 8px; left: 8px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.2); }
+.card-avatar { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 12px; border: 2px solid rgba(255,255,255,0.3); overflow: hidden; }
+.card-portrait { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+.card-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.card-type { font-size: 12px; opacity: 0.8; }
+.card-progress { position: absolute; bottom: 12px; left: 16px; right: 16px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
+.card-progress-fill { height: 100%; background: rgba(255,255,255,0.8); border-radius: 2px; }
+.card-empty { background: var(--bg-card); border: 2px dashed var(--border-color); color: var(--text-light); }
+.card-empty .card-avatar { background: var(--bg-primary); border-color: var(--border-color); color: var(--text-light); }
+.search-box { display: flex; align-items: center; background: var(--bg-card); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; border: 1px solid var(--border-color); }
+.search-box input { flex: 1; border: none; outline: none; font-size: 14px; background: none; color: var(--text-primary); }
+.filter-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.filter-btn { padding: 6px 14px; border-radius: 16px; font-size: 12px; border: 1px solid var(--border-color); background: none; cursor: pointer; color: var(--text-secondary); }
+.filter-btn.active { background: var(--bg-primary); border-color: var(--gold); color: var(--gold-dark); }
+.vocab-list-item { background: var(--bg-card); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.15s; }
+.vocab-list-item:hover { background: #EAF4F1; }
+.vli-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.vli-status.mastered { background: var(--gold-dark); }
+.vli-status.learning { background: #6B5B95; }
+.vli-status.new { background: var(--red-deep); }
+.vli-word { font-size: 17px; font-weight: 700; flex: 1; }
+.vli-meaning { font-size: 13px; color: var(--text-secondary); flex: 2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vli-chapter { font-size: 11px; color: var(--text-light); text-align: right; white-space: nowrap; }
+.letter-index { display: flex; gap: 4px; overflow-x: auto; padding: 8px 0 12px; margin-bottom: 4px; }
+.letter-index .li-btn { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-secondary); }
+.letter-index .li-btn.active { background: var(--red-deep); color: #fff; border-color: var(--red-deep); }
+.rank-road { background: linear-gradient(180deg, #0E2A2A 0%, #163C3A 100%); border-radius: 16px; padding: 24px 16px; margin-bottom: 20px; color: #EAF0F1; }
+.rank-road-title { text-align: center; font-size: 16px; font-weight: 600; letter-spacing: 3px; margin-bottom: 20px; color: var(--gold-light); }
+.rank-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.rank-step { width: 62px; text-align: center; cursor: pointer; transition: transform 0.2s; }
+.rank-step:hover { transform: scale(1.08); }
+.rank-step-icon { width: 50px; height: 50px; border-radius: 50%; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 2px solid; background: rgba(255,255,255,0.05); }
+.rank-step.current .rank-step-icon { border-color: var(--gold); background: rgba(201, 169, 110, 0.15); box-shadow: 0 0 16px rgba(201, 169, 110, 0.3); }
+.rank-step.done .rank-step-icon { border-color: var(--gold-dark); background: rgba(201, 169, 110, 0.1); }
+.rank-step.locked .rank-step-icon { border-color: rgba(255,255,255,0.15); opacity: 0.4; }
+.rank-step-name { font-size: 11px; color: rgba(234,240,241,0.7); }
+.rank-step.current .rank-step-name { color: var(--gold-light); font-weight: 600; }
+.rank-step-desc { font-size: 9px; color: rgba(234,240,241,0.4); margin-top: 2px; }
+.toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--bg-dark); color: #fff; padding: 10px 24px; border-radius: 20px; font-size: 14px; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; max-width: 90%; text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.palace-pattern { position: relative; }
+.palace-pattern::before { content: '✦'; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); color: var(--gold); font-size: 12px; }
+::-webkit-scrollbar { width: 4px; } ::webkit-scrollbar-track { background: transparent; } ::webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+/* ===== 沉浸感：点词高亮 / 卷轴渐显 / 突破动效 / 金光粒子 ===== */
+.vocab-word:hover { background: rgba(46,125,107,0.12); border-radius: 3px; box-shadow: 0 0 0 2px rgba(201,169,110,0.45); transition: all 0.15s; }
+.vocab-word.learned:hover { box-shadow: 0 0 0 2px rgba(201,169,110,0.65); }
+.story-block { animation: scrollReveal 0.45s ease both; }
+@keyframes scrollReveal { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform:none; } }
+.story-section-title::after { content:''; display:block; width:64px; height:2px; margin-top:8px; background: linear-gradient(90deg,var(--gold),transparent); }
+.story-chapter-label { animation: labelIn 0.6s ease both; }
+@keyframes labelIn { from { opacity:0; letter-spacing:10px; } to { opacity:1; letter-spacing:2px; } }
+.rank-circle.pulse { animation: rankPulse 1.1s ease; }
+@keyframes rankPulse { 0%{transform:scale(1); box-shadow:0 0 0 0 rgba(201,169,110,0.6);} 40%{transform:scale(1.16); box-shadow:0 0 0 18px rgba(201,169,110,0);} 100%{transform:scale(1); box-shadow:none;} }
+.rank-num.pulse-num { animation: numFlash 1.1s ease; color: var(--gold-dark); }
+@keyframes numFlash { 0%,100%{color:var(--red-deep);} 50%{color:var(--gold-dark); text-shadow:0 0 14px rgba(201,169,110,0.85);} }
+.card-item.just-unlocked { animation: cardGlow 1.6s ease; }
+@keyframes cardGlow { 0%{ transform:scale(0.9); box-shadow:0 0 0 0 rgba(201,169,110,0.85);} 30%{ transform:scale(1.06); box-shadow:0 0 26px 8px rgba(201,169,110,0.7);} 100%{ transform:scale(1); box-shadow:0 2px 12px var(--shadow);} }
+.choice-btn.chosen { animation: choiceFlash 0.7s ease; }
+@keyframes choiceFlash { from{background: rgba(201,169,110,0.55);} to{background: var(--bg-card);} }
+.burst-particle { position: fixed; width:8px; height:8px; border-radius:50%; pointer-events:none; z-index:998; background: radial-gradient(circle, #f6e6bd, #c9a96e); box-shadow:0 0 9px rgba(201,169,110,0.9); }
+@keyframes burstFly { to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity:0; } }
+.screen-flash { position: fixed; inset:0; background: radial-gradient(circle at center, rgba(255,250,235,0.96), rgba(201,169,110,0.4)); z-index: 997; opacity:0; pointer-events:none; }
+.screen-flash.go { animation: flashGo 1.2s ease; }
+@keyframes flashGo { 0%{opacity:0;} 22%{opacity:1;} 100%{opacity:0;} }
+.sound-btn { font-size:18px; }
+
+/* ====== 沉浸感：立绘 / 封面插画 ====== */
+.home-hero { position: relative; width: 100%; height: 158px; border-radius: 16px; overflow: hidden; margin-bottom: 16px; background-size: cover; background-position: center 32%; box-shadow: 0 6px 20px var(--shadow); }
+.home-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(28,22,18,0.82) 4%, rgba(28,22,18,0.18) 55%, rgba(28,22,18,0) 100%); }
+.home-hero .hh-inner { position: absolute; left: 16px; bottom: 14px; right: 16px; z-index: 2; }
+.home-hero .hh-title { font-size: 21px; font-weight: 800; color: #fff5e0; letter-spacing: 3px; text-shadow: 0 2px 10px rgba(0,0,0,0.55); }
+.home-hero .hh-sub { font-size: 12px; color: #e9d7ad; margin-top: 4px; letter-spacing: 1px; }
+
+.reader-cover { position: relative; width: 100%; height: 168px; margin: 0 0 14px; border-radius: 0 0 16px 16px; overflow: hidden; background-size: cover; background-position: center 38%; box-shadow: 0 4px 16px var(--shadow); }
+.reader-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(28,22,18,0.86) 6%, rgba(28,22,18,0.1) 60%, rgba(28,22,18,0) 100%); }
+.reader-cover .rc-title { position: absolute; left: 16px; bottom: 12px; z-index: 2; color: #fff5e0; font-size: 19px; font-weight: 800; letter-spacing: 2px; text-shadow: 0 2px 9px rgba(0,0,0,0.6); }
+.reader-cover .rc-chapter { position: absolute; left: 16px; top: 12px; z-index: 2; color: #e9d7ad; font-size: 12px; letter-spacing: 2px; }
+
+/* 章节列表封面缩略 */
+.chapter-card { position: relative; }
+.chapter-cover-thumb { width: 100%; height: 96px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 2px 8px var(--shadow); display: block; }
+.chapter-card.locked .chapter-cover-thumb { filter: grayscale(0.7) brightness(0.7); }
+
+/* 人物图鉴 */
+.gallery-block { margin-bottom: 18px; }
+.gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+.char-card { position: relative; border-radius: 14px; overflow: hidden; background: var(--bg-card); box-shadow: 0 2px 10px var(--shadow); }
+.char-card img { width: 100%; height: 200px; object-fit: cover; display: block; background: #e8e0d2; }
+.char-card .cc-info { padding: 8px 10px 10px; }
+.char-card .cc-name { font-size: 14px; font-weight: 700; color: var(--text-color); }
+.char-card .cc-role { font-size: 11px; color: var(--gold-dark); margin: 2px 0 4px; }
+.char-card .cc-desc { font-size: 11px; color: var(--text-light); line-height: 1.5; }
+
+
+/* ====== 角色立绘 Live2D 式轻动效 ======
+   真实 Live2D 需要分层绑定的 Cubism 模型；此处用 CSS 变换 + 指针视差
+   模拟「会呼吸、随光标微微转头」的质感。三层分离避免 transform 冲突：
+   .char-tilt  负责指针视差倾斜(JS 注入 --rx/--ry)
+   .char-float 负责 idle 上下漂浮
+   .char-img   负责呼吸缩放
+*/
+.char-card { perspective: 820px; transition: box-shadow .35s ease; }
+.char-card:hover { box-shadow: 0 10px 28px rgba(212,175,107,0.30); }
+.char-tilt {
+  position: relative;
+  transform: rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transform-style: preserve-3d;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1);
+  will-change: transform;
+}
+.char-float { animation: charFloat 6.5s ease-in-out infinite; }
+.char-img {
+  width: 100%; height: 200px; object-fit: cover; display: block; background: #e8e0d2;
+  transform-origin: 50% 62%;
+  animation: charBreathe 4.8s ease-in-out infinite;
+}
+.char-aura {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(125% 85% at 50% 16%, rgba(255,238,186,0.22), rgba(255,238,186,0) 58%);
+  mix-blend-mode: screen;
+  animation: charAura 5.5s ease-in-out infinite;
+}
+@keyframes charFloat  { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-5px); } }
+@keyframes charBreathe{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.035); } }
+@keyframes charAura   { 0%,100%{ opacity:.5; } 50%{ opacity:1; } }
+
+/* 收藏卡立绘轻呼吸（.card-avatar 已 overflow:hidden，缩放不出框） */
+.card-portrait { animation: charBreathe 5.2s ease-in-out infinite; transform-origin: 50% 55%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .char-float, .char-img, .char-aura, .card-portrait { animation: none !important; }
+  .char-tilt { transition: none !important; }
+  .word-hint-pulse { animation: none !important; }
+}
+
+/* ====== 新手引导（首次打开教程） ====== */
+.tutorial-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.tutorial-card { background: var(--bg-page); border-radius: 18px; width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; padding: 24px 20px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+.tc-header { text-align: center; margin-bottom: 16px; }
+.tc-header .tc-title { font-size: 20px; font-weight: 700; color: var(--red-deep); }
+.tc-header .tc-sub { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+.tc-step { display: none; }
+.tc-step.active { display: block; }
+.tc-step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--red-deep); color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.tc-step-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+.tc-step-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 14px; }
+.tc-step-img { background: linear-gradient(135deg, #f8f4ef, #e8e0d5); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 14px; font-size: 32px; }
+.tc-step-tip { background: var(--gold-light); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--gold-dark); line-height: 1.6; }
+.tc-dots { display: flex; justify-content: center; gap: 6px; margin: 16px 0; }
+.tc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-color); transition: all .3s; }
+.tc-dot.active { width: 24px; border-radius: 4px; background: var(--red-deep); }
+.tc-actions { display: flex; gap: 10px; }
+.tc-actions button { flex: 1; }
+
+/* 抉择后下一步引导 */
+.choice-next { margin-top: 12px; padding: 14px 16px; background: linear-gradient(135deg, #FFF9E6, #FFF3D6); border: 1px solid var(--gold); border-radius: 12px; text-align: center; }
+.choice-next .cn-title { font-size: 13px; font-weight: 700; color: var(--gold-dark); margin-bottom: 6px; }
+.choice-next .cn-progress { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+.choice-next .cn-btns { display: flex; gap: 8px; }
+
+/* 红词点击提示 */
+.word-hint-pulse { animation: wordPulse 2.2s ease-in-out infinite; cursor: pointer; position: relative; }
+@keyframes wordPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(180,45,45,.25); }
+  50% { box-shadow: 0 0 0 4px rgba(180,45,45,0); }
+}
+
+/* 阅读页底部进度 */
+.reader-footer { padding: 16px; background: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 8px; }
+.rf-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.rf-bar { height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+.rf-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--red-deep), var(--red-bright)); transition: width .4s ease; }
+.rf-text { font-size: 11px; color: var(--text-light); margin-top: 4px; text-align: right; }
+
+/* ====== 仙途关卡地图 ====== */
+.xt-map { position: relative; padding: 8px 0 12px; }
+.xt-map-path { position: absolute; left: 28px; top: 28px; bottom: 28px; width: 4px; background: linear-gradient(180deg, var(--gold), rgba(180,45,45,.4)); border-radius: 2px; }
+.xt-node { position: relative; display: flex; align-items: center; gap: 14px; margin: 14px 0; padding-left: 52px; }
+.xt-dot { position: absolute; left: 18px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-color); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-light); z-index: 2; transition: all .3s; }
+.xt-node.done .xt-dot { background: var(--red-deep); border-color: var(--gold); color: #fff; }
+.xt-node.current .xt-dot { background: var(--gold); border-color: var(--red-deep); color: #fff; animation: nodePulse 1.4s ease-in-out infinite; }
+.xt-node.locked .xt-dot { background: #e5e5e5; color: #aaa; }
+.xt-card-box { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px; cursor: pointer; transition: all .2s; }
+.xt-node.done .xt-card-box { border-color: var(--red-deep); }
+.xt-node.current .xt-card-box { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212,175,55,.25); }
+.xt-node.locked .xt-card-box { opacity: .55; cursor: default; }
+.xt-card-box .xt-ch { font-size: 13px; font-weight: 700; color: var(--red-deep); }
+.xt-card-box .xt-tt { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 2px 0; }
+.xt-card-box .xt-ds { font-size: 11px; color: var(--text-light); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xt-card-box .xt-lock { font-size: 11px; color: var(--text-light); }
+@keyframes nodePulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(212,175,55,.4); } 50%{ box-shadow: 0 0 0 6px rgba(212,175,55,0); } }
+
+/* ====== 剧情场景插画（阅读页背景） ====== */
+.story-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: .14; filter: blur(3px) saturate(1.1); pointer-events: none; z-index: 0; transition: background-image .5s ease; }
+.story-content, .story-block { position: relative; z-index: 1; }
+.story-scene-divider { text-align: center; margin: 18px 0 6px; color: var(--gold-dark); font-size: 12px; letter-spacing: 4px; opacity: .8; }
+.story-scene-divider::before, .story-scene-divider::after { content: '❖'; margin: 0 8px; }
+
+/* ====== 互动探索点 ====== */
+.explore-btn { display: inline-flex; align-items: center; gap: 6px; margin: 16px auto; padding: 10px 18px; border-radius: 20px; border: 1px dashed var(--gold); background: rgba(212,175,55,.1); color: var(--gold-dark); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
+.explore-btn:hover { background: rgba(212,175,55,.2); transform: translateY(-1px); }
+.explore-modal { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.em-card { background: var(--bg-page); border-radius: 16px; width: 100%; max-width: 360px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.4); text-align: center; }
+.em-flavor { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
+.em-word { font-size: 26px; font-weight: 700; color: var(--red-deep); margin-bottom: 4px; }
+.em-phonetic { font-size: 13px; color: var(--text-light); font-style: italic; margin-bottom: 14px; }
+.em-q { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+.em-opts { display: flex; flex-direction: column; gap: 8px; }
+.em-opts button { padding: 11px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 14px; cursor: pointer; transition: all .2s; }
+.em-opts button:hover { border-color: var(--red-deep); }
+.em-opts button.correct { background: #d6f0d6; border-color: #2e9e57; }
+.em-opts button.wrong { background: #f6d6d6; border-color: #c0392b; }
+.em-reward { margin-top: 12px; font-size: 12px; color: var(--gold-dark); }
+
+/* ====== 战斗场景画面 ====== */
+.battle-scene { position: relative; min-height: 280px; border-radius: 14px; overflow: hidden; background-size: cover; background-position: center; margin-bottom: 12px; border: 1px solid rgba(212,175,55,.35); }
+.battle-scene::after { content:''; position:absolute; inset:0; background: linear-gradient(180deg, rgba(20,10,20,.3), rgba(10,10,25,.65)); }
+.bs-enemy { position: absolute; top: 14px; right: 14px; left: 14px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
+.bs-enemy-sigil { width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle, rgba(255,90,90,.9), rgba(120,20,20,.4) 60%, rgba(0,0,0,0) 72%); box-shadow: 0 0 30px rgba(255,80,80,.5); animation: enemyFloat 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.bs-enemy-name { margin-top: 8px; font-size: 13px; font-weight: 700; color: #ffd9d9; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.bs-player { position: absolute; bottom: 14px; left: 14px; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+.bs-player-avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; border: 2px solid var(--gold); box-shadow: 0 0 14px rgba(212,175,55,.5); }
+.bs-player-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.bs-player-name { margin-top: 4px; font-size: 11px; color: #ffe9b8; text-shadow: 0 1px 3px rgba( 0,0,0,.6); }
+.bs-slash { position: absolute; height: 3px; background: linear-gradient(90deg, rgba(255,255,255,0), #fff, rgba(255,255,255,0)); border-radius: 3px; z-index: 3; pointer-events: none; opacity: 0; }
+.bs-fx { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: visible; }
+@keyframes enemyFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
+.bs-particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #ffe9b8; box-shadow: 0 0 8px #ffd84d; z-index: 3; pointer-events: none; }
+
+/* ====== 战斗化试炼（Boss 战） ====== */
+.battle-hud { position: relative; padding: 10px 12px 12px; margin-bottom: 12px; background: linear-gradient(160deg, rgba(70,22,22,.55), rgba(30,30,45,.55)); border: 1px solid rgba(212,175,107,.35); border-radius: 14px; }
+.bh-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.bh-name { font-size: 12px; font-weight: 700; color: #ffe9b8; min-width: 84px; }
+.bh-bar { flex: 1; height: 12px; background: rgba(0,0,0,.35); border-radius: 8px; overflow: hidden; }
+.bh-fill { height: 100%; border-radius: 8px; transition: width .35s ease; }
+.bh-fill.enemy { background: linear-gradient(90deg, #ff6b6b, #c0392b); }
+.bh-fill.player { background: linear-gradient(90deg, #5ad27e, #2e9e57); }
+.bh-hp { font-size: 11px; color: #ffe9b8; min-width: 46px; text-align: right; }
+.bh-combo { text-align: center; font-size: 15px; font-weight: 800; color: #ffd66b; letter-spacing: 1px; height: 20px; text-shadow: 0 1px 6px rgba(255,180,60,.6); }
+.dmg-float { position: absolute; left: 50%; top: 6px; transform: translateX(-50%); font-size: 22px; font-weight: 800; pointer-events: none; animation: dmgFloat .9s ease-out forwards; }
+.dmg-float.dmg-enemy { color: #ff7b7b; text-shadow: 0 1px 8px rgba(255,60,60,.7); }
+.dmg-float.dmg-player { color: #ffd66b; text-shadow: 0 1px 8px rgba(255,200,60,.7); }
+@keyframes dmgFloat { 0% { opacity: 0; transform: translate(-50%,6px) scale(.7); } 25% { opacity: 1; transform: translate(-50%,-6px) scale(1.15); } 100% { opacity: 0; transform: translate(-50%,-30px) scale(1); } }
+.bh-shake { animation: bhShake .3s; }
+@keyframes bhShake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+/* 道之试炼（抉择前考词） */
+.choice-trial { margin-top: 14px; padding: 14px; background: rgba(40,30,20,.35); border: 1px solid rgba(212,175,107,.3); border-radius: 14px; }
+.trial-word { font-size: 22px; font-weight: 800; color: #fff5e0; text-align: center; margin: 6px 0; }
+.trial-q { text-align: center; font-size: 13px; color: #e9d7ad; margin: 8px 0 10px; }
+.trial-opt { margin-bottom: 8px; }
+
+/* 章节封印 */
+.ch-lock-note { margin-top: 8px; font-size: 12px; color: #ffb4a0; background: rgba(120,30,20,.25); border: 1px dashed rgba(255,120,90,.4); border-radius: 10px; padding: 8px 10px; line-height: 1.6; }
+.ch-lock-note b { color: #ffd0b0; }
+
+/* 境界突破全屏特效 */
+.breakthrough { position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 45%, rgba(30,18,55,.5), rgba(0,0,0,.94)); opacity: 0; transition: opacity .4s ease; pointer-events: none; overflow: hidden; }
+.breakthrough.go { opacity: 1; }
+.bt-ring { position: absolute; top: 45%; left: 50%; width: 62vmin; height: 62vmin; margin: -31vmin 0 0 -31vmin; border-radius: 50%; border: 2px solid rgba(212,175,55,.5); box-shadow: 0 0 70px rgba(212,175,55,.45), inset 0 0 50px rgba(212,175,55,.25); animation: btRing 2.4s ease-out forwards; }
+.bt-ring2 { position: absolute; top: 45%; left: 50%; width: 80vmin; height: 80vmin; margin: -40vmin 0 0 -40vmin; border-radius: 50%; border: 1px solid rgba(255,220,130,.3); animation: btRing 2.4s .25s ease-out forwards; }
+@keyframes btRing { 0%{transform:scale(.2);opacity:0} 18%{opacity:.9} 100%{transform:scale(1.7);opacity:0} }
+.bt-particles { position: absolute; inset: 0; overflow: hidden; }
+.bt-p { position: absolute; bottom: 28%; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle,#fff,#ffd700 70%); box-shadow: 0 0 9px #ffd700; animation: btRise 2.2s ease-out forwards; }
+@keyframes btRise { 0%{transform:translate(0,0) scale(1);opacity:0} 12%{opacity:1} 100%{transform:translate(var(--dx),-72vh) scale(.25);opacity:0} }
+.bt-title { position: relative; color: var(--gold); font-size: 13px; letter-spacing: 7px; margin-bottom: 10px; text-shadow: 0 0 18px rgba(212,175,55,.85); opacity: 0; animation: btFade .5s .2s forwards; }
+.bt-rank { position: relative; color: #fff; font-size: 13vw; font-weight: 800; text-shadow: 0 0 28px rgba(255,215,120,.95), 0 0 64px rgba(212,175,55,.6); opacity: 0; animation: btPop .8s .35s cubic-bezier(.2,1.4,.3,1) forwards; }
+.bt-sub { position: relative; color: rgba(234,240,241,.86); font-size: 14px; margin-top: 14px; opacity: 0; animation: btFade .6s .9s forwards; }
+@keyframes btPop { 0%{transform:scale(.3);opacity:0} 60%{transform:scale(1.16);opacity:1} 100%{transform:scale(1);opacity:1} }
+@keyframes btFade { to{opacity:1} }
+
+/* 探索奖励掉落 */
+.em-reward-drop { display: inline-block; margin-top: 6px; padding: 5px 10px; border-radius: 10px; background: rgba(212,175,55,.16); border: 1px solid rgba(212,175,55,.45); color: var(--gold-dark); font-size: 12px; font-weight: 600; animation: emDrop .5s ease both; }
+@keyframes emDrop { 0%{transform:translateY(-8px) scale(.8);opacity:0} 100%{transform:translateY(0) scale(1);opacity:1} }
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-ring, .bt-ring2, .bt-p { animation: none !important; }
+  .em-reward-drop { animation: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="app-container">
+
+<div class="top-bar">
+  <button class="menu-btn" onclick="showToast('藏经阁开发中')">☰</button>
+  <div style="text-align:center"><h1>仙途十二阶</h1><div class="subtitle">凡女逆袭 · 5491词修仙录</div></div>
+  <button class="menu-btn sound-btn" id="sound-btn" onclick="toggleSfx()" title="音效开关">🔊</button>
+  <button class="menu-btn" id="guide-btn" onclick="localStorage.removeItem('xt12_tutorial_seen');location.reload()" title="查看入门指引" style="font-size:16px">❓</button>
+</div>
+
+<div id="page-home" class="page active">
+  <div class="home-hero" style="background-image:url('assets/covers/ch01.png')">
+    <div class="hh-inner">
+      <div class="hh-title">仙途十二阶</div>
+      <div class="hh-sub">凡尘弱女 · 逆袭飞升 · 以词证道</div>
+    </div>
+  </div>
+  <div class="progress-overview palace-pattern">
+    <div class="section-header" style="margin-bottom:12px"><h2>我的道行</h2></div>
+    <div class="progress-stats">
+      <div class="stat-item"><div class="stat-num" id="stat-learned">0</div><div class="stat-label">已学词</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-total">5491</div><div class="stat-label">总词汇</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-cards">0/30</div><div class="stat-label">收藏卡</div></div>
+      <div class="stat-item"><div class="stat-num" id="stat-review">0</div><div class="stat-label">待温养</div></div>
+    </div>
+    <div class="rank-circle-container">
+      <div class="rank-circle"><div class="rank-num" id="current-rank-num">1</div><div class="rank-total">/12</div></div>
+      <div class="rank-info"><div class="rank-title" id="current-rank-name">凡人</div><div class="rank-next" id="next-rank-text">下一境界：练气（还需 40 词）</div></div>
+    </div>
+    <div class="mini-stats">
+      <div class="mini-stat mastered"><div class="ms-label">已悟</div><div class="ms-num" id="ms-mastered">0</div></div>
+      <div class="mini-stat review"><div class="ms-label">待温养</div><div class="ms-num" id="ms-review">0</div></div>
+      <div class="mini-stat remaining"><div class="ms-label">未习得</div><div class="ms-num" id="ms-remaining">5491</div></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:16px">
+    <button class="btn btn-primary" style="flex:1" onclick="openShareModal()">📜 分享我的仙途</button>
+    <button class="btn btn-outline" style="flex:1" onclick="switchTab('quiz')">🔄 温养（<span id="home-due">0</span>）</button>
+  </div>
+  <div class="save-sync">
+    <div class="section-header" style="margin-bottom:8px"><h2>云端续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备同步</span></div>
+    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度默认存于本机。接上 JSONBin 云端后，本地版与网页版自动互通，换设备也不丢进度。</p>
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="exportSave()">⬇️ 导出存档</button>
+      <button class="btn btn-outline" style="flex:1" onclick="document.getElementById('save-file').click()">⬆️ 导入存档</button>
+    </div>
+    <input type="file" id="save-file" accept="application/json,.json" style="display:none" onchange="importSave(this)">
+    <div class="cloud-box">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">☁️ 云端自动同步（JSONBin）</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input type="text" id="cloud-key" placeholder="粘贴 JSONBin API Key（X-Master-Key）" autocomplete="off" style="flex:1;min-width:0;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text-primary)">
+        <button class="btn btn-outline" style="white-space:nowrap" onclick="cloudConnect()">🔗 连接</button>
+      </div>
+      <div id="cloud-status" style="font-size:11px;color:var(--text-light);line-height:1.6">未连接 · 填入 API Key 后点「连接」，首次会自动创建云端存档</div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-outline" style="flex:1" onclick="cloudPush(true)">☁️ 上传进度</button>
+        <button class="btn btn-outline" style="flex:1" onclick="cloudPull(true)">☁️ 拉取进度</button>
+      </div>
+    </div>
+  </div>
+  <div class="chapter-list">
+    <div class="section-header"><h2>修行履历</h2><span class="view-all" id="home-cards-link" onclick="switchTab('cards')">藏录 3/30</span></div>
+    <div id="chapter-list-container"></div>
+  </div>
+  <div class="feature-highlights">
+    <div class="feature-item"><div class="fi-icon">📖</div><div class="fi-title">剧情悟词</div><div class="fi-desc">仙途历险，记得更牢</div></div>
+    <div class="feature-item"><div class="fi-icon">🔄</div><div class="fi-title">词库全本</div><div class="fi-desc">5491 考研词，A-Z 检索</div></div>
+    <div class="feature-item"><div class="fi-icon">💎</div><div class="fi-title">道心相印</div><div class="fi-desc">你即主角，更有动力</div></div>
+    <div class="feature-item"><div class="fi-icon">🎮</div><div class="fi-title">抉择机缘</div><div class="fi-desc">每段剧情由你定</div></div>
+  </div>
+</div>
+
+<div id="page-read" class="page reader-page">
+  <div class="reader-nav">
+    <button class="back-btn" onclick="switchTab('home')">‹</button>
+    <div class="reader-title" id="reader-title">第一章 · 杂役入宗</div>
+    <div class="reader-progress" id="reader-progress">0/123</div>
+  </div>
+  <div class="reader-cover" id="reader-cover" style="background-image:url('assets/covers/ch01.png')">
+    <div class="rc-chapter" id="reader-cover-chapter">第一章</div>
+    <div class="rc-title" id="reader-cover-title">杂役入宗</div>
+  </div>
+  <div class="story-section-num" id="story-sections"></div>
+  <div class="story-content" id="story-content"></div>
+</div>
+
+<div id="page-quiz" class="page quiz-container">
+  <div id="quiz-menu" style="padding-top:8px">
+    <div style="text-align:center;padding:8px 0 4px"><h2 style="font-size:20px">◇ 试词 · 温养 ◇</h2><p style="font-size:13px;color:var(--text-light);margin-top:4px">随机闯关，或按遗忘曲线温养旧词</p></div>
+    <button class="btn btn-primary" style="width:100%;margin-bottom:12px" onclick="startQuiz()">⚔️ 随机试词（20 词）</button>
+    <button class="btn btn-red" style="width:100%;margin-bottom:12px" onclick="startReviewMode()">🔄 今日温养（<span id="menu-due">0</span> 词待复习）</button>
+    <div style="background:var(--bg-card);border-radius:12px;padding:14px;font-size:12px;color:var(--text-secondary);line-height:1.85">
+      📜 <b>艾宾浩斯温养</b>：悟透之词会按 <b>1→2→4→7→15→30→60</b> 天的节奏安排复习。答对则记忆加深、间隔拉长；答错则重置回首日。忘得越勤，练得越牢。
+    </div>
+  </div>
+  <div id="quiz-play-area" style="display:none">
+    <div class="quiz-header">
+      <div class="qq-type" id="quiz-type-label">试词过关</div>
+      <div class="quiz-score-display" id="quiz-score">0</div>
+      <div class="quiz-score-total">/<span id="quiz-total">20</span></div>
+    </div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-pf" style="width:0%"></div></div>
+    <div class="quiz-question-area" id="quiz-question-area"></div>
+    <div class="quiz-options" id="quiz-options-area"></div>
+  </div>
+</div>
+
+<div id="page-cards" class="page">
+  <div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">◇ 我的藏录 ◇</h2><p style="font-size:13px;color:var(--text-light)">词入仙册，道缘有凭</p></div>
+  <div class="gallery-block">
+    <div class="section-header"><h2>人物图鉴</h2><span class="view-all" onclick="showToast('收集藏录卡可解锁更多人物')">立绘 · 6</span></div>
+    <div class="gallery-grid" id="char-gallery"></div>
+  </div>
+  <div class="collection-tabs" id="collection-tabs">
+    <button class="col-tab active" data-tab="all">全部</button>
+    <button class="col-tab" data-tab="character">修士</button>
+    <button class="col-tab" data-tab="location">宗门秘境</button>
+    <button class="col-tab" data-tab="item">法宝</button>
+    <button class="col-tab" data-tab="event">奇遇</button>
+    <button class="col-tab" data-tab="skill">功法</button>
+  </div>
+  <div class="collection-count" id="collection-count">已收集：3/30</div>
+  <div class="cards-grid" id="cards-grid"></div>
+</div>
+
+<div id="page-vocab" class="page">
+  <div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">◇ 悟道册 ◇</h2><p style="font-size:13px;color:var(--text-light)" id="vocab-total-text">已收录 5491 词</p></div>
+  <div class="search-box"><span style="color:var(--text-light);margin-right:8px">🔍</span><input type="text" placeholder="搜索英文或中文释义" id="vocab-search" oninput="renderVocabList()"></div>
+  <div class="letter-index" id="letter-index"></div>
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter="all" onclick="setVocabFilter(this,'all')">全部</button>
+    <button class="filter-btn" data-filter="mastered" onclick="setVocabFilter(this,'mastered')">已悟</button>
+    <button class="filter-btn" data-filter="learning" onclick="setVocabFilter(this,'learning')">温养中</button>
+    <button class="filter-btn" data-filter="new" onclick="setVocabFilter(this,'new')">未习得</button>
+  </div>
+  <div id="vocab-list-container"></div>
+</div>
+
+<div id="page-rank" class="page">
+  <div class="rank-road">
+    <div class="rank-road-title">✦ 仙途地图 · 十二章 ✦</div>
+    <div class="xt-map" id="xt-map-container"></div>
+    <div class="rank-road-title" style="margin-top:20px">✦ 修仙十二境界 ✦</div>
+    <div class="rank-steps" id="rank-steps-container"></div>
+    <p style="text-align:center;font-size:12px;color:rgba(234,240,241,0.5);margin-top:16px">非是诸词皆须死记！精选 5491 个考研核心词，化入仙途，反复历劫，根基更牢！</p>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
+  <button class="tab-item" data-tab="read" onclick="switchTab('read')"><span class="tab-icon">📜</span><span class="tab-label">卷</span></button>
+  <button class="tab-item" data-tab="cards" onclick="switchTab('cards')"><span class="tab-icon">🃏</span><span class="tab-label">藏</span></button>
+  <button class="tab-item" data-tab="vocab" onclick="switchTab('vocab')"><span class="tab-icon">📿</span><span class="tab-label">词</span></button>
+  <button class="tab-item" data-tab="rank" onclick="switchTab('rank')"><span class="tab-label">阶</span><span class="tab-icon">☯️</span></button>
+</div>
+
+<div class="word-modal-overlay" id="word-modal"><div class="word-modal"><div class="word-modal-handle"></div><div id="word-modal-content"></div></div></div>
+<div class="word-modal-overlay" id="share-modal"><div class="word-modal"><div class="word-modal-handle"></div><div id="share-content"></div></div></div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script src="vocab.js"></script>
+<script>
+// ============================================================ DATA
+const RANKS = [
+  { name:'凡人', icon:'🧒', desc:'灵根未显，初入宗门' },
+  { name:'练气', icon:'🌬️', desc:'引气入体，初窥门径' },
+  { name:'筑基', icon:'🏗️', desc:'根基稳固，脱胎换骨' },
+  { name:'开光', icon:'✨', desc:'神识初开，灵台清明' },
+  { name:'金丹', icon:'🔮', desc:'丹田结丹，寿元大增' },
+  { name:'元婴', icon:'👶', desc:'元神出窍，生死蜕变' },
+  { name:'化神', icon:'🌟', desc:'神魂凝实，纵横一方' },
+  { name:'炼虚', icon:'🌫️', desc:'虚空炼体，超凡入圣' },
+  { name:'合体', icon:'🔗', desc:'身魂合一，通天彻地' },
+  { name:'大乘', icon:'🏔️', desc:'道法圆满，只待飞升' },
+  { name:'渡劫', icon:'⚡', desc:'历经天劫，九死一生' },
+  { name:'飞升', icon:'🌌', desc:'羽化登仙，超脱凡尘' },
+];
+// 十二境界：按「已学词数」累计晋级（覆盖 5491 全词库）
+const RANK_THRESHOLDS = [0, 40, 120, 250, 450, 700, 1000, 1500, 2200, 3000, 4000, 5491];
+
+const CHAPTERS = [
+  { id:1, title:'杂役入宗', desc:'测灵石上，她被判定最劣等的杂灵根。当众受辱那刻，一枚古玉坠入掌心……' },
+  { id:2, title:'灵根觉醒', desc:'后山密室里苏醒的一缕残魂，揭开了她被篡改的命数。测灵大会，惊变将至。' },
+  { id:3, title:'宗门大比', desc:'天之骄女柳如烟下毒算计，擂台之上，她一招雪耻——却也惊动了不该惊动的人。' },
+  { id:4, title:'幻月洞天', desc:'幻月深处守着镇魂之宝，伴生灵兽破壳，而洞口，正被人悄然封死。' },
+  { id:5, title:'生死劫', desc:'绝境悟生死道，灵气倒灌冲破桎梏。可宗门已因她获罪，长老重伤。' },
+  { id:6, title:'渡劫飞升', desc:'九重雷劫加身，弑神者血脉觉醒。她扶摇直上，命运却早已被上界写就。' },
+  { id:7, title:'上界初临', desc:'飞升落地，她才知上界并非乐土。一道敕令，点破了她弑神者的身份。' },
+  { id:8, title:'宗门浩劫', desc:'柳家引来上界靠山，青云宗倾覆在即。她于千里之外，转身驰援。' },
+  { id:9, title:'上尊拜师', desc:'曾居高临下的上界使者，竟跪伏求她收徒。这一局，反客为主。' },
+  { id:10, title:'绝境顿悟', desc:'上界试炼中，她于生死边缘参透大道，修为暴涨三重。' },
+  { id:11, title:'上界天劫', desc:'上界以九霄天劫考校，她再历雷火，剑指更高之境。' },
+  { id:12, title:'云上棋局', desc:'飞升之上，她看清自己原是棋子。这一局，她要翻盘执棋。' },
+];
+// 章节试炼通关后解锁的藏录卡
+const CHAPTER_QUIZ_CARD = { 1:10, 2:16, 3:11, 4:12, 5:17, 6:18, 7:19, 8:20, 9:21, 10:22, 11:23, 12:24 };
+
+// 剧情词（60 个）—— 提供「仙途语境义 / 例句 / 收藏卡归属」；真实音标释义优先取自 vocab.js
+const STORY_WORDS = [
+  { word:'timid', phonetic:'/ˈtɪmɪd/', meaning:'胆小的；羞怯的', contextMeaning:'胆怯', difficulty:2, example:'The timid disciple lowered her eyes.', exampleTrans:'胆怯的弟子垂下了眼。', storyContext:'苏渺性子 timid，受辱时只敢低头。', chapter:1, collectionType:'character', collectionName:'苏渺' },
+  { word:'quiet', phonetic:'/ˈkwaɪət/', meaning:'安静的；平静的', contextMeaning:'安静', difficulty:1, example:'The quiet of the night.', exampleTrans:'夜的安静。', storyContext:'她只愿在 quiet 的柴房里默念心法。', chapter:1 },
+  { word:'companion', phonetic:'/kəmˈpæniən/', meaning:'同伴；伙伴', contextMeaning:'同伴', difficulty:2, example:'A loyal companion.', exampleTrans:'一位忠诚的同伴。', storyContext:'唯有灵兽雪团是她不离不弃的 companion。', chapter:1, collectionType:'character', collectionName:'雪团' },
+  { word:'feeble', phonetic:'/ˈfiːbl/', meaning:'虚弱的；无力的', contextMeaning:'虚弱', difficulty:3, example:'Her feeble spiritual root.', exampleTrans:'她虚弱的灵根。', storyContext:'测灵石判她 feeble 杂灵根，众人嗤笑。', chapter:1 },
+  { word:'pressure', phonetic:'/ˈpreʃər/', meaning:'压力；压迫', contextMeaning:'压力', difficulty:2, example:'Under great pressure.', exampleTrans:'在巨大压力下。', storyContext:'同门的白眼让她承受巨大 pressure。', chapter:1 },
+  { word:'hope', phonetic:'/hoʊp/', meaning:'希望；期望', contextMeaning:'希望', difficulty:1, example:'A flicker of hope.', exampleTrans:'一丝希望。', storyContext:'只要活着，便有 hope 飞升那一天。', chapter:1 },
+  { word:'gloomy', phonetic:'/ˈɡluːmi/', meaning:'阴沉的；阴暗的', contextMeaning:'阴沉', difficulty:3, example:'A gloomy dungeon.', exampleTrans:'阴沉的地牢。', storyContext:'后山灵脉 gloomy，终年不见天日。', chapter:1 },
+  { word:'damp', phonetic:'/dæmp/', meaning:'潮湿的', contextMeaning:'潮湿', difficulty:2, example:'The damp cave.', exampleTrans:'潮湿的洞窟。', storyContext:'柴房 damp 阴冷，她却甘之如饴。', chapter:1 },
+  { word:'cold', phonetic:'/koʊld/', meaning:'冷的；寒冷的', contextMeaning:'冷', difficulty:1, example:'The cold wind.', exampleTrans:'冷风。', storyContext:'深夜修炼，山风 cold 彻骨。', chapter:1 },
+  { word:'narrow', phonetic:'/ˈnæroʊ/', meaning:'狭窄的', contextMeaning:'狭窄', difficulty:2, example:'A narrow path.', exampleTrans:'狭窄的小径。', storyContext:'她每日走那条 narrow 的采药小径。', chapter:1 },
+  { word:'courtyard', phonetic:'/ˈkɔːrtjɑːrd/', meaning:'庭院；院子', contextMeaning:'庭院', difficulty:2, example:'The training courtyard.', exampleTrans:'演武庭院。', storyContext:'晨课在青云宗的 central courtyard 举行。', chapter:1, collectionType:'location', collectionName:'青云宗' },
+  { word:'chamber', phonetic:'/ˈtʃeɪmbər/', meaning:'室；密室', contextMeaning:'密室', difficulty:2, example:'A hidden chamber.', exampleTrans:'一处隐秘密室。', storyContext:'采药时她误入一处 hidden chamber。', chapter:1, collectionType:'location', collectionName:'残魂密室' },
+  { word:'wretched', phonetic:'/ˈretʃɪd/', meaning:'可怜的；悲惨的', contextMeaning:'可怜', difficulty:4, example:'A wretched menial.', exampleTrans:'可怜的杂役。', storyContext:'曾几何时，她过着 wretched 的杂役生涯。', chapter:1 },
+  { word:'meticulous', phonetic:'/məˈtɪkjələs/', meaning:'一丝不苟的；细致的', contextMeaning:'细致', difficulty:4, example:'Meticulous in herb care.', exampleTrans:'照料灵草一丝不苟。', storyContext:'她浇灌灵草极为 meticulous，暗藏玄机。', chapter:2, collectionType:'item', collectionName:'清灵草' },
+  { word:'stern', phonetic:'/stɜːrn/', meaning:'严厉的；严峻的', contextMeaning:'严厉', difficulty:3, example:'The stern elder.', exampleTrans:'严厉的长老。', storyContext:'玄清子长老目光 stern，令人生畏。', chapter:2, collectionType:'character', collectionName:'玄清子' },
+  { word:'subtle', phonetic:'/ˈsʌtl/', meaning:'微妙的；精细的', contextMeaning:'微妙', difficulty:3, example:'A subtle qi shift.', exampleTrans:'灵气的微妙异动。', storyContext:'她察觉灵气中 subtle 的异动。', chapter:2 },
+  { word:'assess', phonetic:'/əˈses/', meaning:'评估；评定', contextMeaning:'评估', difficulty:3, example:'Assess one\'s root.', exampleTrans:'评估灵根。', storyContext:'长老欲 assess 她的真实禀赋。', chapter:2 },
+  { word:'anticipate', phonetic:'/ænˈtɪsɪpeɪt/', meaning:'预期；预料', contextMeaning:'预料', difficulty:3, example:'Anticipate the trap.', exampleTrans:'预料陷阱。', storyContext:'她已 anticipate 了柳如烟的算计。', chapter:2 },
+  { word:'apparent', phonetic:'/əˈpærənt/', meaning:'明显的；显然的', contextMeaning:'明显', difficulty:2, example:'An apparent anomaly.', exampleTrans:'明显的异象。', storyContext:'测灵石亮起刹那，异象 apparent。', chapter:2 },
+  { word:'adequate', phonetic:'/ˈædɪkwət/', meaning:'足够的；胜任的', contextMeaning:'足够', difficulty:3, example:'Adequate foundation.', exampleTrans:'足够的基础。', storyContext:'她根基尚不 adequate，需勤补。', chapter:2 },
+  { word:'admire', phonetic:'/ədˈmaɪər/', meaning:'钦佩；欣赏', contextMeaning:'钦佩', difficulty:2, example:'I admire her grit.', exampleTrans:'我钦佩她的韧劲。', storyContext:'连柳如烟也暗自 admire 她的坚韧。', chapter:2 },
+  { word:'ambitious', phonetic:'/æmˈbɪʃəs/', meaning:'有雄心的', contextMeaning:'野心', difficulty:3, example:'An ambitious goal.', exampleTrans:'宏大的目标。', storyContext:'她 ambitious 之志，直指飞升。', chapter:2 },
+  { word:'intrigue', phonetic:'/ɪnˈtriːɡ/', meaning:'阴谋；诡计', contextMeaning:'阴谋', difficulty:4, example:'Court intrigue.', exampleTrans:'宗门阴谋。', storyContext:'大比之前，各峰 intrigue 四起。', chapter:3 },
+  { word:'conspire', phonetic:'/kənˈspaɪər/', meaning:'密谋；共谋', contextMeaning:'密谋', difficulty:4, example:'They conspired against her.', exampleTrans:'他们密谋对付她。', storyContext:'柳如烟 conspire 下毒，欲废她修为。', chapter:3 },
+  { word:'manipulate', phonetic:'/məˈnɪpjuleɪt/', meaning:'操纵；控制', contextMeaning:'操纵', difficulty:4, example:'Manipulate the array.', exampleTrans:'操纵阵法。', storyContext:'有人试图 manipulate 试炼阵法。', chapter:3 },
+  { word:'resent', phonetic:'/rɪˈzent/', meaning:'怨恨；愤恨', contextMeaning:'怨恨', difficulty:3, example:'They resented her rise.', exampleTrans:'他们怨恨她的崛起。', storyContext:'败者 resent 她一夜成名。', chapter:3 },
+  { word:'envy', phonetic:'/ˈenvi/', meaning:'嫉妒；羡慕', contextMeaning:'嫉妒', difficulty:2, example:'Envy clouded them.', exampleTrans:'嫉妒蒙蔽了他们。', storyContext:'同门之 envy，比妖兽更危险。', chapter:3 },
+  { word:'betray', phonetic:'/bɪˈtreɪ/', meaning:'背叛；出卖', contextMeaning:'背叛', difficulty:3, example:'He betrayed the sect.', exampleTrans:'他背叛了宗门。', storyContext:'最怕被师兄 betray。', chapter:3 },
+  { word:'suspect', phonetic:'/səˈspekt/', meaning:'怀疑；猜疑', contextMeaning:'怀疑', difficulty:2, example:'I suspect a spy.', exampleTrans:'我怀疑有内奸。', storyContext:'她开始 suspect 柳家图谋。', chapter:3 },
+  { word:'treacherous', phonetic:'/ˈretʃərəs/', meaning:'背叛的；奸诈的', contextMeaning:'奸诈', difficulty:4, example:'A treacherous foe.', exampleTrans:'奸诈的对手。', storyContext:' treacherous 的柳如烟最难防。', chapter:3 },
+  { word:'arbitrary', phonetic:'/ˈɑːrbɪtreri/', meaning:'任意的；武断的', contextMeaning:'武断', difficulty:4, example:'An arbitrary ruling.', exampleTrans:'武断的裁决。', storyContext:'裁判 arbitrary 判罚，暗藏偏袒。', chapter:3 },
+  { word:'ambiguous', phonetic:'/æmˈbɪɡjuəs/', meaning:'模棱两可的；含糊的', contextMeaning:'含糊', difficulty:4, example:'An ambiguous verse.', exampleTrans:'含糊的偈语。', storyContext:'古籍中 ambiguous 的偈语，暗藏天机。', chapter:3 },
+  { word:'eloquent', phonetic:'/ˈeləkwənt/', meaning:'雄辩的；有说服力的', contextMeaning:'雄辩', difficulty:4, example:'An eloquent defense.', exampleTrans:'一番雄辩的辩护。', storyContext:'她 eloquent 陈词，当众揭穿阴谋。', chapter:3 },
+  { word:'dignity', phonetic:'/ˈdɪɡnəti/', meaning:'尊严；高贵', contextMeaning:'尊严', difficulty:3, example:'She kept her dignity.', exampleTrans:'她守住了尊严。', storyContext:'纵为杂役，亦不失 dignity。', chapter:4 },
+  { word:'cunning', phonetic:'/ˈkʌnɪŋ/', meaning:'狡猾的；机巧的', contextMeaning:'机巧', difficulty:3, example:'A cunning trap.', exampleTrans:'机巧的陷阱。', storyContext:'她以 cunning 之计破上古阵。', chapter:4 },
+  { word:'prosper', phonetic:'/ˈprɒspər/', meaning:'繁荣；兴旺', contextMeaning:'兴旺', difficulty:3, example:'May the sect prosper.', exampleTrans:'愿宗门兴旺。', storyContext:'愿青云宗 prosper 万年。', chapter:4 },
+  { word:'fragile', phonetic:'/ˈfrædʒaɪl/', meaning:'脆弱的；易碎的', contextMeaning:'脆弱', difficulty:3, example:'A fragile beast egg.', exampleTrans:'一枚脆弱的灵兽蛋。', storyContext:'她护住那 fragile 的灵兽蛋。', chapter:4, collectionType:'character', collectionName:'雪团' },
+  { word:'relentless', phonetic:'/rɪˈlentləs/', meaning:'不懈的；不间断的', contextMeaning:'不懈', difficulty:4, example:'Relentless training.', exampleTrans:'不懈的苦修。', storyContext:'她 relentless 苦修，不曾懈怠。', chapter:4 },
+  { word:'profound', phonetic:'/prəˈfaʊnd/', meaning:'深刻的；深远的', contextMeaning:'深奥', difficulty:3, example:'A profound insight.', exampleTrans:'一次深奥的领悟。', storyContext:'秘境中她得 profound 之悟。', chapter:4 },
+  { word:'hesitate', phonetic:'/ˈhezɪteɪt/', meaning:'犹豫；踌躇', contextMeaning:'犹豫', difficulty:2, example:'Do not hesitate.', exampleTrans:'勿犹豫。', storyContext:'机缘面前，她不再 hesitate。', chapter:4 },
+  { word:'endure', phonetic:'/ɪnˈdjʊr/', meaning:'忍受；承受', contextMeaning:'忍受', difficulty:3, example:'Endure the trial.', exampleTrans:'承受试炼。', storyContext:'她须 endure 秘境中的万重险。', chapter:4 },
+  { word:'solitude', phonetic:'/ˈsɒlɪtuːd/', meaning:'孤独；孤境', contextMeaning:'孤境', difficulty:3, example:'Cultivate in solitude.', exampleTrans:'于孤境清修。', storyContext:'她偏爱 solitude 中的清修。', chapter:4 },
+  { word:'affection', phonetic:'/əˈfekʃn/', meaning:'喜爱；情愫', contextMeaning:'情愫', difficulty:2, example:'Affection for her beast.', exampleTrans:'对灵兽的喜爱。', storyContext:'她对雪团渐生 affection。', chapter:5, collectionType:'character', collectionName:'雪团' },
+  { word:'benevolent', phonetic:'/bəˈnevələnt/', meaning:'仁慈的；仁厚的', contextMeaning:'仁厚', difficulty:4, example:'A benevolent immortal.', exampleTrans:'仁厚的仙人。', storyContext:'上界使者看似 benevolent，却另有图谋。', chapter:5 },
+  { word:'vigilant', phonetic:'/ˈvɪdʒɪlənt/', meaning:'警惕的；警醒的', contextMeaning:'警惕', difficulty:3, example:'Remain vigilant.', exampleTrans:'保持警惕。', storyContext:'渡劫时须 vigilant 防心魔。', chapter:5 },
+  { word:'obscure', phonetic:'/əbˈskjʊr/', meaning:'晦涩的；模糊的', contextMeaning:'晦涩', difficulty:3, example:'An obscure manual.', exampleTrans:'晦涩的古卷。', storyContext:'她参悟 obscure 的上古残卷。', chapter:5 },
+  { word:'abandon', phonetic:'/əˈbændən/', meaning:'抛弃；舍弃', contextMeaning:'舍弃', difficulty:2, example:'Abandon earthly ties.', exampleTrans:'舍弃尘缘。', storyContext:'飞升前须 abandon 凡尘执念。', chapter:5 },
+  { word:'absorb', phonetic:'/əbˈsɔːrb/', meaning:'吸收；吸纳', contextMeaning:'吸纳', difficulty:2, example:'Absorb the qi.', exampleTrans:'吸纳灵气。', storyContext:'她运转心法 absorb 周天灵气。', chapter:5 },
+  { word:'accelerate', phonetic:'/əkˈseləreɪt/', meaning:'加速；促进', contextMeaning:'加速', difficulty:3, example:'Accelerate the breakthrough.', exampleTrans:'加速突破。', storyContext:'她欲 accelerate 结丹之速。', chapter:5 },
+  { word:'accomplish', phonetic:'/əˈkɒmplɪʃ/', meaning:'完成；成就', contextMeaning:'成就', difficulty:2, example:'Accomplish ascension.', exampleTrans:'成就飞升。', storyContext:'她终将 accomplish 飞升大业。', chapter:5 },
+  { word:'allocate', phonetic:'/ˈæləkeɪt/', meaning:'分配；拨出', contextMeaning:'分配', difficulty:3, example:'Allocate resources.', exampleTrans:'分配资源。', storyContext:'她 carefully allocate 修炼资源。', chapter:5 },
+  { word:'alter', phonetic:'/ˈɔːltər/', meaning:'改变；修改', contextMeaning:'改变', difficulty:2, example:'Alter one\'s fate.', exampleTrans:'改变命运。', storyContext:'她誓要 alter 废柴之命。', chapter:5 },
+  { word:'aggressive', phonetic:'/əˈɡresɪv/', meaning:'凌厉的；好斗的', contextMeaning:'凌厉', difficulty:3, example:'An aggressive sword.', exampleTrans:'凌厉的剑势。', storyContext:'她的剑势 aggressive 而决绝。', chapter:5 },
+  { word:'ascend', phonetic:'/əˈsend/', meaning:'上升；登天', contextMeaning:'登天', difficulty:3, example:'Ascend to the realm.', exampleTrans:'登临上界。', storyContext:'雷劫散尽，她 ascend 飞升。', chapter:6, collectionType:'location', collectionName:'上界' },
+  { word:'advocate', phonetic:'/ˈædvəkeɪt/', meaning:'提倡；主张', contextMeaning:'主张', difficulty:4, example:'Advocate the right path.', exampleTrans:'主张正道。', storyContext:'她 advocate 正道修行，不媚上界。', chapter:6 },
+  { word:'assign', phonetic:'/əˈsaɪn/', meaning:'指派；分配', contextMeaning:'指派', difficulty:2, example:'Assign a mission.', exampleTrans:'指派任务。', storyContext:'上界长老 assign 她新试炼。', chapter:6 },
+  { word:'adjacent', phonetic:'/əˈdʒeɪsənt/', meaning:'邻近的；毗邻的', contextMeaning:'毗邻', difficulty:3, example:'The adjacent peak.', exampleTrans:'毗邻的仙峰。', storyContext:' adjacent 的仙峰传来钟声。', chapter:6 },
+  { word:'articulate', phonetic:'/ɑːrˈtɪkjuleɪt/', meaning:'清晰表达；阐述', contextMeaning:'阐述', difficulty:4, example:'Articulate the dao.', exampleTrans:'阐述大道。', storyContext:'她于论道大会上 articulate 己见。', chapter:6 },
+  { word:'attractive', phonetic:'/əˈtræktɪv/', meaning:'吸引人的；诱人的', contextMeaning:'诱人', difficulty:2, example:'An attractive offer.', exampleTrans:'诱人的机缘。', storyContext:'上界有 attractive 的机缘在等她。', chapter:6 },
+  { word:'authentic', phonetic:'/ɔːˈθentɪk/', meaning:'真正的；本真的', contextMeaning:'本真', difficulty:3, example:'Seek the authentic dao.', exampleTrans:'求本真之道。', storyContext:'她终悟 authentic 修行之本。', chapter:6 },
+  { word:'fate', phonetic:'/\'feit/', meaning:'n.命运', contextMeaning:'命运', difficulty:2, example:'The fate of the sect.', exampleTrans:'宗门的命运。', storyContext:'她不信 fate 早已注定，只信手中的剑。', chapter:6 },
+  { word:'summit', phonetic:'/\'sʌmit/', meaning:'n.顶，最高点；颠峰，高峰；最高级会议', contextMeaning:'绝顶', difficulty:3, example:'Atop the summit.', exampleTrans:'立于绝顶。', storyContext:'她立于雷劫 summit，俯瞰曾欺辱她的人间。', chapter:6 },
+  { word:'expose', phonetic:'/ik\'spəuz/', meaning:'v.(to)使暴露,受到;使曝光', contextMeaning:'揭露', difficulty:4, example:'Expose the truth.', exampleTrans:'揭露真相。', storyContext:'她 expose 了柳家篡改灵根的秘法。', chapter:7, collectionType:'event', collectionName:'血脉觉醒' },
+  { word:'descent', phonetic:'/di\'sent/', meaning:'n.下降,降下;斜坡;血统,家世', contextMeaning:'血脉', difficulty:4, example:'Her divine descent.', exampleTrans:'她神圣的血脉。', storyContext:'残魂道破她的 descent——上古弑神者后裔。', chapter:7, collectionType:'character', collectionName:'弑神血脉' },
+  { word:'identity', phonetic:'/ai\'dentəti/', meaning:'n.身份;本体;特征;同一(性);一致;国籍;等式', contextMeaning:'身份', difficulty:3, example:'Her true identity.', exampleTrans:'她真实的身份。', storyContext:'identity 揭晓那刻，满座死寂。', chapter:7, collectionType:'event', collectionName:'血脉觉醒' },
+  { word:'divine', phonetic:'/di\'vain/', meaning:'a.神的，神授的，天赐的；极好的，极美的', contextMeaning:'上界的', difficulty:3, example:'A divine decree.', exampleTrans:'一道上界敕令。', storyContext:'divine 使者踏云而至，目光如电。', chapter:7, collectionType:'character', collectionName:'上界使者' },
+  { word:'descend', phonetic:'/di\'send/', meaning:'v.下来,下降;遗传(指财产,气质,权利)', contextMeaning:'降临', difficulty:3, example:'The immortal descended.', exampleTrans:'仙人降临。', storyContext:'上界敕令 descend，整座山门震颤。', chapter:7, collectionType:'character', collectionName:'上界使者' },
+  { word:'forbid', phonetic:'/fə\'bɪd/', meaning:'v.禁止,不许', contextMeaning:'禁绝', difficulty:4, example:'A forbidden art.', exampleTrans:'被禁的秘术。', storyContext:'弑神之力，乃天道 forbid 之术。', chapter:7, collectionType:'character', collectionName:'弑神血脉' },
+  { word:'mortal', phonetic:'/\'mɔ:təl/', meaning:'a.致命的;终有一死的;人世间的 n.凡人', contextMeaning:'凡躯', difficulty:2, example:'A mortal body.', exampleTrans:'一副凡躯。', storyContext:'纵是 mortal 之身，亦敢逆天改命。', chapter:7, collectionType:'character', collectionName:'苏渺' },
+  { word:'rage', phonetic:'/reidʒ/', meaning:'n.愤怒', contextMeaning:'震怒', difficulty:4, example:'Heaven\'s rage.', exampleTrans:'上界之怒。', storyContext:'上界震怒，降下 rage 欲将她抹杀。', chapter:7, collectionType:'character', collectionName:'弑神血脉' },
+  { word:'summon', phonetic:'/\'sʌmən/', meaning:'v.召唤;传讯,传唤;鼓起(勇气),振作(精神)', contextMeaning:'召唤', difficulty:3, example:'Summon the sword.', exampleTrans:'召唤飞剑。', storyContext:'她 summon 出残魂所授的千古古剑。', chapter:7, collectionType:'item', collectionName:'古剑·残魂' },
+  { word:'tremble', phonetic:'/\'trembl/', meaning:'n.战栗,颤抖 v.发抖,颤抖；摇动；焦虑', contextMeaning:'震颤', difficulty:2, example:'The mountain trembled.', exampleTrans:'山门震颤。', storyContext:'灵脉 tremble，似在回应她的觉醒。', chapter:7 },
+  { word:'shatter', phonetic:'/\'ʃætə/', meaning:'n.碎片；粉碎　v.粉碎；使疲惫；使震骇', contextMeaning:'崩碎', difficulty:3, example:'Shatter the seal.', exampleTrans:'崩碎封印。', storyContext:'她一剑 shatter 了锁灵之印。', chapter:7, collectionType:'item', collectionName:'古剑·残魂' },
+  { word:'glory', phonetic:'/\'glɔ:ri/', meaning:'n.光荣,荣誉', contextMeaning:'荣光', difficulty:3, example:'The glory of ascension.', exampleTrans:'飞升的荣光。', storyContext:'昔日受辱，今朝 glory 加身。', chapter:7, collectionType:'character', collectionName:'苏渺' },
+  { word:'disaster', phonetic:'/ˌdi\'zɑ:stə/', meaning:'n.灾难,大祸;彻底的失败', contextMeaning:'浩劫', difficulty:4, example:'A sudden disaster.', exampleTrans:'一场骤起的浩劫。', storyContext:'柳家引来 disaster，宗门倾覆在即。', chapter:8, collectionType:'event', collectionName:'宗门浩劫' },
+  { word:'rescue', phonetic:'/\'reskju:/', meaning:'v./n.营救,援救', contextMeaning:'驰援', difficulty:3, example:'Rescue the fallen.', exampleTrans:'驰援倒下者。', storyContext:'她飞身 rescue 重伤的同门。', chapter:8, collectionType:'character', collectionName:'苏渺' },
+  { word:'sacrifice', phonetic:'/\'sækrifais/', meaning:'n.牺牲,牺牲品;祭品 v.(for,to)牺牲,献出', contextMeaning:'舍身', difficulty:4, example:'A noble sacrifice.', exampleTrans:'一次壮烈的舍身。', storyContext:'玄清子以 sacrifice 护她周全。', chapter:8, collectionType:'character', collectionName:'玄清子' },
+  { word:'defend', phonetic:'/di\'fend/', meaning:'v.防守,保卫;为…辩护,为…答辩', contextMeaning:'守护', difficulty:3, example:'Defend the sect.', exampleTrans:'守护宗门。', storyContext:'她立誓 defend 青云宗到底。', chapter:8, collectionType:'character', collectionName:'苏渺' },
+  { word:'collapse', phonetic:'/kə\'læps/', meaning:'v./n.倒塌；崩溃；(价格)暴跌；倒闭，破产', contextMeaning:'崩塌', difficulty:3, example:'The hall collapsed.', exampleTrans:'大殿崩塌。', storyContext:'护宗大阵 collapse，山门告破。', chapter:8, collectionType:'event', collectionName:'宗门浩劫' },
+  { word:'loyal', phonetic:'/\'lɔiəl/', meaning:'a.(to)忠诚的,忠贞的', contextMeaning:'忠勇', difficulty:2, example:'A loyal companion.', exampleTrans:'忠勇的同伴。', storyContext:'雪团 loyal 相随，不离不弃。', chapter:8, collectionType:'character', collectionName:'雪团' },
+  { word:'unite', phonetic:'/ju:\'nait/', meaning:'vi.联合,团结;统一,合并vt.使联合', contextMeaning:'同心', difficulty:3, example:'Unite as one.', exampleTrans:'同心一体。', storyContext:'各峰弟子 unite，共御外敌。', chapter:8, collectionType:'event', collectionName:'宗门浩劫' },
+  { word:'crisis', phonetic:'/\'kraisis/', meaning:'n.(pl.crises)危机,紧要关头', contextMeaning:'危局', difficulty:4, example:'In the crisis.', exampleTrans:'于危局之中。', storyContext:'crisis 当前，方见人心真假。', chapter:8 },
+  { word:'restore', phonetic:'/ri\'stɔ:/', meaning:'v.恢复,使回复;归还,交还;修复,重建', contextMeaning:'重整', difficulty:3, example:'Restore the order.', exampleTrans:'重整秩序。', storyContext:'她欲 restore 宗门荣光。', chapter:8, collectionType:'event', collectionName:'宗门浩劫' },
+  { word:'survive', phonetic:'/sə\'vaiv/', meaning:'v.幸免于,幸存;比…长命', contextMeaning:'幸存', difficulty:3, example:'Only she survived.', exampleTrans:'唯她幸存。', storyContext:'浩劫之后，唯她 survive 重整旗鼓。', chapter:8, collectionType:'character', collectionName:'苏渺' },
+  { word:'kneel', phonetic:'/ni:l/', meaning:'v.跪,下跪', contextMeaning:'跪伏', difficulty:3, example:'He knelt before her.', exampleTrans:'他跪伏在她面前。', storyContext:'上界使者竟 kneel 求她收徒。', chapter:9, collectionType:'character', collectionName:'上界使者' },
+  { word:'beg', phonetic:'/beg/', meaning:'vt.请求，乞求 vi.恳请，行乞', contextMeaning:'恳求', difficulty:3, example:'Beg for guidance.', exampleTrans:'恳求指点。', storyContext:'使者 beg 她传授秘法。', chapter:9, collectionType:'character', collectionName:'上界使者' },
+  { word:'talent', phonetic:'/\'tælənt/', meaning:'n.才能,天资;人才', contextMeaning:'天赋', difficulty:3, example:'A rare talent.', exampleTrans:'罕见的天赋。', storyContext:'她之 talent，连上界也为之侧目。', chapter:9, collectionType:'character', collectionName:'苏渺' },
+  { word:'persuade', phonetic:'/pə\'sweɪd/', meaning:'v.说服,劝说;(of)使相信', contextMeaning:'说动', difficulty:4, example:'Persuade the envoy.', exampleTrans:'说动使者。', storyContext:'她以言语 persuade 使者退兵。', chapter:9 },
+  { word:'astonish', phonetic:'/ə\'stɔniʃ/', meaning:'vt.使惊讶，使吃惊', contextMeaning:'惊动', difficulty:3, example:'Astonish the realm.', exampleTrans:'惊动诸界。', storyContext:'她的锋芒 astonish 了上界。', chapter:9 },
+  { word:'superior', phonetic:'/sju:\'piriə/', meaning:'a.优良的,卓越的;上级的 n.上级;长者;高手', contextMeaning:'上尊', difficulty:4, example:'A superior being.', exampleTrans:'一位上尊。', storyContext:'superior 使者亲临，礼数竟缺。', chapter:9, collectionType:'character', collectionName:'上界使者' },
+  { word:'humble', phonetic:'/\'hʌmbl/', meaning:'a.谦卑的,恭顺的;地位低下的 v.降低,贬低', contextMeaning:'谦退', difficulty:2, example:'Stay humble.', exampleTrans:'保持谦退。', storyContext:'她虽凌云，仍 humble 待旧友。', chapter:9, collectionType:'character', collectionName:'苏渺' },
+  { word:'grateful', phonetic:'/\'greitful/', meaning:'a.(to,for)感激的;感谢的', contextMeaning:'感念', difficulty:3, example:'Grateful for mercy.', exampleTrans:'感念恩义。', storyContext:'弟子 grateful 她留得一命。', chapter:9, collectionType:'character', collectionName:'柳如烟' },
+  { word:'deserve', phonetic:'/di\'zə:v/', meaning:'v.应受,值得', contextMeaning:'当得', difficulty:3, example:'Deserve the throne.', exampleTrans:'当得此位。', storyContext:'她说柳如烟 deserve 一个了断。', chapter:9, collectionType:'character', collectionName:'柳如烟' },
+  { word:'rival', phonetic:'/\'raivəl/', meaning:'n.竞争者,对手 v.竞争,对抗 a.竞争的', contextMeaning:'劲敌', difficulty:3, example:'A worthy rival.', exampleTrans:'可敬的劲敌。', storyContext:'柳如烟终成她平生 rival。', chapter:9, collectionType:'character', collectionName:'柳如烟' },
+  { word:'comprehend', phonetic:'/ˌkɔmpri\'hend/', meaning:'vt.理解，领会；包含，包括', contextMeaning:'参透', difficulty:4, example:'Comprehend the dao.', exampleTrans:'参透大道。', storyContext:'她于生死间 comprehend 了无常。', chapter:10, collectionType:'skill', collectionName:'弑神诀' },
+  { word:'transcend', phonetic:'/træn\'send/', meaning:'vt.超出,超越(经验、知识、能力的范围等)', contextMeaning:'超脱', difficulty:4, example:'Transcend the mortal.', exampleTrans:'超脱凡尘。', storyContext:'修为 transcend 凡俗桎梏。', chapter:10, collectionType:'skill', collectionName:'弑神诀' },
+  { word:'surge', phonetic:'/sɜ:dʒ/', meaning:'vi.汹涌；彭湃；蜂拥而至 n.巨浪;汹涌;彭湃', contextMeaning:'暴涨', difficulty:3, example:'A surge of power.', exampleTrans:'力量暴涨。', storyContext:'灵气 surge，冲开任督二脉。', chapter:10, collectionType:'skill', collectionName:'弑神诀' },
+  { word:'realm', phonetic:'/relm/', meaning:'n.王国,国土;领域', contextMeaning:'境界', difficulty:3, example:'A higher realm.', exampleTrans:'更高的境界。', storyContext:'她一脚踏入全新 realm。', chapter:10 },
+  { word:'meditate', phonetic:'/\'mediteit/', meaning:'v.想,考虑,(尤指宗教上的)沉思,冥想', contextMeaning:'入定', difficulty:2, example:'Meditate in silence.', exampleTrans:'于静中入定。', storyContext:'她闭关 meditate 三七二十一日。', chapter:10, collectionType:'character', collectionName:'苏渺' },
+  { word:'enlighten', phonetic:'/in\'laitən/', meaning:'v.启发,启蒙,教导', contextMeaning:'点化', difficulty:4, example:'Enlighten the mind.', exampleTrans:'点化灵台。', storyContext:'残魂一语 enlighten 她的迷障。', chapter:10, collectionType:'location', collectionName:'残魂密室' },
+  { word:'infinite', phonetic:'/\'infinət/', meaning:'a.无限的,无穷的 n.无限', contextMeaning:'无尽', difficulty:3, example:'Infinite qi.', exampleTrans:'无尽灵气。', storyContext:'混沌灵根汲取 infinite 之力。', chapter:10, collectionType:'skill', collectionName:'弑神诀' },
+  { word:'essence', phonetic:'/\'esəns/', meaning:'n.本质,实质', contextMeaning:'本源', difficulty:3, example:'The essence of dao.', exampleTrans:'大道本源。', storyContext:'她握住了法则的 essence。', chapter:10, collectionType:'skill', collectionName:'弑神诀' },
+  { word:'insight', phonetic:'/\'insait/', meaning:'n.洞察力,见识', contextMeaning:'顿悟', difficulty:4, example:'A sudden insight.', exampleTrans:'一次顿悟。', storyContext:'雷劫之中，她得无上 insight。', chapter:10, collectionType:'skill', collectionName:'弑神诀' },
+  { word:'calm', phonetic:'/kɑ:m/', meaning:'a.(天气,海洋等)静的 n.平静 v.(使)平静', contextMeaning:'沉静', difficulty:1, example:'Stay calm.', exampleTrans:'保持沉静。', storyContext:'心越 calm，剑越利。', chapter:10 },
+  { word:'thunder', phonetic:'/\'θʌndə/', meaning:'n.雷(声);轰隆声 v.打雷;大声说,吼叫', contextMeaning:'雷鸣', difficulty:2, example:'Thunder roared.', exampleTrans:'雷鸣大作。', storyContext:'九重 thunder 自天外而来。', chapter:11, collectionType:'location', collectionName:'雷劫绝顶' },
+  { word:'lightning', phonetic:'/\'laitniŋ/', meaning:'n.闪电 a.闪电般的,快速的', contextMeaning:'雷光', difficulty:3, example:'A bolt of lightning.', exampleTrans:'一道雷光。', storyContext:'lightning 劈落，她岿然不动。', chapter:11, collectionType:'location', collectionName:'雷劫绝顶' },
+  { word:'catastrophe', phonetic:'/kə\'tæstrəfi/', meaning:'n.大灾难；(悲剧)结局', contextMeaning:'大劫', difficulty:4, example:'The final catastrophe.', exampleTrans:'最后的大劫。', storyContext:'飞升前的 catastrophe，无人能免。', chapter:11, collectionType:'event', collectionName:'飞升雷劫' },
+  { word:'eternal', phonetic:'/i\'tə:nəl/', meaning:'n.永久的,永恒的', contextMeaning:'永恒', difficulty:3, example:'Eternal glory.', exampleTrans:'永恒的荣光。', storyContext:'她以一战换得 eternal 之名。', chapter:11, collectionType:'event', collectionName:'飞升雷劫' },
+  { word:'soar', phonetic:'/sɔ:/', meaning:'vi.(指鸟等)高飞，翱翔；飞涨；高耸', contextMeaning:'凌空', difficulty:3, example:'Soar to the sky.', exampleTrans:'凌空而起。', storyContext:'她御剑 soar，直破云霄。', chapter:11, collectionType:'character', collectionName:'苏渺' },
+  { word:'vanish', phonetic:'/\'væniʃ/', meaning:'vi.突然不见;消失', contextMeaning:'消散', difficulty:2, example:'The clouds vanished.', exampleTrans:'云霭消散。', storyContext:'劫云 vanish，天光乍破。', chapter:11, collectionType:'location', collectionName:'雷劫绝顶' },
+  { word:'radiant', phonetic:'/\'reidiənt/', meaning:'a.发光的,辐射的,容光焕发的', contextMeaning:'璀璨', difficulty:3, example:'A radiant figure.', exampleTrans:'璀璨的身影。', storyContext:'飞升之刻，她 radiant 如日。', chapter:11, collectionType:'character', collectionName:'苏渺' },
+  { word:'destiny', phonetic:'/\'destini/', meaning:'n.命运;天数,天命', contextMeaning:'天命', difficulty:3, example:'Her own destiny.', exampleTrans:'她自己的天命。', storyContext:'命运在手，destiny 由她改写。', chapter:11, collectionType:'character', collectionName:'苏渺' },
+  { word:'triumph', phonetic:'/\'traiəmf/', meaning:'n.胜利,成功 v.得胜,战胜', contextMeaning:'凯旋', difficulty:4, example:'A hard-won triumph.', exampleTrans:'一场苦战得来的凯旋。', storyContext:'九重雷劫后，她 triumph 登临。', chapter:11, collectionType:'event', collectionName:'飞升雷劫' },
+  { word:'illusion', phonetic:'/i\'lju:ʒən/', meaning:'n.幻想，错误的观念；错觉，幻觉，假象', contextMeaning:'幻局', difficulty:4, example:'Break the illusion.', exampleTrans:'破此幻局。', storyContext:'上界不过是场 illusion。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'puppet', phonetic:'/\'pʌpit/', meaning:'n.木偶,傀儡', contextMeaning:'棋子', difficulty:3, example:'A mere puppet.', exampleTrans:'区区一枚棋子。', storyContext:'她原是上界摆弄的 puppet。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'awake', phonetic:'/ə\'weik/', meaning:'a.醒着的 vt.唤醒，使觉醒 vi.醒来，醒悟到', contextMeaning:'觉醒', difficulty:3, example:'Awake at last.', exampleTrans:'终于觉醒。', storyContext:'她 awake，看穿千年棋局。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'scheme', phonetic:'/ski:m/', meaning:'n.计划,方案;阴谋;配置 v.计划,策划;阴谋', contextMeaning:'棋局', difficulty:4, example:'A grand scheme.', exampleTrans:'一场宏大的棋局。', storyContext:'上界以众生为 scheme。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'defy', phonetic:'/di\'fai/', meaning:'v.(公然)违抗,反抗;蔑视', contextMeaning:'逆抗', difficulty:4, example:'Defy the heavens.', exampleTrans:'逆抗天道。', storyContext:'她要 defy 那执棋之人。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'throne', phonetic:'/θrəun/', meaning:'n.御座，宝座；王位，王权', contextMeaning:'天座', difficulty:4, example:'The heavenly throne.', exampleTrans:'那天座。', storyContext:'她不跪 throne，只跪本心。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'reform', phonetic:'/ri\'fɔ:m/', meaning:'v./n.改革,改造,改良', contextMeaning:'重写', difficulty:4, example:'Reform the law.', exampleTrans:'重写法则。', storyContext:'她以弑神之力 reform 天道。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'forge', phonetic:'/fɔ:dʒ/', meaning:'v.锻造,伪造 n.锻工车间;锻炉', contextMeaning:'开创', difficulty:3, example:'Forge a new order.', exampleTrans:'开创新规。', storyContext:'她 forge 属于自己的秩序。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'perpetual', phonetic:'/pə\'petʃuəl/', meaning:'a.永久的,永恒的,长期的', contextMeaning:'长存', difficulty:3, example:'Perpetual peace.', exampleTrans:'长久的安宁。', storyContext:'她许众生 perpetual 之安。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+  { word:'master', phonetic:'/\'mɑ:stə/', meaning:'n.男主人;师傅;硕士 v.精通,控制 a.主要的', contextMeaning:'执掌', difficulty:3, example:'Master one\'s fate.', exampleTrans:'执掌自身命运。', storyContext:'凡女亦可 master 自己的命数。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+];
+
+const STORY_SECTIONS = [
+  {
+    label:'第1篇', title:'测灵之辱',
+    choices: [
+      { text:'① 将玉佩悄悄藏入怀中', result:'玉佩触肤即热，一缕苍老神识钻入识海：「混沌灵根……本座等了三百年。」', unlockCard:13, markWords:['chamber'] },
+      { text:'② 当众呈交，以示清白', result:'你交出玉佩，却不知它正是柳家灭门的证物——杀机，自此锁定你。', unlockCard:null },
+    ],
+    content:`测灵大典上，苏渺赤足踏上测灵石。石面只泛起一丝灰光——最劣等的杂灵根。
+
+"杂灵根，贬为杂役。"执法长老声音冷淡。台下哄笑中，柳如烟——宗主亲传的天之骄女——俯视她，唇角噙着一丝意味深长的轻蔑："也配与我同宗？"
+
+苏渺性子 timid，受辱时只敢低头。可她心里藏着一团不肯灭的火：只要活着，便有 hope 飞升那一天。
+
+后山灵脉 gloomy，终年不见天日。深夜山风 cold 彻骨，她被发配到 damp 阴冷的柴房，每日走那条 narrow 的采药小径。同门的白眼让她承受巨大 pressure，她却只在 quiet 的夜里默念心法。
+
+那一夜，她在采药时失足跌入一处 hidden chamber。石缝中滚出一枚古朴玉佩，触手生温。曾几何时，她过着 wretched 的杂役生涯；如今这 feeble 的灵根，竟在玉佩旁微微发烫……`,
+  },
+  {
+    label:'第2篇', title:'残魂传道',
+    choices: [
+      { text:'① 修习残魂所授《清灵诀》', result:'混沌灵根一旦引动，灵气如潮倒灌——你才知自己从不是废柴。', unlockCard:16, markWords:['meticulous'] },
+      { text:'② 婉拒，怕惹祸上身', result:'你压下贪念，却不知柳家早已布下眼线，正等着你露出破绽。', unlockCard:null },
+    ],
+    content:`玉佩中的残魂，竟是三百年前陨落的上古剑仙。他一眼看穿：苏渺并非杂灵根，而是传说中万中无一的混沌灵根——只不过被人以秘法封印，才显出 feeble 之象。
+
+"想报仇，便随老夫修行。"残魂授她《清灵诀》。苏渺浇灌灵草时极为 meticulous，暗中将灵气一丝丝引入经脉。
+
+晨课在青云宗的 central courtyard 举行。玄清子长老目光 stern，却破天荒唤住她："你灵息有异，老夫要 assess 你的根骨。"
+
+她心头一紧，却察觉灵气中 subtle 的异动——有人在她身边布了窥探之阵。她已 anticipate 柳家的算计，不动声色。
+
+测灵大会当日，她故意引动一丝混沌之气。测灵石轰然亮起，异象 apparent！满座哗然。柳如烟脸色铁青，连她都暗自 admire 这"废柴"的坚韧。
+
+"根基尚不 adequate，需勤补。"长老沉吟。苏渺垂眸，ambitious 之志，早已直指飞升。`,
+  },
+  {
+    label:'第3篇', title:'大比雪耻',
+    choices: [
+      { text:'① 当众饶柳如烟一命', result:'你留她一命，却也埋下更深的恨——有些敌人，仁慈即是养虎。', unlockCard:14 },
+      { text:'② 一掌废其修为，立威全场', result:'柳如烟修为尽废，宗门哗然。你于万众前立威，亦与上界结下死仇。', unlockCard:14 },
+    ],
+    content:`宗门大比前，各峰 intrigue 四起。柳如烟 conspire 在她的茶中下毒，又令师兄 manipulate 试炼阵法，欲将她困死其中。
+
+苏渺早有 suspect。擂台之上，柳如烟剑锋藏着阴毒，她却以巧劲反震，一招将其挑落台下。满场死寂——谁料那"废柴"已至如此境地。
+
+败者 resent 她一夜成名，同门之 envy 比妖兽更尖锐。她最怕的，是被身边人 betray。裁判一次 arbitrary 判罚，明显偏袒柳家；古籍中 ambiguous 的偈语，此刻竟与残魂的警告吻合。
+
+"这场比试，有鬼。"苏渺 eloquent 陈词，当众揭穿柳如烟下毒之实。柳如烟面如死灰——那张 treacherous 的面具，终于碎了。
+
+可她不知道，这一胜，惊动了不该惊动的人。`,
+  },
+  {
+    label:'第4篇', title:'幻月洞天',
+    choices: [
+      { text:'① 以《清灵诀》强行破阵', result:'阵法崩碎刹那，镇魂珠入手，而洞口轰然封死——有人要你埋骨于此。', unlockCard:15, markWords:['cunning'] },
+      { text:'② 寻阵眼徐徐化解', result:'你以 cunning 之法解阵，灵兽蛋裂壳，雪团初啼，却也错失了先机。', unlockCard:15, markWords:['cunning'] },
+    ],
+    content:`为压制体内躁动的混沌灵根，苏渺奉命入幻月洞天，寻那传说中的镇魂珠。
+
+纵为杂役出身，她亦不失 dignity。洞天深处，上古阵法守护着宝物，守阵傀儡 treacherous 难缠。她以 cunning 之计诱其自毁，终见珠光。
+
+破阵之时，一枚 fragile 的灵兽蛋裂开，一只雪白小兽扑入她怀——那便是伴生灵兽雪团，此后成了她生死不离的 companion。她对它渐生 affection。
+
+她在洞中 relentless 苦修，于 solitude 里参悟 obscure 的上古残卷，得 profound 之悟。机缘面前，她不再 hesitate，甘愿 endure 一切险阻。
+
+"愿青云宗 prosper 万年。"她握珠望向洞口，却忽觉灵气倒灌——有人 from outside 封死了出路。`,
+  },
+  {
+    label:'第5篇', title:'生死悟道',
+    choices: [
+      { text:'① 独力抗劫，绝境突破', result:'你拒尽援手，于生死边缘悟透大道，修为暴涨三重。', unlockCard:17, markWords:['absorb'] },
+      { text:'② 引动护宗大阵求援', result:'玄清子破阵而来，为你挡下致命一击，却重伤呕血——这一恩，你用余生来还。', unlockCard:17, markWords:['absorb'] },
+    ],
+    content:`绝境之中，苏渺反将镇魂珠之力导入经脉。她运转心法 absorb 周天灵气，欲 accelerate 结丹之速。
+
+可洞外封印者，竟是柳家的靠山——上界派来的使者。那人看似 benevolent，言语温和，却暗中以神识锁死她的灵脉。她须 vigilant 防备心魔趁虚而入。
+
+"飞升前须 abandon 凡尘执念。"残魂叹息。她 careful allocate 毕生资源，誓要 alter 这废柴之命。
+
+剑势 aggressive 而决绝，她于生死之间 accomplish 了突破。灵气如潮，冲破桎梏——可当她破封而出，只见宗门因她获罪，玄清子长老为护她重伤倒地。
+
+"这一局，我来改写。"她望向上界使者的方向，眼中再无 timid。`,
+  },
+  {
+    label:'第6篇', title:'九重雷劫',
+    choices: [
+      { text:'① 引雷入体，以劫炼魂', result:'九重雷劫尽数融入混沌灵根，你于烈焰中舒展双臂，扶摇直上。', unlockCard:18, markWords:['ascend','fate','summit'] },
+      { text:'② 借上界法宝避劫', result:'你拈下那枚 attractive 的仙缘，却也自此被上界握住了命门。', unlockCard:18, markWords:['attractive'] },
+    ],
+    content:`上界震怒，降下九重雷劫。苏渺立于雷劫 summit，混沌灵根彻底觉醒——她竟是上古"弑神者"血脉的最后传人，而 fate 早已被上界写就。
+
+邻峰 adjacent 的钟声为她而鸣。她于论道大会上 articulate 己见，advocate 正道修行，不媚上界权贵。
+
+雷劫加身，她不再躲闪。灵气倒灌，修为节节攀升。上界长老 assign 她新试炼，又以一枚 attractive 的仙缘相诱，欲以机缘缚她，她却一笑置之。
+
+"本真之道，岂在他人掌中。"她终悟 authentic 修行之本。
+
+雷劫散尽，她 ascend 飞升，化作流光直入上界。可云端之上，无数道目光正静静俯视——那里，才是一场更大棋局的开始。`,
+  },
+
+  {
+    label:'第7篇', title:'上界初临',
+    choices: [
+      { text:'① 引动血脉，当众显圣', result:'混沌灵根昭然天下，你以弑神之姿，震住整座天庭。', unlockCard:25, markWords:['descent','divine'] },
+      { text:'② 隐忍不发，静观其变', result:'你压下锋芒，却也看清了天庭篡改灵根、收割天才的真相。', unlockCard:19, markWords:['expose'] },
+    ],
+    content:`上界，并非传说中的乐土。
+
+飞升落地，苏渺所见，是层层悬浮的仙峰，与俯视众生如蝼蚁的上界修士。一道 divine 敕令自云霄 descend，落在她面前——要她交出混沌灵根，献于天庭。
+
+"你不过一介 mortal，也配执掌弑神之力？"使者冷笑。苏渺却笑了。她 summon 出残魂所授的古剑，剑鸣清越，整座仙峰 tremble。
+
+"我的 identity，轮不到你来定。"她一字一句，expose 了天庭篡改下界灵根、收割天才的秘辛。当年封印她灵根的那只手，正是上界。
+
+使者大怒，rage 如潮压下。她却一剑 shatter 了敕令金印。那一刻，descent 觉醒——她是上古弑神者的最后血脉，forbid 之术加身，天庭亦不能辱。
+
+昔日受辱的杂役，今朝 glory 加身。她望向天庭方向：这一笔账，该算了。`,
+  },
+  {
+    label:'第8篇', title:'宗门浩劫',
+    choices: [
+      { text:'① 独力护宗，死战不退', result:'你以一己之力挡下上界大军，青云宗因你而存。', unlockCard:20, markWords:['defend','sacrifice'] },
+      { text:'② 联合同门，共御外敌', result:'各峰弟子 unite 一处，你 rescue 下每一个同门，浩劫之后重整山河。', unlockCard:20, markWords:['unite','rescue'] },
+    ],
+    content:`千里之外的青云宗，骤起 disaster。
+
+柳家攀上上界靠山，率众压境。护宗大阵在轰鸣中 collapse，山门告破。玄清子长老以 sacrifice 燃尽本源，护下宗门残脉，却倒在血泊之中。雪团 loyal 相随，嘶鸣着护在主人身旁，不肯离去。
+
+讯息传至上界时，苏渺正在论道。她二话不说，撕裂虚空，赶赴故土。
+
+"谁动我宗门，我便灭谁满门。"她立于残垣之上，defend 青云宗到底。各峰幸存的弟子 unite 一处，crisis 当前，方见真心。她 rescue 下每一个还能呼吸的同门，亲手安葬逝者。
+
+浩劫之后，唯她 survive，重整旗鼓。她以弑神之力 restore 护宗大阵，将青云宗，重新立回天地之间。
+
+这一日，苏渺不再是杂役，而是青云宗的脊梁。`,
+  },
+  {
+    label:'第9篇', title:'上尊拜师',
+    choices: [
+      { text:'① 收其为徒，反客为主', result:'上界使者跪你阶下，这一局，反客为主。', unlockCard:27, markWords:['kneel','beg'] },
+      { text:'② 逐之出境，不结因果', result:'你未纳此徒，却也以言语劝退天庭，免了下界兵燹。', unlockCard:21 },
+    ],
+    content:`上界震动。
+
+那位曾居高临下的 superior 使者，竟亲自登门，kneel 在她阶下，beg 她收自己为徒，传授弑神之道。
+
+原因无他——苏渺之 talent，连天庭也为之侧目。她于上界论道台上一剑惊四座，astonish 了诸方老怪。
+
+"你可知，多少人盼着拜入我门下？"使者仍放不下架子。苏渺却 humble 如常，只淡淡道："我收徒，看心不看位。"
+
+她以言语 persuade 天庭退兵，免了下界一场兵燹。昔日的 rival 柳如烟，如今甘为她递剑的侍者，眼中再无嫉恨，只剩 grateful——她 grateful 苏渺当年留她一命，更 grateful 这份超越恩怨的格局。
+
+"柳如烟 deserve 一个了断，也 deserve 一片天地。"苏渺说。曾经的天之骄女，终于在她面前，弯下了从不肯弯的脊背——不是臣服，是信服。`,
+  },
+  {
+    label:'第10篇', title:'绝境顿悟',
+    choices: [
+      { text:'① 独参大道，闭关顿悟', result:'你于死地参透无常，修为暴涨三重。', unlockCard:22, markWords:['comprehend','insight'] },
+      { text:'② 借残魂点化，破关而出', result:'残魂一缕神识 enlighten 你的迷障，你以弑神诀破开千重杀阵。', unlockCard:29, markWords:['enlighten'] },
+    ],
+    content:`天庭终于撕破脸。
+
+九霄试炼台上，苏渺被万道法则锁困，置于死地。她却闭目 meditate，于绝境之中 comprehend 了无常与生死——原来弑神之道，不在杀伐，在 transcend。
+
+灵气 surge，如江河倒灌。她一脚踏入全新 realm，握住了法则的 essence。残魂残留的一缕神识，于此刻 enlighten 她的最后迷障，让她得无上 insight。
+
+心越 calm，剑越利。她以 infinite 之力，破开天庭设下的千重杀阵。
+
+当她睁眼，试炼台已成废墟，而她的修为，暴涨三重。
+
+"原来所谓天劫，不过是用来 transcend 的阶梯。"她轻笑。天庭这才惊觉——他们养出的，是一头注定撕破苍穹的猛虎。`,
+  },
+  {
+    label:'第11篇', title:'上界天劫',
+    choices: [
+      { text:'① 引雷炼魂，硬抗天威', result:'九霄雷海加身，你炼就 eternal 之躯，立于云巅。', unlockCard:23, markWords:['thunder','lightning'] },
+      { text:'② 御剑凌霄，破劫而出', result:'你御剑 soar，radiant 如日，硬生生劈开天劫。', unlockCard:23, markWords:['soar','radiant'] },
+    ],
+    content:`天庭震怒，降下上界天劫。
+
+thunder 自九霄滚落，lightning 如银蛇劈下，这是专门针对弑神者的 catastrophe，古来无人能活。
+
+苏渺御剑 soar，迎着雷海而上。劫云 vanish 的刹那，她 radiant 如日，令天地皆为之失色。
+
+"我的 destiny，我自己写。"她一字一顿。天劫加身，反而炼就 eternal 之躯。
+
+当最后一道雷光散尽，她 triumph 立于云巅。脚下，是跪伏的天庭；头顶，是再无桎梏的苍穹。
+
+这一战，她赢的不是一个境界，是万灵被压了万年的那口气。`,
+  },
+  {
+    label:'第12篇', title:'云上棋局',
+    choices: [
+      { text:'① 执棋落子，重写天道', result:'你以弑神之力 reform 天道，许众生 perpetual 之安。', unlockCard:30, markWords:['defy','reform'] },
+      { text:'② 碎局而出，自成一界', result:'你看穿 illusion，撕碎棋局，从此天地再无注定。', unlockCard:24, markWords:['illusion','awake'] },
+    ],
+    content:`飞升之上，还有棋局。
+
+苏渺终于 awake——所谓上界、天庭，不过是一场 illusion。她原是执棋者手中的 puppet，用来打破旧秩序的刀。
+
+那执棋之人，端坐 throne，俯瞰诸天如戏，把万灵当作掌中 scheme。可他算漏了一样东西：一个从杂役爬上来、什么都不信只信自己的凡女。
+
+"我不做你的子，也不做你的局。"苏渺 defy 那高高在上的存在，以弑神之力 reform 天道法则。她 forge 属于自己的秩序，许众生 perpetual 之安。
+
+从此，天地之间，再无注定。每个凡女，皆可 master 自己的命数。
+
+她转身，望向来路——那个曾在测灵石上低头的少女，早已不在。在的，是一个把天道踩在脚下、为众生重写规则的苏渺。
+
+【全文完】`,
+  },
+];
+
+// 收藏卡（含由抉择/试炼解锁的事件卡）；words 用于计算卡牌进度
+const COLLECTION_CARDS = [
+  { id:1, name:'苏渺', type:'character', rarity:'SSR', icon:'🧝‍♀️', desc:'废柴逆袭，终成上仙', words:['timid','quiet','hope','feeble','pressure','wretched'] },
+  { id:2, name:'雪团', type:'character', rarity:'SSR', icon:'🐾', desc:'伴生灵兽，不离不弃', words:['companion','fragile','affection'] },
+  { id:3, name:'玄清子', type:'character', rarity:'SSR', icon:'🧙', desc:'青云长老，严师慈心', words:['stern','assess'] },
+  { id:4, name:'柳如烟', type:'character', rarity:'SR', icon:'🌸', desc:'天之骄女，亦敌亦友', words:['envy','resent','betray','suspect','treacherous','arbitrary','ambiguous','eloquent'] },
+  { id:5, name:'青云宗', type:'location', rarity:'SSR', icon:'⛰️', desc:'修仙名门，故事起点', words:['courtyard'] },
+  { id:6, name:'残魂密室', type:'location', rarity:'SR', icon:'🕳️', desc:'上古剑仙，传承之地', words:['chamber'] },
+  { id:7, name:'清灵草', type:'item', rarity:'R', icon:'🌿', desc:'她亲手培育的第一株灵草', words:['meticulous'] },
+  { id:8, name:'上界', type:'location', rarity:'SSR', icon:'🌌', desc:'飞升之后的新天地', words:['ascend','adjacent','assign','advocate','articulate','attractive','authentic'] },
+  { id:9, name:'清灵诀', type:'skill', rarity:'SR', icon:'📜', desc:'残魂所授的入门心法', words:['subtle','adequate','admire','ambitious'] },
+  { id:10, name:'测灵惊变', type:'event', rarity:'SR', icon:'⚡', desc:'灰光乍起，惊动四座', words:['apparent'] },
+  { id:11, name:'大比雪耻', type:'event', rarity:'SR', icon:'⚔️', desc:'一招挑落，万众哗然', words:['intrigue','conspire','manipulate','anticipate'] },
+  { id:12, name:'幻月破阵', type:'event', rarity:'SR', icon:'🌙', desc:'阵碎珠得，洞口封死', words:['cunning','dignity','prosper','hesitate','endure'] },
+  { id:13, name:'残魂传承', type:'event', rarity:'SSR', icon:'👁️', desc:'三百年等候，一缕神识', words:['chamber'] },
+  { id:14, name:'柳家阴谋', type:'event', rarity:'R', icon:'🕸️', desc:'下毒嫁祸，步步杀机', words:['conspire','betray','suspect'] },
+  { id:15, name:'镇魂得珠', type:'event', rarity:'SSR', icon:'🔮', desc:'洞天深处，珠光入手', words:['fragile','companion'] },
+  { id:16, name:'混沌灵根', type:'skill', rarity:'SSR', icon:'🌟', desc:'万中无一，却被封印', words:['feeble','subtle'] },
+  { id:17, name:'生死悟道', type:'event', rarity:'SSR', icon:'☯️', desc:'绝境突破，修为暴涨', words:['absorb','accelerate','accomplish','allocate','alter','aggressive','abandon','vigilant','obscure','benevolent','solitude','profound','relentless'] },
+  { id:18, name:'九重雷劫', type:'event', rarity:'SSR', icon:'🌩️', desc:'以劫炼魂，扶摇直上', words:['ascend','authentic'] },
+  { id:19, name:'血脉觉醒', type:'event', rarity:'SR', icon:'🩸', desc:'弑神者身份，当众点破', words:['expose','identity','descent','divine','forbid','mortal','rage','summon','tremble','shatter','glory'] },
+  { id:20, name:'宗门浩劫', type:'event', rarity:'SR', icon:'🔥', desc:'上界靠山压境，倾覆在即', words:['disaster','collapse','unite','crisis','restore','survive','rescue','defend'] },
+  { id:21, name:'上尊拜师', type:'event', rarity:'SSR', icon:'🙇', desc:'上界使者，跪求收徒', words:['kneel','beg','talent','persuade','astonish','superior','humble','grateful','deserve','rival'] },
+  { id:22, name:'绝境顿悟', type:'event', rarity:'SSR', icon:'🌠', desc:'生死之间，参透大道', words:['comprehend','transcend','surge','realm','meditate','enlighten','infinite','essence','insight','calm'] },
+  { id:23, name:'上界天劫', type:'event', rarity:'SSR', icon:'⚡', desc:'再历雷火，剑指高境', words:['thunder','lightning','catastrophe','eternal','soar','vanish','radiant','destiny','triumph'] },
+  { id:24, name:'云上破局', type:'event', rarity:'SSR', icon:'♟️', desc:'翻盘执棋，重写天道', words:['illusion','puppet','awake','scheme','defy','throne','reform','forge','perpetual','master'] },
+  { id:25, name:'弑神血脉', type:'character', rarity:'SSR', icon:'⚜️', desc:'上古弑神者，最后传人', words:['descent','divine','forbid','mortal','rage'] },
+  { id:26, name:'古剑·残魂', type:'item', rarity:'SR', icon:'🗡️', desc:'剑仙残魂所授的千古古剑', words:['summon','shatter'] },
+  { id:27, name:'上界使者', type:'character', rarity:'SR', icon:'👼', desc:'高高在上，终跪阶下', words:['divine','descend','superior','kneel','beg'] },
+  { id:28, name:'雷劫绝顶', type:'location', rarity:'R', icon:'🏔️', desc:'九重雷劫之下，她立于此', words:['thunder','lightning','vanish','radiant'] },
+  { id:29, name:'弑神诀', type:'skill', rarity:'SSR', icon:'📿', desc:'以劫炼魂的禁忌心法', words:['comprehend','transcend','surge','infinite','essence','insight','enlighten'] },
+  { id:30, name:'天棋破局', type:'event', rarity:'SSR', icon:'👑', desc:'凡女执棋，天地重塑', words:['illusion','puppet','awake','scheme','defy','throne','reform','forge','perpetual','master'] },
+];
+
+// ============================================================ 角色立绘（与收藏卡的 character 类对应）
+const CHARACTERS = [
+  { name:'苏渺', role:'主角 · 废柴逆袭', img:'assets/characters/sumiao.png', desc:'清丽坚毅的少女修士，混沌灵根觉醒，终以词证道、扶摇飞升。' },
+  { name:'雪团', role:'伴生灵兽', img:'assets/characters/xuetuan.png', desc:'通体雪白的小灵兽，于幻月洞天破壳，与苏渺不离不弃。' },
+  { name:'玄清子', role:'青云长老', img:'assets/characters/xuanqingzi.png', desc:'慈严相济的宗门长老，残魂之秘的引路人，为护苏渺重伤。' },
+  { name:'柳如烟', role:'天之骄女 · 对手', img:'assets/characters/liuruyan.png', desc:'宗主亲传骄女，高傲绝美，下毒算计却终成亦敌亦友。' },
+  { name:'残魂·剑仙', role:'上古传承', img:'assets/characters/canhun.png', desc:'玉佩中的一缕剑仙残魂，候了三百年，授她清灵诀与弑神之秘。' },
+  { name:'上界使者', role:'上界来使', img:'assets/characters/shangjie.png', desc:'高高在上的鎏金使者，最终跪伏阶下，求苏渺收其为徒。' },
+];
+// 收藏卡 id -> 立绘（仅 character 类且有立绘者）
+const CARD_PORTRAIT = { 1:'assets/characters/sumiao.png', 2:'assets/characters/xuetuan.png', 3:'assets/characters/xuanqingzi.png', 4:'assets/characters/liuruyan.png', 25:'assets/characters/canhun.png', 27:'assets/characters/shangjie.png' };
+// 章节 id -> 封面（1..12 对应 ch01..ch12）
+const CHAPTER_COVER = {};
+for (let i = 1; i <= 12; i++) CHAPTER_COVER[i] = `assets/covers/ch${String(i).padStart(2,'0')}.png`;
+
+// ============================================================ VOCAB INDEX (from vocab.js)
+const TOTAL = (window.VOCAB && window.VOCAB.length) || 0;
+const VOCAB_MAP = {};
+const LETTER_GROUPS = {};
+if (window.VOCAB) {
+  window.VOCAB.forEach(v => {
+    VOCAB_MAP[v.word] = v;
+    const L = (v.word[0] || '#').toUpperCase();
+    (LETTER_GROUPS[L] = LETTER_GROUPS[L] || []).push(v);
+  });
+}
+const LETTERS = Object.keys(LETTER_GROUPS).sort();
+
+// 取词信息：优先真实音标释义，剧情词再叠加语境义/例句/收藏归属
+function extractPOS(def) {
+  const m = (def || '').match(/^([a-zA-Z]+\.)\s*/);
+  return m ? m[1] : '';
+}
+function getWordInfo(word) {
+  const real = VOCAB_MAP[word];
+  const base = STORY_WORDS.find(w => w.word === word);
+  const defStr = (real && real.def) || (base && base.meaning) || '';
+  return {
+    word: word,
+    phonetic: (real && real.phonetic) || (base && base.phonetic) || '',
+    def: defStr,
+    pos: extractPOS(defStr),
+    contextMeaning: (base && base.contextMeaning) || defStr,
+    example: base && base.example,
+    exampleTrans: base && base.exampleTrans,
+    difficulty: base && base.difficulty,
+    collectionType: base && base.collectionType,
+    collectionName: base && base.collectionName,
+  };
+}
+
+// ============================================================ REVIEW（艾宾浩斯遗忘曲线）
+// 复习间隔（天）：首次 1 天，逐次拉长；答错则重置为第 0 级
+const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30, 60];
+function ensureReviewSchedule() {
+  state.mastered.forEach(w => {
+    if (!state.reviewSchedule[w]) state.reviewSchedule[w] = { level: 0, nextDue: Date.now() };
+  });
+}
+function scheduleReview(word, level) {
+  const lv = Math.max(0, Math.min(level, REVIEW_INTERVALS.length - 1));
+  state.reviewSchedule[word] = { level: lv, nextDue: Date.now() + REVIEW_INTERVALS[lv] * 86400000 };
+}
+function getDueReviews() {
+  const now = Date.now();
+  return Object.keys(state.reviewSchedule).filter(w => state.learned.has(w) && state.reviewSchedule[w].nextDue <= now);
+}
+function dueReviewCount() { return getDueReviews().length; }
+
+// ============================================================ STATE（以单词字符串为键）
+let state = {
+  learned: new Set(), mastered: new Set(),
+  quizScore: 0, quizTotal: 20, quizCurrent: 0, quizMode: 'en2cn',
+  currentQuizWords: [], currentSection: 0, currentChapter: 1,
+  collectedCards: new Set([1,2,3]), quizIsReview: false,
+  vocabFilter: 'all', vocabLetter: (LETTERS[0] || 'A'), madeChoices: {},
+  choiceTrial: {}, // { 'sec0':true } 已通过「道之试炼」的章节
+  reviewSchedule: {}, // { word: { level:int, nextDue:timestamp } }
+};
+function loadState() {
+  try {
+    const saved = localStorage.getItem('xt12_state_v2');
+    if (saved) {
+      const p = JSON.parse(saved);
+      state.learned = new Set(p.learned || []);
+      state.mastered = new Set(p.mastered || []);
+      state.collectedCards = new Set(p.collectedCards || [1,2,3]);
+      state.madeChoices = p.madeChoices || {};
+      state.choiceTrial = p.choiceTrial || {};
+      state.reviewSchedule = p.reviewSchedule || {};
+      if (typeof p.sfxOn === 'boolean') sfxOn = p.sfxOn;
+    }
+  } catch(e) {}
+}
+function saveState() {
+  try {
+    localStorage.setItem('xt12_state_v2', JSON.stringify({
+      learned: [...state.learned], mastered: [...state.mastered],
+      collectedCards: [...state.collectedCards], madeChoices: state.madeChoices,
+      choiceTrial: state.choiceTrial,
+      reviewSchedule: state.reviewSchedule, sfxOn: sfxOn,
+    }));
+  } catch(e) {}
+  scheduleCloudPush(); // 已连接云端时自动防抖上传
+}
+function wordStatus(word) {
+  if (state.mastered.has(word)) return 'mastered';
+  if (state.learned.has(word)) return 'learning';
+  return 'new';
+}
+/* ============================================================ 云端同步（JSONBin 免费 JSON 存储）
+   配置存 localStorage（xt12_cloud）：{ apiKey, binId, lastSync }
+   - 首次「连接」自动创建 bin；之后每次保存自动防抖上传；启动时自动检测云端更新
+   - 冲突策略：最后写入者胜，云端比本机新时自动同步不覆盖，手动操作会弹窗确认 */
+const CLOUD_CFG_KEY = 'xt12_cloud';
+let _cloudTimer = null, _cloudBusy = false;
+function getCloudCfg() { try { return JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || '{}') || {}; } catch(e) { return {}; } }
+function setCloudCfg(c) { try { localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(c)); } catch(e) {} }
+function buildCloudPayload() {
+  return { v: 3, app: 'xt12', updatedAt: Date.now(),
+    state: localStorage.getItem('xt12_state_v2'),
+    leaderboard: localStorage.getItem('xt12_leaderboard') };
+}
+async function jsonbinReq(path, method, body) {
+  const cfg = getCloudCfg();
+  const res = await fetch('https://api.jsonbin.io/v3/b' + path, {
+    method: method, body: body ? JSON.stringify(body) : undefined,
+    headers: { 'X-Master-Key': cfg.apiKey, 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) { const e = new Error('HTTP ' + res.status); e.status = res.status; throw e; }
+  return res.json();
+}
+async function cloudConnect() {
+  if (_cloudBusy) return;
+  const keyEl = document.getElementById('cloud-key');
+  const apiKey = ((keyEl && keyEl.value.trim()) || getCloudCfg().apiKey || '').trim();
+  if (!apiKey) { showToast('请先填入 JSONBin API Key'); return; }
+  _cloudBusy = true;
+  const cfg = getCloudCfg(); cfg.apiKey = apiKey; setCloudCfg(cfg); // 先落盘，jsonbinReq 才能读到 key
+  try {
+    if (!cfg.binId) {
+      saveState(); // 确保有初始存档再创建云端
+      const data = await jsonbinReq('', 'POST', buildCloudPayload());
+      cfg.binId = data.metadata && data.metadata.id;
+      if (!cfg.binId) throw new Error('no-bin');
+      cfg.lastSync = Date.now();
+      setCloudCfg(cfg);
+      showToast('☁️ 云端已连接，存档已上传 ✓');
+    } else {
+      await jsonbinReq('/' + cfg.binId + '/latest', 'GET'); // 校验 bin 有效
+      cfg.lastSync = Date.now(); setCloudCfg(cfg);
+      showToast('☁️ 云端已连接 ✓');
+    }
+    updateCloudStatus();
+  } catch (e) {
+    showToast(e.status === 401 ? 'API Key 无效，请检查' : (e.status === 404 ? '云端存档不存在，请删除后重新连接' : '连接失败：' + e.message));
+  }
+  _cloudBusy = false;
+}
+function updateCloudStatus() {
+  const cfg = getCloudCfg();
+  const keyEl = document.getElementById('cloud-key');
+  const el = document.getElementById('cloud-status');
+  if (keyEl && cfg.apiKey && !keyEl.value) keyEl.value = cfg.apiKey;
+  if (!el) return;
+  if (cfg.apiKey && cfg.binId) {
+    const t = new Date(cfg.lastSync || Date.now());
+    const pad = n => String(n).padStart(2, '0');
+    el.textContent = '已连接 ✓ 云端存档 ' + cfg.binId.slice(0, 8) + '… · 上次同步 ' + pad(t.getMonth() + 1) + '/' + pad(t.getDate()) + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes());
+    el.style.color = '#3a8a5f';
+  } else if (cfg.apiKey) {
+    el.textContent = '已填 Key · 尚未连接，点「🔗 连接」创建云端存档';
+    el.style.color = 'var(--text-light)';
+  } else {
+    el.textContent = '未连接 · 填入 API Key 后点「连接」，首次会自动创建云端存档';
+    el.style.color = 'var(--text-light)';
+  }
+}
+async function cloudPush(manual) {
+  let cfg = getCloudCfg();
+  if (!cfg.apiKey || !cfg.binId) {
+    if (!manual) return;
+    showToast('请先连接云端（填 API Key 点连接）'); return;
+  }
+  try {
+    const remote = await jsonbinReq('/' + cfg.binId + '/latest', 'GET');
+    const r = remote.record || {};
+    if (r.updatedAt && cfg.lastSync && r.updatedAt > cfg.lastSync + 60000) {
+      if (manual) {
+        if (!confirm('⚠️ 云端进度比本机新（' + new Date(r.updatedAt).toLocaleString() + '），上传会覆盖云端，确定继续？')) return;
+      } else { return; } // 自动同步遇云端更新则跳过，交由用户手动决定
+    }
+    await jsonbinReq('/' + cfg.binId, 'PUT', buildCloudPayload());
+    cfg = getCloudCfg(); cfg.lastSync = Date.now(); setCloudCfg(cfg);
+    updateCloudStatus();
+    if (manual) showToast('☁️ 已上传到云端 ✓');
+  } catch (e) {
+    if (manual) showToast('上传失败：' + (e.status === 401 ? 'API Key 无效' : '网络异常'));
+  }
+}
+async function cloudPull(manual) {
+  const cfg = getCloudCfg();
+  if (!cfg.apiKey || !cfg.binId) { if (manual) showToast('请先连接云端（填 API Key 点连接）'); return; }
+  try {
+    const data = await jsonbinReq('/' + cfg.binId + '/latest', 'GET');
+    const r = data.record || {};
+    if (!r.state) { if (manual) showToast('云端暂无存档，先点「☁️ 上传进度」'); return; }
+    if (manual) {
+      if (!confirm('拉取云端进度会覆盖本机当前进度，确定？')) return;
+    } else if (!(r.updatedAt > (cfg.lastSync || 0))) {
+      return; // 自动检测：云端不新则跳过
+    }
+    localStorage.setItem('xt12_state_v2', r.state);
+    if (r.leaderboard) localStorage.setItem('xt12_leaderboard', r.leaderboard);
+    loadState();
+    const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇';
+    let ri = 0; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (state.learned.size >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri;
+    renderAll();
+    const c2 = getCloudCfg(); c2.lastSync = r.updatedAt || Date.now(); setCloudCfg(c2);
+    updateCloudStatus();
+    showToast(manual ? '☁️ 已从云端拉取 ✓' : '☁️ 检测到云端更新，已同步 ✓');
+  } catch (e) {
+    if (manual) showToast('拉取失败：' + (e.status === 401 ? 'API Key 无效' : '网络异常'));
+  }
+}
+// 防抖自动上传：游戏内每处保存进度后调用（3.5 秒内合并为一次上传）
+function scheduleCloudPush() {
+  const cfg = getCloudCfg();
+  if (!cfg.apiKey || !cfg.binId) return;
+  clearTimeout(_cloudTimer);
+  _cloudTimer = setTimeout(() => { cloudPush(false); }, 3500);
+}
+/* 存档导出：把本机 localStorage 打包成 JSON 文件，便于跨设备续缘 */
+function exportSave() {
+  try {
+    const data = { v: 2, state: localStorage.getItem('xt12_state_v2'), leaderboard: localStorage.getItem('xt12_leaderboard') };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date(), pad = n => String(n).padStart(2, '0');
+    a.href = url;
+    a.download = '仙途十二阶存档_' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    showToast('已导出存档 ✓ 换设备时导入即可');
+  } catch (e) { showToast('导出失败：' + e.message); }
+}
+/* 存档导入：读回 JSON 写回 localStorage，并重载状态与界面 */
+function importSave(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function() {
+    try {
+      const data = JSON.parse(reader.result);
+      if (data.state) localStorage.setItem('xt12_state_v2', data.state);
+      if (data.leaderboard) localStorage.setItem('xt12_leaderboard', data.leaderboard);
+      loadState();
+      const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇';
+      let ri = 0; const learned = state.learned.size; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (learned >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri;
+      renderAll();
+      showToast('存档已导入 ✓ 仙途延续');
+    } catch (e) { showToast('导入失败：文件格式不正确'); }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+if (!window.VOCAB) {
+  document.addEventListener('DOMContentLoaded', () => showToast('词库未加载：请确认 vocab.js 与本页同目录'));
+}
+
+// ============================================================ RENDER
+function renderCharGallery() {
+  const box = document.getElementById('char-gallery');
+  if (!box) return;
+  box.innerHTML = CHARACTERS.map(c => `
+    <div class="char-card">
+      <div class="char-tilt">
+        <div class="char-float">
+          <img class="char-img" src="${c.img}" alt="${c.name}" loading="lazy" onerror="this.style.display='none'">
+          <div class="char-aura"></div>
+        </div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-name">${c.name}</div>
+        <div class="cc-role">${c.role}</div>
+        <div class="cc-desc">${c.desc}</div>
+      </div>
+    </div>`).join('');
+  box.querySelectorAll('.char-card').forEach(attachCharTilt);
+}
+/* 立绘随指针/手指视差倾斜，模拟 Live2D「看向光标」的质感 */
+function attachCharTilt(card) {
+  const tilt = card.querySelector('.char-tilt');
+  if (!tilt) return;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  const onMove = function(e) {
+    const r = card.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    tilt.style.setProperty('--ry', (px * 12).toFixed(2) + 'deg');
+    tilt.style.setProperty('--rx', (-py * 12).toFixed(2) + 'deg');
+  };
+  const reset = function() { tilt.style.setProperty('--ry', '0deg'); tilt.style.setProperty('--rx', '0deg'); };
+  card.addEventListener('pointermove', onMove);
+  card.addEventListener('pointerleave', reset);
+  card.addEventListener('pointercancel', reset);
+}
+function renderAll() {
+  renderChapterList(); renderStorySections(); renderStoryContent();
+  renderCollectionCards(); renderVocabList(); renderRankSteps(); renderMap(); renderLetterIndex(); renderCharGallery(); updateStats();
+}
+
+function updateStats() {
+  ensureReviewSchedule();
+  const learned = state.learned.size, mastered = state.mastered.size;
+  const total = TOTAL || 5491;
+  const remaining = total - learned, review = dueReviewCount();
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-learned').textContent = learned;
+  document.getElementById('stat-cards').textContent = `${state.collectedCards.size}/${COLLECTION_CARDS.length}`;
+  document.getElementById('stat-review').textContent = Math.max(0, review);
+  document.getElementById('ms-mastered').textContent = mastered;
+  document.getElementById('ms-review').textContent = Math.max(0, review);
+  document.getElementById('ms-remaining').textContent = Math.max(0, remaining);
+  const hcl = document.getElementById('home-cards-link');
+  if (hcl) hcl.textContent = `藏录 ${state.collectedCards.size}/${COLLECTION_CARDS.length}`;
+  const hd = document.getElementById('home-due');
+  if (hd) hd.textContent = Math.max(0, review);
+  // 境界
+  let ri = 0;
+  for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (learned >= RANK_THRESHOLDS[i]) ri = i;
+  const rank = RANKS[ri], nextRank = RANKS[Math.min(ri + 1, 11)];
+  const wordsForNext = (RANK_THRESHOLDS[Math.min(ri + 1, 11)]) - learned;
+  document.getElementById('current-rank-num').textContent = ri + 1;
+  document.getElementById('current-rank-name').textContent = rank.name;
+  document.getElementById('next-rank-text').textContent = ri >= 11 ? '已至最高境界，仙途圆满！' : `下一境界：${nextRank.name}（还需 ${Math.max(0, wordsForNext)} 词）`;
+  // 境界突破：全屏特效 + 脉冲 + 音效
+  if (ri > _lastRankIdx) {
+    const rc = document.querySelector('.rank-circle');
+    const rn = document.getElementById('current-rank-num');
+    if (rc) { rc.classList.remove('pulse'); void rc.offsetWidth; rc.classList.add('pulse'); }
+    if (rn) { rn.classList.remove('pulse-num'); void rn.offsetWidth; rn.classList.add('pulse-num'); }
+    screenFlash();
+    showBreakthrough(rank.name);
+    if (rc) celebrateAt(rc, 22);
+  }
+  _lastRankIdx = ri;
+  renderChapterList();
+}
+
+function switchTab(tabName) {
+  sfx('tap');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  const page = document.getElementById(`page-${tabName}`);
+  if (page) page.classList.add('active');
+  const tabBtn = document.querySelector(`.tab-item[data-tab="${tabName}"]`);
+  if (tabBtn) tabBtn.classList.add('active');
+  try { window.scrollTo(0, 0); } catch (e) {}
+  if (tabName === 'quiz') showQuizMenu();
+  if (tabName === 'home') renderChapterList();
+  if (tabName === 'rank') renderMap();
+  if (tabName === 'vocab') { renderLetterIndex(); renderVocabList(); }
+}
+
+function renderChapterList() {
+  const container = document.getElementById('chapter-list-container');
+  const cn = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
+  container.innerHTML = CHAPTERS.map((ch, i) => {
+    const chId = ch.id;
+    const chWords = chapterWords(chId);
+    const learnedInCh = chWords.filter(w => state.learned.has(w)).length;
+    const pct = Math.round((learnedInCh / chWords.length) * 100);
+    const locked = !isChapterUnlocked(chId);
+    const prevWords = chapterWords(chId - 1);
+    const prevLearned = prevWords.filter(w => state.learned.has(w)).length;
+    const badge = locked ? '🔒 封印' : (learnedInCh > 0 ? '修习' : '未启');
+    const lockNote = locked
+      ? `<div class="ch-lock-note">🔒 上一章封印未解：需先习得 <b>${prevLearned}/${prevWords.length}</b> 词，方可开启本章仙卷与试炼。</div>`
+      : '';
+    const dis = locked ? 'disabled style="opacity:.45;pointer-events:none"' : '';
+    return `
+    <div class="chapter-card ${locked ? 'locked' : ''}">
+      <span class="ch-badge ${learnedInCh > 0 && !locked ? 'done' : ''}">${badge}</span>
+      <img class="chapter-cover-thumb" src="${CHAPTER_COVER[chId] || 'assets/covers/ch01.png'}" alt="第${cn[i]}章封面" onerror="this.style.display='none'">
+      <div class="ch-title">第${cn[i]}章 · ${ch.title}</div>
+      <div class="ch-desc">${ch.desc}</div>
+      <div class="ch-progress-bar"><div class="ch-progress-fill" style="width:${pct}%"></div></div>
+      <div class="ch-progress-text"><span>仙卷进度</span><span>${learnedInCh}/${chWords.length}</span></div>
+      ${lockNote}
+      <div class="ch-actions">
+        <button class="btn btn-outline" ${dis} onclick="openChapter(${chId})">翻阅仙卷</button>
+        <button class="btn btn-primary" ${dis} onclick="quizChapter(${chId})">⚔️ 试炼（战斗）</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setCurrentChapter(chId) {
+  state.currentChapter = chId;
+  const chLabel = ['一','二','三','四','五','六','七','八','九','十','十一','十二'][chId-1];
+  document.getElementById('reader-title').textContent = `第${chLabel}章 · ${CHAPTERS[chId-1].title}`;
+  const cover = document.getElementById('reader-cover');
+  const coverUrl = CHAPTER_COVER[chId] || 'assets/covers/ch01.png';
+  if (cover) {
+    cover.style.backgroundImage = `url('${coverUrl}')`;
+    document.getElementById('reader-cover-chapter').textContent = `第${chLabel}章`;
+    document.getElementById('reader-cover-title').textContent = CHAPTERS[chId-1].title;
+  }
+  const sc = document.getElementById('story-content');
+  if (sc) sc.style.setProperty('--story-bg', `url('${coverUrl}')`);
+  renderStoryContent();
+}
+
+function renderStorySections() {
+  const container = document.getElementById('story-sections');
+  container.innerHTML = STORY_SECTIONS.map((s, i) =>
+    `<div class="sec-dot ${i === state.currentSection ? 'active' : ''} ${i < state.currentSection ? 'done' : ''}" onclick="jumpToSection(${i})">${i+1}</div>`
+  ).join('');
+}
+function jumpToSection(idx) {
+  state.currentSection = idx; renderStorySections();
+  const el = document.getElementById('sec-' + idx);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================ 互动探索点
+const EXPLORE_EVENTS = {
+  0:  { word:'damp',     flavor:'你拨开柴房角落的蛛网，发现一本残破药典，墨迹沾着 damp 的潮气……' },
+  1:  { word:'meticulous', flavor:'密室石壁上的剑诀图谱，笔画 meticulous 得令人屏息，似有玄机……' },
+  2:  { word:'anticipate', flavor:'你将玉佩贴额，竟能 anticipate 柳如烟下一步的杀招，是福是祸？' },
+  3:  { word:'companion', flavor:'雪团化作光球绕你而转，似在指引一处秘洞——它是你最忠实的 companion。' },
+  4:  { word:'fragile',   flavor:'绝境中你护住那 fragile 的本命灯，灵气却逆流而上，破而后立。' },
+  5:  { word:'tremendous', flavor:'雷劫压下，你感到 tremendous 的威压，血脉却在轰鸣中苏醒。' },
+  6:  { word:'arrogant',  flavor:'上界使者面目 arrogant，却在你剑意下弯了脊背，世道颠倒。' },
+  7:  { word:'devastating', flavor:'宗门倾覆，那 devastating 的火光中，你转身逆行驰援。' },
+  8:  { word:'humble',    flavor:'上界使者竟 humble 求你收徒，这一局，反客为主。' },
+  9:  { word:'profound',  flavor:'生死边缘，你参透一道 profound 的大道，修为暴涨三重。' },
+  10: { word:'inevitable', flavor:'九霄天劫如期而至，那是 inevitable 的试炼，也是登顶的阶梯。' },
+  11: { word:'illusion',  flavor:'云上棋局虚实难辨，你终于看清这一切原是illusion，落子无悔。' },
+};
+// 探索掉落奖励池（权重随机）
+const EXPLORE_REWARDS = [
+  { name:'天降机缘', flavor:'天道垂青，一缕灵光为你录入新的仙缘词汇。', apply() {
+    const un = window.VOCAB ? shuffleArray(window.VOCAB.filter(w => !state.learned.has(w.word))) : [];
+    const w = un[0];
+    if (w) { state.learned.add(w.word); return `新词收录：${w.word} ${w.phonetic||''}`; }
+    return '仙缘已足，灵光散入金辉。';
+  }},
+  { name:'残卷馈赠', flavor:'尘封残卷中飞出一页藏录，落进你的袖中。', apply() {
+    const un = COLLECTION_CARDS.filter(c => !state.collectedCards.has(c.id));
+    if (!un.length) return '藏录已全，残卷化作祥光归元。';
+    const c = un[Math.floor(Math.random() * un.length)];
+    state.collectedCards.add(c.id);
+    return `解锁藏录：${c.name}`;
+  }},
+  { name:'顿悟之赏', flavor:'一念顿悟，随机一词被你彻底参透。', apply() {
+    const cand = shuffleArray([...state.learned].filter(w => !state.mastered.has(w)));
+    const w = cand[0];
+    if (w) { state.mastered.add(w); return `顿悟一词：${w}`; }
+    return '已无未悟之词，机缘归于虚空。';
+  }},
+  { name:'上品灵石', flavor:'一枚温润灵石入手，道心更固，仙途漫漫亦可从容。', apply() {
+    return '灵石入怀 · 道心稳固';
+  }},
+];
+function rollExploreReward() {
+  const total = EXPLORE_REWARDS.reduce((s, r) => s + 1, 0);
+  let idx = Math.floor(Math.random() * total);
+  return EXPLORE_REWARDS[idx];
+}
+function openExplore(sIdx) {
+  const ev = EXPLORE_EVENTS[sIdx];
+  if (!ev) return;
+  const info = getWordInfo(ev.word);
+  if (!info) return;
+  const correct = (info.contextMeaning || (info.def || '').split('；')[0]);
+  const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== ev.word)).slice(0, 3).map(w => (w.def || '').split('；')[0]);
+  const options = shuffleArray([correct, ...distractors]);
+  const labels = ['A','B','C','D'];
+  const esc = s => String(s).replace(/'/g, "\\'");
+  const overlay = document.createElement('div');
+  overlay.className = 'explore-modal';
+  overlay.innerHTML = `<div class="em-card">
+    <div class="em-flavor">🔍 ${ev.flavor}</div>
+    <div class="em-word">${info.word}</div>
+    ${info.phonetic ? `<div class="em-phonetic">${info.phonetic}</div>` : ''}
+    <div class="em-q">择其义，方得机缘：</div>
+    <div class="em-opts">${options.map((o,i)=>`<button onclick="handleExploreAnswer(this,'${esc(o)}','${esc(correct)}',${sIdx})">${labels[i]}. ${o}</button>`).join('')}</div>
+    <div class="em-reward" id="em-reward"></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+function handleExploreAnswer(btn, sel, correct, sIdx) {
+  if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+  if (sel === correct) {
+    btn.classList.add('correct');
+    const ev = EXPLORE_EVENTS[sIdx];
+    state.learned.add(ev.word);
+    const reward = rollExploreReward();
+    const rewardMsg = reward.apply();
+    saveState(); updateStats(); renderStoryContent(); renderCollectionCards();
+    const rw = document.getElementById('em-reward');
+    if (rw) rw.innerHTML = `✨ 机缘已得 · 该词已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span>`;
+    sfx('unlock'); screenFlash();
+    try { const r = btn.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, 14); } catch (e) {}
+    setTimeout(() => { const o = document.querySelector('.explore-modal'); if (o) o.remove(); }, 2200);
+  } else {
+    btn.classList.add('wrong');
+    const rw = document.getElementById('em-reward');
+    if (rw) rw.textContent = '✗ 似是而非，再斟酌一二';
+  }
+}
+
+function renderStoryContent() {
+  const container = document.getElementById('story-content');
+  const activeCh = state.currentChapter;
+  const sections = STORY_SECTIONS.filter((s, i) => i === (activeCh - 1));
+  if (sections.length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">请选择左侧仙卷章节</div>'; return; }
+  const sIdx = activeCh - 1;
+  const section = sections[0];
+  let html = `<div class="story-block" id="sec-${sIdx}">`;
+  html += `<div class="story-chapter-label">${section.label}</div>`;
+  html += `<div class="story-section-title">${section.title}</div>`;
+  html += `<div class="story-text"><p>`;
+  const paragraphs = section.content.split('\n\n');
+  paragraphs.forEach(para => {
+    if (!para.trim()) return;
+    let p = para;
+    STORY_WORDS.forEach(v => {
+      const regex = new RegExp(`\\b(${v.word})\\b`, 'gi');
+      const isL = state.learned.has(v.word);
+      p = p.replace(regex, `<span class="vocab-word ${isL ? 'learned' : 'word-hint-pulse'}" onclick="openWordModal('${v.word}')">$1</span>`);
+    });
+    STORY_WORDS.forEach(v => {
+      if (v.contextMeaning && v.contextMeaning.length > 1) {
+        const esc = v.contextMeaning.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(esc, 'g');
+        const isL = state.learned.has(v.word);
+        p = p.replace(regex, `<span class="vocab-word ${isL ? 'learned' : 'word-hint-pulse'}" onclick="openWordModal('${v.word}')">${v.contextMeaning}</span>`);
+      }
+    });
+    html += p + '</p><p>';
+  });
+  html = html.slice(0, -4);
+  html += `</p></div>`;
+  if (section.choices && section.choices.length) {
+    const choiceKey = 'sec' + sIdx;
+    const chosen = state.madeChoices[choiceKey] !== undefined;
+    const trialDone = !!state.choiceTrial[choiceKey];
+    if (!chosen && !trialDone) {
+      // 道之试炼：先证明你认得本章一词，才显分支选项（杜绝白送抉择）
+      const qWord = pickTrialWord(sIdx);
+      const info = getWordInfo(qWord);
+      const correctMeaning = info.contextMeaning || (info.def || '').split('；')[0];
+      const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== qWord)).slice(0, 3).map(w => (w.def || '').split('；')[0]);
+      const options = shuffleArray([correctMeaning, ...distractors]);
+      const labels = ['A', 'B', 'C', 'D'];
+      const esc = s => String(s).replace(/'/g, "\\'");
+      html += `<div class="choice-trial">
+        <div class="cb-title">✦ 道之试炼 ✦</div>
+        <div class="cb-sub">择此分支前，须先明本章一词真义</div>
+        <div class="trial-word">${qWord}</div>
+        ${info.phonetic ? `<div class="qq-hint" style="font-size:12px;text-align:center">${info.phonetic}</div>` : ''}
+        <div class="trial-q">请择其义：</div>
+        ${options.map((opt, i) => `<button class="q-option trial-opt" onclick="handleChoiceTrial(${sIdx}, '${esc(qWord)}', '${esc(opt)}', '${esc(correctMeaning)}')"><span class="opt-label">${labels[i]}</span><span>${opt}</span></button>`).join('')}
+      </div>`;
+    } else {
+      html += `<div class="choice-block">
+        <div class="cb-title">✦ 道之抉择 ✦</div>
+        <div class="cb-sub">你的选择，将开启不同的藏录。</div>`;
+      section.choices.forEach((c, ci) => {
+        const isChosen = chosen && state.madeChoices[choiceKey] === ci;
+        html += `<button class="choice-btn ${isChosen ? 'chosen' : ''}" ${chosen ? 'disabled' : ''} onclick="handleChoice(${sIdx}, ${ci})">${c.text}</button>`;
+      });
+      html += `</div>`;
+    }
+  }
+  // 互动探索点：本章有可探索机缘则插入「探索」按钮
+  if (EXPLORE_EVENTS[sIdx]) {
+    html += `<div style="text-align:center"><button class="explore-btn" onclick="openExplore(${sIdx})">🔍 探索此处 · 觅机缘</button></div>`;
+  }
+  html += `</div>`;
+  // 阅读页底部：本章学词进度条
+  const chId = section.chapter;
+  const chStoryWords = STORY_WORDS.filter(w => w.chapter === chId).map(w => w.word);
+  const learnedInCh = chStoryWords.filter(w => state.learned.has(w)).length;
+  const totalCh = chStoryWords.length;
+  const pctCh = totalCh > 0 ? Math.round((learnedInCh / totalCh) * 100) : 0;
+  const needForUnlock = Math.ceil(totalCh * 0.6);
+  const canUnlockNext = learnedInCh >= needForUnlock;
+  html += `<div class="reader-footer"><div class="rf-title"><span>📖 本章修习进度</span><span style="font-size:11px">${canUnlockNext ? '✅ 已达解锁条件' : '🔒 还需 ' + (needForUnlock - learnedInCh) + ' 词'}</span></div><div class="rf-bar"><div class="rf-fill" style="width:${pctCh}%"></div></div><div class="rf-text">已学 ${learnedInCh} / ${totalCh} 词 · ${pctCh}%</div></div>`;
+  container.innerHTML = html;
+  const learnedInStory = STORY_WORDS.filter(w => state.learned.has(w.word)).length;
+  document.getElementById('reader-progress').textContent = `${learnedInStory}/${STORY_WORDS.length}`;
+}
+
+function handleChoice(sIdx, ci) {
+  const choiceKey = 'sec' + sIdx;
+  const ch = STORY_SECTIONS[sIdx].choices[ci];
+  state.madeChoices[choiceKey] = ci;
+  if (ch.markWords) ch.markWords.forEach(w => state.learned.add(w));
+  if (ch.unlockCard) {
+    state.collectedCards.add(ch.unlockCard);
+    const card = COLLECTION_CARDS.find(c => c.id === ch.unlockCard);
+    showToast(`🃏 解锁藏录：${card ? card.name : '新卡'}`);
+    sfx('unlock'); screenFlash(); _justUnlockedCard = ch.unlockCard;
+  } else {
+    showToast('✦ 命运分支已定');
+  }
+  sfx('choice');
+  saveState(); updateStats(); renderStoryContent(); renderCollectionCards();
+  // 选择后追加下一步引导
+  appendChoiceNextStep(sIdx);
+}
+
+/* 抉择后：显示本章进度与下一步行动 */
+function appendChoiceNextStep(sIdx) {
+  const sec = STORY_SECTIONS[sIdx];
+  if (!sec || !sec.chapter) return;
+  const chId = sec.chapter;
+  const chStoryWords = STORY_WORDS.filter(w => w.chapter === chId).map(w => w.word);
+  const learnedInCh = chStoryWords.filter(w => state.learned.has(w)).length;
+  const totalCh = chStoryWords.length;
+  const pct = Math.round((learnedInCh / totalCh) * 100);
+  const chIdx = CHAPTERS.findIndex(c => c.id === chId);
+  const hasNext = chIdx >= 0 && chIdx < CHAPTERS.length - 1;
+  const nextLocked = hasNext && learnedInCh < Math.ceil(totalCh * 0.6);
+  
+  // Find the choice-block and append after it
+  const choiceBlocks = document.querySelectorAll('.choice-block');
+  if (choiceBlocks.length === 0) return;
+  const lastBlock = choiceBlocks[choiceBlocks.length - 1];
+  
+  // Remove old next-step if exists
+  const old = document.querySelector('.choice-next'); if (old) old.remove();
+  
+  let actionHtml = '';
+  if (nextLocked) {
+    actionHtml = `<div style="font-size:11.5px;color:var(--text-light);margin-top:4px">🔒 再学 ${Math.ceil(totalCh*0.6) - learnedInCh} 词解锁下一章</div>
+      <div class="cn-btns"><button class="btn btn-primary" style="flex:1;font-size:13px" onclick="startChapterBattle(${chId})">⚔️ 去试炼巩固</button><button class="btn btn-outline" style="flex:1;font-size:13px" onclick="switchTab('home')">🏠 回宗门</button></div>`;
+  } else if (hasNext) {
+    actionHtml = `<div style="font-size:11.5px;color:#2e9e57;margin-top:4px">✅ 已达解锁条件，可进入下一章！</div>
+      <div class="cn-btns"><button class="btn btn-primary" style="flex:1;font-size:13px" onclick="switchTab('read');setCurrentChapter(${CHAPTERS[chIdx+1].id})">📖 进入下一章</button><button class="btn btn-outline" style="flex:1;font-size:13px" onclick="startChapterBattle(${chId})">⚔️ 再战试炼</button></div>`;
+  } else {
+    actionHtml = `<div style="font-size:11.5px;color:var(--gold-dark);margin-top:4px">🏆 最终章！仙途将成，继续温养旧词冲刺飞升吧</div>
+      <div class="cn-btns"><button class="btn btn-outline" style="flex:1;font-size:13px" onclick="switchTab('quiz')">🔄 去温养复习</button><button class="btn btn-outline" style="flex:1;font-size:13px" onclick="switchTab('cards')">🃏 看藏录</button></div>`;
+  }
+  
+  const nextEl = document.createElement('div');
+  nextEl.className = 'choice-next';
+  nextEl.innerHTML = `<div class="cn-title">✦ 本章修习进度</div><div class="cn-progress">已学 <b>${learnedInCh}</b> / ${totalCh} 词（${pct}%）</div>${actionHtml}`;
+  lastBlock.parentNode.insertBefore(nextEl, lastBlock.nextSibling);
+}
+
+/* 单词真人发音：主用有道在线真人音频（不依赖本机语音包），失败再兜底 Web Speech */
+let _enVoice = null;
+(function () {
+  try {
+    if ('speechSynthesis' in window) {
+      const pick = () => { const vs = window.speechSynthesis.getVoices(); _enVoice = vs.find(v => /^en/i.test(v.lang) || /english/i.test(v.name)) || null; };
+      pick();
+      window.speechSynthesis.onvoiceschanged = pick;
+    }
+  } catch (e) {}
+})();
+let _curAudio = null;
+function speakWord(word) {
+  const w = (word || '').trim();
+  if (!w) return;
+  if (_curAudio) { try { _curAudio.pause(); } catch (e) {} }
+  let fellBack = false;
+  const fallback = () => {
+    if (fellBack) return; fellBack = true;
+    try {
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(w);
+        u.lang = 'en-US'; u.rate = 0.9; u.pitch = 1.0;
+        if (_enVoice) u.voice = _enVoice;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      } else { showToast('当前环境暂无法发音'); }
+    } catch (e) { showToast('当前环境暂无法发音'); }
+  };
+  try {
+    const audio = new Audio('https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(w) + '&type=2');
+    _curAudio = audio;
+    audio.onerror = fallback;
+    const p = audio.play();
+    if (p && p.catch) p.catch(fallback);
+  } catch (e) { fallback(); }
+}
+function openWordModal(word) {
+  const info = getWordInfo(word);
+  if (!info.def) { showToast('该词暂无释义'); return; }
+  state.learned.add(word); saveState(); updateStats();
+  // 若当前在剧情页，刷新高亮
+  if (document.getElementById('page-read').classList.contains('active')) renderStoryContent();
+  const isMastered = state.mastered.has(word);
+  const hasCollection = !!info.collectionType;
+  const content = document.getElementById('word-modal-content');
+  let html = `
+    <div class="wm-header">
+      <div class="wm-icon">${info.word[0] ? info.word[0].toUpperCase() : '?'}</div>
+      <div class="wm-word-info"><div class="wm-word">${info.word}</div>${info.phonetic ? `<div class="wm-phonetic">${info.phonetic}</div>` : ''}</div>
+      <button class="wm-speak-btn" title="朗读单词" onclick="speakWord('${info.word.replace(/'/g,"\\'")}')">🔊</button>
+      <button class="wm-mastered-btn ${isMastered ? 'done' : ''}" onclick="toggleMastered('${info.word.replace(/'/g,"\\'")}', this)">${isMastered ? '已悟 ✓' : '标记悟透'}</button>
+    </div>`;
+  if (info.contextMeaning && info.contextMeaning !== info.def) {
+    html += `<div class="wm-context-label">仙途语境义</div><div class="wm-context-meaning">${info.contextMeaning}</div>`;
+  }
+  html += `<div class="wm-context-label">${info.contextMeaning && info.contextMeaning !== info.def ? '完整释义' : '释义'}</div><div class="wm-full-meaning">${info.def}</div>`;
+  if (info.example) html += `<div class="wm-example"><div class="ex-sentence">"${info.example}"</div><div class="ex-translate">${info.exampleTrans}</div></div>`;
+  if (info.difficulty) html += `<div class="wm-difficulty">难度评级：${'★'.repeat(info.difficulty)}${'☆'.repeat(5-info.difficulty)}</div>`;
+  if (state.reviewSchedule[info.word]) {
+    const s = state.reviewSchedule[info.word];
+    const due = s.nextDue <= Date.now();
+    const d = new Date(s.nextDue);
+    const txt = due ? '⏰ 温养到期，速去「试词·温养」' : `下次温养：${d.getMonth()+1}月${d.getDate()}日（第 ${s.level+1} 轮）`;
+    html += `<div class="wm-collection-hint" style="border-color:${due?'var(--red-bright)':'var(--gold)'};color:${due?'var(--red-deep)':'var(--gold-dark)'}">🔄 ${txt}</div>`;
+  }
+  if (hasCollection) html += `<div class="wm-collection-hint">🔒 归属藏录 · 待解锁<br><small>试词通关后，此词归入「${info.collectionName}」录中。</small></div>`;
+  html += `<div class="quiz-mode-toggle">
+      <button class="qm-btn" onclick="quickQuizWord('${info.word.replace(/'/g,"\\'")}', 'en2cn')">英择中义</button>
+      <button class="qm-btn" onclick="quickQuizWord('${info.word.replace(/'/g,"\\'")}', 'cn2en')">中写英语</button>
+    </div>
+    <div class="wm-actions">
+      <button class="btn btn-outline" onclick="markRemembered('${info.word.replace(/'/g,"\\'")}')">收入温养</button>
+      <button class="btn btn-red" onclick="quickQuizWord('${info.word.replace(/'/g,"\\'")}', 'en2cn')">试此一道</button>
+    </div>`;
+  content.innerHTML = html;
+  document.getElementById('word-modal').classList.add('show');
+  speakWord(info.word); // 点开单词自动朗读一遍
+}
+function hideWordModal() { document.getElementById('word-modal').classList.remove('show'); }
+function toggleMastered(word, btn) {
+  if (state.mastered.has(word)) { state.mastered.delete(word); btn.classList.remove('done'); btn.textContent = '标记悟透'; if (state.reviewSchedule[word]) delete state.reviewSchedule[word]; }
+  else { state.mastered.add(word); btn.classList.add('done'); btn.textContent = '已悟 ✓'; showToast('已悟透此词 ✓'); if (!state.reviewSchedule[word]) scheduleReview(word, 0); }
+  saveState(); updateStats();
+}
+function markRemembered(word) {
+  state.learned.add(word);
+  if (!state.reviewSchedule[word]) scheduleReview(word, 0);
+  saveState(); updateStats();
+  showToast(`「${word}」已收入温养册，择日温养 ✓`); hideWordModal();
+}
+document.getElementById('word-modal').addEventListener('click', function(e) { if (e.target === this) hideWordModal(); });
+
+// ============================================================ QUIZ（覆盖全词库）
+let currentQuizWord = null;
+function showQuizMenu() {
+  exitBattle();
+  document.getElementById('quiz-menu').style.display = 'block';
+  document.getElementById('quiz-play-area').style.display = 'none';
+  const md = document.getElementById('menu-due');
+  if (md) md.textContent = getDueReviews().length;
+  window.scrollTo(0, 0);
+}
+function startQuiz() {
+  exitBattle();
+  document.getElementById('quiz-menu').style.display = 'none';
+  document.getElementById('quiz-play-area').style.display = 'block';
+  state.quizIsReview = false; state.quizScore = 0; state.quizCurrent = 0; state.quizMode = 'en2cn';
+  state.currentQuizWords = sampleQuizWords(20);
+  state.quizTotal = state.currentQuizWords.length;
+  document.getElementById('quiz-total').textContent = state.quizTotal;
+  showQuizQuestion();
+}
+function startChapterQuiz(chId) {
+  switchTab('quiz');
+  document.getElementById('quiz-menu').style.display = 'none';
+  document.getElementById('quiz-play-area').style.display = 'block';
+  state.quizIsReview = false; state.quizScore = 0; state.quizCurrent = 0; state.quizMode = 'en2cn';
+  state.currentQuizWords = sampleQuizWords(20);
+  state.quizTotal = state.currentQuizWords.length;
+  document.getElementById('quiz-total').textContent = state.quizTotal;
+  showQuizQuestion();
+  const cardId = CHAPTER_QUIZ_CARD[chId];
+  state._chapterQuizCard = cardId;
+}
+function startReviewMode() {
+  exitBattle();
+  document.getElementById('quiz-menu').style.display = 'none';
+  document.getElementById('quiz-play-area').style.display = 'block';
+  state.quizIsReview = true; state.quizScore = 0; state.quizCurrent = 0; state.quizMode = 'en2cn';
+  const due = getDueReviews();
+  state.currentQuizWords = due.slice(0, 40);
+  state.quizTotal = state.currentQuizWords.length;
+  document.getElementById('quiz-total').textContent = state.quizTotal;
+  if (state.quizTotal === 0) { showReviewEmpty(); return; }
+  showQuizQuestion();
+}
+function showReviewEmpty() {
+  document.getElementById('quiz-question-area').innerHTML = `<div style="text-align:center;padding:60px 20px"><div style="font-size:56px;margin-bottom:16px">🍃</div><div class="qq-word" style="font-size:24px">暂无待温养之词</div><div class="qq-hint" style="margin-top:8px">已悟之词皆已记牢，去「卷」里悟新词吧</div><div style="margin-top:24px"><button class="btn btn-primary" onclick="showQuizMenu()">返回选择</button></div></div>`;
+  document.getElementById('quiz-options-area').innerHTML = '';
+}
+function quickQuizWord(word, mode) {
+  hideWordModal(); exitBattle(); switchTab('quiz');
+  document.getElementById('quiz-menu').style.display = 'none';
+  document.getElementById('quiz-play-area').style.display = 'block';
+  state.currentQuizWords = [word]; state.quizScore = 0; state.quizCurrent = 0; state.quizTotal = 1; state.quizMode = mode;
+  state.quizIsReview = false; state._chapterQuizCard = null;
+  document.getElementById('quiz-total').textContent = '1'; showQuizQuestion();
+}
+function sampleQuizWords(n) {
+  const pool = (window.VOCAB && window.VOCAB.length) ? window.VOCAB : STORY_WORDS;
+  // 优先抽未掌握词，其次全部
+  const unmastered = pool.filter(v => !state.mastered.has(v.word));
+  const src = unmastered.length >= n ? unmastered : pool;
+  return shuffleArray(src).slice(0, n).map(v => v.word);
+}
+function showQuizQuestion() {
+  if (state.quizCurrent >= state.currentQuizWords.length) {
+    if (battle) { state.currentQuizWords = state.currentQuizWords.concat(shuffleArray(battlePool)); }
+    else { showQuizResult(); return; }
+  }
+  const word = state.currentQuizWords[state.quizCurrent];
+  currentQuizWord = word;
+  document.getElementById('quiz-pf').style.width = `${(state.quizCurrent / state.currentQuizWords.length) * 100}%`;
+  const area = document.getElementById('quiz-question-area');
+  const optsArea = document.getElementById('quiz-options-area');
+  document.getElementById('quiz-type-label').textContent = (state.quizMode === 'cn2en') ? '试词 · 中写英语' : '试词 · 英择中义';
+  const info = getWordInfo(word);
+  if (state.quizMode === 'cn2en') {
+    const rawPrompt = info.contextMeaning || info.def.split('；')[0];
+    const prompt = rawPrompt.replace(/^[a-zA-Z]+\.\s*/, '');
+    area.innerHTML = `<div class="qq-type">试词 · 中写英语</div><div class="qq-word" style="font-size:24px">${prompt}${info.pos ? ` <span style="font-size:14px;opacity:0.7">${info.pos}</span>` : ''}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div><div class="qq-hint">写出对应的英文单词</div><div class="quiz-input-area"><input class="qi-input" id="spell-input" placeholder="输入英文单词..." autocomplete="off" onkeydown="if(event.key==='Enter')checkSpellingAnswer()"></div>`;
+    optsArea.innerHTML = `<div style="padding:0 16px 24px"><button class="btn btn-red" style="width:100%" onclick="checkSpellingAnswer()">呈上答案</button></div>`;
+    setTimeout(() => document.getElementById('spell-input')?.focus(), 300);
+    speakWord(word);
+  } else {
+    const correctMeaning = info.contextMeaning || info.def.split('；')[0];
+    const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => (w.def.split('；')[0]));
+    const options = shuffleArray([correctMeaning, ...distractors]);
+    const labels = ['A','B','C','D'];
+    area.innerHTML = `<div class="qq-type">试词 · 英择中义</div><div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${info.pos || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
+    optsArea.innerHTML = options.map((opt, i) => `<button class="q-option" onclick="checkMCAnswer(this, '${opt.replace(/'/g,"\\'")}', '${correctMeaning.replace(/'/g,"\\'")}')"><span class="opt-label">${labels[i]}</span><span>${opt}</span></button>`).join('');
+    speakWord(word);
+  }
+  document.getElementById('quiz-score').textContent = state.quizScore;
+}
+function checkMCAnswer(btn, selected, correct) {
+  document.querySelectorAll('.q-option').forEach(o => o.style.pointerEvents = 'none');
+  if (selected === correct) { btn.classList.add('correct'); state.quizScore++; showToast('答对了！✓'); sfx('correct'); state.mastered.add(currentQuizWord); if (!state.reviewSchedule[currentQuizWord]) scheduleReview(currentQuizWord, 0); }
+  else { btn.classList.add('wrong'); document.querySelectorAll('.q-option').forEach(o => { if (o.textContent.includes(correct)) o.classList.add('correct'); }); showToast(`正解：${correct}`); sfx('wrong'); }
+  state.learned.add(currentQuizWord);
+  if (state.quizIsReview) applyReviewResult(currentQuizWord, selected === correct);
+  saveState(); updateStats();
+  if (battle) { const ended = applyBattleHit(selected === correct); if (ended) return; }
+  setTimeout(() => { state.quizCurrent++; showQuizQuestion(); }, 1200);
+}
+function checkSpellingAnswer() {
+  const input = document.getElementById('spell-input');
+  if (!input || !currentQuizWord) return;
+  const ok = input.value.trim().toLowerCase() === currentQuizWord.toLowerCase();
+  if (ok) { state.quizScore++; state.mastered.add(currentQuizWord); if (!state.reviewSchedule[currentQuizWord]) scheduleReview(currentQuizWord, 0); showToast('拼写正确！✓'); sfx('correct'); }
+  else { showToast(`正解：${currentQuizWord}`); sfx('wrong'); }
+  state.learned.add(currentQuizWord);
+  if (state.quizIsReview) applyReviewResult(currentQuizWord, ok);
+  saveState(); updateStats();
+  if (battle) { const ended = applyBattleHit(ok); if (ended) return; }
+  setTimeout(() => { state.quizCurrent++; showQuizQuestion(); }, 1200);
+}
+// 温养模式：答对则记忆等级+1（间隔拉长），答错则重置为首日
+function applyReviewResult(word, correct) {
+  const cur = state.reviewSchedule[word];
+  const lv = cur ? cur.level : 0;
+  scheduleReview(word, correct ? lv + 1 : 0);
+}
+function showQuizResult() {
+  const area = document.getElementById('quiz-question-area');
+  const optsArea = document.getElementById('quiz-options-area');
+  const pct = Math.round((state.quizScore / state.quizTotal) * 100);
+  const isReview = state.quizIsReview;
+  // 章节试炼通关 -> 解锁藏录（温养模式不触发）
+  if (!isReview && state._chapterQuizCard && state.quizScore >= Math.ceil(state.quizTotal * 0.6)) {
+    if (!state.collectedCards.has(state._chapterQuizCard)) {
+      state.collectedCards.add(state._chapterQuizCard);
+      const c = COLLECTION_CARDS.find(x => x.id === state._chapterQuizCard);
+      setTimeout(() => showToast(`🃏 解锁藏录：${c ? c.name : '新卡'}`), 1500);
+      sfx('unlock'); screenFlash(); _justUnlockedCard = state._chapterQuizCard;
+    }
+  }
+  const title = isReview ? '温养圆满' : '试炼结算';
+  area.innerHTML = `<div style="text-align:center;padding:40px 20px"><div style="font-size:64px;margin-bottom:16px">${pct>=80?'🎉':pct>=60?'👍':'💪'}</div><div class="qq-word" style="font-size:28px">${title}</div><div style="font-size:32px;margin-top:8px">${state.quizScore}/${state.quizTotal}</div><div class="qq-hint" style="margin-top:8px">${isReview ? '旧词重历，根基更牢' : `已通 ${state.quizScore} 道试炼`}</div><div style="margin-top:24px"><button class="btn btn-primary" onclick="${isReview ? 'startReviewMode()' : 'startQuiz()'}" style="margin-right:8px">${isReview ? '再温一轮' : '再历一轮'}</button><button class="btn btn-outline" onclick="showQuizMenu()" style="margin-right:8px">返回选择</button><button class="btn btn-outline" onclick="switchTab('home')">返回</button></div></div>`;
+  optsArea.innerHTML = '';
+  document.getElementById('quiz-pf').style.width = '100%';
+  if (!isReview && pct >= 60 && state.quizScore >= 5) {
+    const uncollected = COLLECTION_CARDS.filter(c => !state.collectedCards.has(c.id));
+    if (uncollected.length > 0) { const nc = uncollected[0]; state.collectedCards.add(nc.id); saveState(); setTimeout(() => showToast(`🃏 解锁新藏录：${nc.name}`), 1800); sfx('unlock'); screenFlash(); _justUnlockedCard = nc.id; }
+  }
+  saveState(); updateStats(); renderCollectionCards();
+}
+
+// ============================================================ 词关锁剧情 & 抉择考词 辅助
+function chapterWords(chId) { return STORY_WORDS.filter(w => w.chapter === chId).map(w => w.word); }
+function isChapterUnlocked(chId) {
+  if (chId <= 1) return true;
+  const prev = chapterWords(chId - 1);
+  if (!prev.length) return true;
+  const learned = prev.filter(w => state.learned.has(w)).length;
+  return learned >= Math.ceil(prev.length * 0.6);
+}
+function openChapter(chId) {
+  if (!isChapterUnlocked(chId)) { const p = chapterWords(chId - 1); showToast(`🔒 上一章封印未解，需先习得 ${p.filter(w => state.learned.has(w)).length}/${p.length} 词`); return; }
+  switchTab('read'); setCurrentChapter(chId);
+}
+function quizChapter(chId) {
+  if (!isChapterUnlocked(chId)) { const p = chapterWords(chId - 1); showToast(`🔒 上一章封印未解，需先习得 ${p.filter(w => state.learned.has(w)).length}/${p.length} 词`); return; }
+  startChapterBattle(chId);
+}
+function pickTrialWord(sIdx) {
+  const chId = sIdx + 1;
+  const words = chapterWords(chId).filter(w => { const i = getWordInfo(w); return i && i.def; });
+  const arr = words.length ? words : STORY_WORDS.map(w => w.word);
+  return shuffleArray(arr)[0];
+}
+function handleChoiceTrial(sIdx, word, selected, correct) {
+  if (selected === correct) {
+    state.choiceTrial['sec' + sIdx] = true;
+    saveState(); sfx('correct'); showToast('✦ 道心已稳，抉择开启');
+    renderStoryContent();
+  } else {
+    sfx('wrong'); showToast('道心未稳，再悟一次');
+    renderStoryContent();
+  }
+}
+
+// ============================================================ 战斗化试炼（Boss 战）
+const CHAPTER_ENEMY = { 1:'测灵长老', 2:'残魂试炼', 3:'柳如烟', 4:'幻月阵灵', 5:'心魔幻象', 6:'九重雷劫', 7:'上界敕令', 8:'柳家靠山', 9:'上界使者', 10:'顿悟心障', 11:'九霄天劫', 12:'执棋之人' };
+const ENEMY_ICON = { 1:'🧓', 2:'👻', 3:'🌸', 4:'🌙', 5:'😈', 6:'⚡', 7:'📜', 8:'🐉', 9:'🛐', 10:'🔮', 11:'🌩️', 12:'♟️' };
+let battle = null, battlePool = [];
+
+function exitBattle() {
+  if (!battle) return;
+  battle = null;
+  const qh = document.querySelector('.quiz-header'); if (qh) qh.style.display = '';
+  const qpb = document.querySelector('.quiz-progress-bar'); if (qpb) qpb.style.display = '';
+  const hud = document.getElementById('battle-hud'); if (hud) hud.remove();
+}
+function startChapterBattle(chId) {
+  switchTab('quiz');
+  document.getElementById('quiz-menu').style.display = 'none';
+  document.getElementById('quiz-play-area').style.display = 'block';
+  let pool = chapterWords(chId);
+  if (pool.length < 10) pool = pool.concat(sampleQuizWords(12));
+  battlePool = shuffleArray(pool);
+  state.currentQuizWords = battlePool.slice();
+  state.quizMode = 'en2cn'; state.quizCurrent = 0; state.quizIsReview = false;
+  state._chapterQuizCard = CHAPTER_QUIZ_CARD[chId];
+  battle = { chId: chId, enemyName: CHAPTER_ENEMY[chId] || '敌修', enemyMax: 100, enemyHp: 100, playerMax: 100, playerHp: 100, combo: 0, score: 0, cardId: CHAPTER_QUIZ_CARD[chId] };
+  const qh = document.querySelector('.quiz-header'); if (qh) qh.style.display = 'none';
+  const qpb = document.querySelector('.quiz-progress-bar'); if (qpb) qpb.style.display = 'none';
+  renderBattleHUD();
+  showQuizQuestion();
+}
+function renderBattleHUD() {
+  const pa = document.getElementById('quiz-play-area');
+  let hud = document.getElementById('battle-hud');
+  if (!hud) { hud = document.createElement('div'); hud.id = 'battle-hud'; pa.insertBefore(hud, pa.firstChild); }
+  const cover = CHAPTER_COVER[battle.chId] || 'assets/covers/ch01.png';
+  const icon = ENEMY_ICON[battle.chId] || '👹';
+  hud.innerHTML = `
+    <div class="battle-scene" style="background-image:url('${cover}')">
+      <div class="bs-enemy"><div class="bs-enemy-sigil">${icon}</div><div class="bs-enemy-name">⚔ ${battle.enemyName}</div></div>
+      <div class="bs-player"><div class="bs-player-avatar"><img src="assets/characters/sumiao.png" alt="苏渺" onerror="this.style.display='none'"></div><div class="bs-player-name">苏渺</div></div>
+      <div id="bs-fx"></div>
+    </div>
+    <div class="bh-row" style="margin-top:10px"><div class="bh-name">⚔ 对战：${battle.enemyName}</div></div>
+    <div class="bh-row"><div class="bh-bar"><div class="bh-fill enemy" id="bh-enemy-fill"></div></div><div class="bh-hp" id="bh-enemy-hp"></div></div>
+    <div class="bh-combo" id="bh-combo"></div>
+    <div class="bh-row"><div class="bh-name">🛡 道心</div></div>
+    <div class="bh-row"><div class="bh-bar"><div class="bh-fill player" id="bh-player-fill"></div></div><div class="bh-hp" id="bh-player-hp"></div></div>`;
+  updateBattleHUD();
+}
+function battleCast() {
+  const fx = document.getElementById('bs-fx'); if (!fx) return;
+  const slash = document.createElement('div'); slash.className = 'bs-slash';
+  slash.style.left = '44px'; slash.style.top = '200px'; slash.style.width = '210px'; slash.style.transform = 'rotate(-26deg)'; slash.style.opacity = '1';
+  fx.appendChild(slash);
+  setTimeout(() => { slash.style.transition = 'opacity .4s'; slash.style.opacity = '0'; }, 60);
+  setTimeout(() => slash.remove(), 480);
+  for (let i = 0; i < 6; i++) { const p = document.createElement('div'); p.className = 'bs-particle'; p.style.left = (250 + Math.random() * 40) + 'px'; p.style.top = (24 + Math.random() * 70) + 'px'; fx.appendChild(p); setTimeout(() => p.remove(), 650); }
+}
+function updateBattleHUD() {
+  const ef = document.getElementById('bh-enemy-fill'); if (ef) ef.style.width = (battle.enemyHp / battle.enemyMax * 100) + '%';
+  const pf = document.getElementById('bh-player-fill'); if (pf) pf.style.width = (battle.playerHp / battle.playerMax * 100) + '%';
+  const eh = document.getElementById('bh-enemy-hp'); if (eh) eh.textContent = battle.enemyHp + '/' + battle.enemyMax;
+  const ph = document.getElementById('bh-player-hp'); if (ph) ph.textContent = battle.playerHp + '/' + battle.playerMax;
+  const cb = document.getElementById('bh-combo'); if (cb) cb.textContent = battle.combo >= 2 ? ('连击 ×' + battle.combo) : '';
+}
+function showBattleFloat(text, cls) {
+  const hud = document.getElementById('battle-hud'); if (!hud) return;
+  const f = document.createElement('div'); f.className = 'dmg-float ' + cls; f.textContent = text;
+  hud.appendChild(f); setTimeout(() => f.remove(), 900);
+}
+// 答对=扣敌血+连击倍率(>=3 触发大招并回血)；答错=道心掉血。任一方空血即结算。
+function applyBattleHit(correct) {
+  if (!battle) return false;
+  if (correct) {
+    battle.combo++;
+    const mult = Math.min(2.5, 1 + battle.combo * 0.12);
+    const dmg = Math.round(13 * mult);
+    battle.enemyHp = Math.max(0, battle.enemyHp - dmg);
+    battle.score++;
+    battleCast();
+    if (battle.combo >= 3) { battle.playerHp = Math.min(battle.playerMax, battle.playerHp + 4); showBattleFloat('大招! -' + dmg, 'dmg-enemy'); }
+    else showBattleFloat('-' + dmg, 'dmg-enemy');
+  } else {
+    battle.combo = 0;
+    const dmg = 20;
+    battle.playerHp = Math.max(0, battle.playerHp - dmg);
+    showBattleFloat('-' + dmg, 'dmg-player');
+  }
+  updateBattleHUD();
+  if (battle.enemyHp <= 0) { showBattleResult('win'); return true; }
+  if (battle.playerHp <= 0) { showBattleResult('lose'); return true; }
+  return false;
+}
+function showBattleResult(kind) {
+  const chId = battle.chId, cardId = battle.cardId, enemyName = battle.enemyName;
+  const area = document.getElementById('quiz-question-area');
+  const optsArea = document.getElementById('quiz-options-area');
+  if (kind === 'win') {
+    if (cardId && !state.collectedCards.has(cardId)) {
+      state.collectedCards.add(cardId);
+      const c = COLLECTION_CARDS.find(x => x.id === cardId);
+      showToast(`🃏 击败 ${enemyName}，解锁藏录：${c ? c.name : '新卡'}`);
+      sfx('unlock'); screenFlash(); _justUnlockedCard = cardId;
+    } else { showToast(`🎉 击败 ${enemyName}！`); }
+  }
+  const title = kind === 'win' ? '🎉 大捷' : '💀 道心受创';
+  const sub = kind === 'win' ? `你击溃了 ${enemyName}，仙途再进一阶。` : `心魔反噬，道心受损。整顿后再战！`;
+  area.innerHTML = `<div style="text-align:center;padding:40px 20px"><div style="font-size:64px;margin-bottom:16px">${kind === 'win' ? '🎉' : '💀'}</div><div class="qq-word" style="font-size:28px">${title}</div><div class="qq-hint" style="margin-top:8px">${sub}</div><div style="margin-top:24px"><button class="btn btn-primary" style="margin-right:8px" onclick="startChapterBattle(${chId})">${kind === 'win' ? '再战一场' : '重整旗鼓'}</button><button class="btn btn-outline" style="margin-right:8px" onclick="showQuizMenu()">返回</button><button class="btn btn-outline" onclick="switchTab('home')">回宗</button></div></div>`;
+  optsArea.innerHTML = '';
+  const qh = document.querySelector('.quiz-header'); if (qh) qh.style.display = '';
+  const qpb = document.querySelector('.quiz-progress-bar'); if (qpb) qpb.style.display = '';
+  const hud = document.getElementById('battle-hud'); if (hud) hud.remove();
+  battle = null;
+  saveState(); updateStats(); renderCollectionCards(); renderChapterList();
+}
+
+// ============================================================ COLLECTION CARDS
+function renderCollectionCards(filter) {
+  filter = filter || 'all';
+  const grid = document.getElementById('cards-grid');
+  const filtered = filter === 'all' ? COLLECTION_CARDS : COLLECTION_CARDS.filter(c => c.type === filter);
+  document.getElementById('collection-count').textContent = `已收集：${state.collectedCards.size}/${COLLECTION_CARDS.length}`;
+  const typeName = { character:'修士', location:'宗门秘境', item:'法宝', event:'奇遇', skill:'功法' };
+  grid.innerHTML = filtered.map(card => {
+    const owned = state.collectedCards.has(card.id);
+    const progress = card.words ? card.words.filter(w => state.learned.has(w)).length : 0;
+    const total = card.words ? card.words.length : 0;
+    const pctW = total ? Math.round(progress / total * 100) : 0;
+    const portrait = CARD_PORTRAIT[card.id];
+    if (!owned) return `<div class="card-item card-empty"><div class="card-avatar">${portrait ? `<img src="${portrait}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'">` : '?'}</div><div class="card-name">???</div><div class="card-type">未解锁</div></div>`;
+    const justU = (card.id === _justUnlockedCard) ? ' just-unlocked' : '';
+    if (justU) _justUnlockedCard = null;
+    const avatarHtml = portrait ? `<img class="card-portrait" src="${portrait}" alt="${card.name}" onerror="this.style.display='none'">` : card.icon;
+    return `<div class="card-item ${card.rarity.toLowerCase()}${justU}" onclick="showToast('${card.name}：${card.desc}')">
+      <div class="card-rarity">${card.rarity}</div>
+      <div class="card-avatar">${avatarHtml}</div>
+      <div class="card-name">${card.name}</div>
+      <div class="card-type">${typeName[card.type] || '其他'}</div>
+      ${total ? `<div class="card-progress"><div class="card-progress-fill" style="width:${pctW}%"></div></div><div style="position:absolute;bottom:8px;width:100%;text-align:center;font-size:10px;opacity:0.7">${progress}/${total} 词</div>` : ''}
+    </div>`;
+  }).join('');
+}
+document.querySelectorAll('.col-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.col-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active'); renderCollectionCards(this.dataset.tab);
+  });
+});
+
+// ============================================================ VOCAB LIST（全词库 A-Z 索引）
+function renderLetterIndex() {
+  const box = document.getElementById('letter-index');
+  if (!LETTERS.length) { box.innerHTML = ''; return; }
+  box.innerHTML = LETTERS.map(L => `<button class="li-btn ${L === state.vocabLetter ? 'active' : ''}" onclick="setVocabLetter('${L}')">${L}</button>`).join('');
+}
+function setVocabLetter(L) { state.vocabLetter = L; renderLetterIndex(); renderVocabList(); }
+
+function renderVocabList() {
+  const container = document.getElementById('vocab-list-container');
+  if (!window.VOCAB) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">词库未加载</div>'; return; }
+  const searchTerm = (document.getElementById('vocab-search')?.value || '').trim().toLowerCase();
+  const filter = state.vocabFilter;
+  let items;
+  if (searchTerm) {
+    items = window.VOCAB.filter(v => v.word.toLowerCase().includes(searchTerm) || v.def.toLowerCase().includes(searchTerm)).slice(0, 300);
+  } else {
+    items = LETTER_GROUPS[state.vocabLetter] || [];
+  }
+  if (filter === 'mastered') items = items.filter(v => state.mastered.has(v.word));
+  else if (filter === 'learning') items = items.filter(v => state.learned.has(v.word) && !state.mastered.has(v.word));
+  else if (filter === 'new') items = items.filter(v => !state.learned.has(v.word));
+  document.getElementById('vocab-total-text').textContent = searchTerm
+    ? `匹配 ${items.length}${items.length >= 300 ? '+ 词（仅显前300）' : ' 词'}`
+    : `第 ${state.vocabLetter} 部 · 共 ${items.length} 词`;
+  container.innerHTML = items.map(v => {
+    const sc = wordStatus(v.word);
+    return `<div class="vocab-list-item" onclick="openWordModal('${v.word.replace(/'/g,"\\'")}')"><div class="vli-status ${sc}"></div><div class="vli-word">${v.word}</div><div class="vli-meaning">${v.def}</div><div class="vli-chapter">${sc === 'mastered' ? '已悟' : sc === 'learning' ? '温养' : '未学'}</div></div>`;
+  }).join('');
+  if (items.length === 0) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">暂无匹配词汇</div>';
+}
+function setVocabFilter(btn, filter) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); state.vocabFilter = filter; renderVocabList(); }
+
+// ============================================================ 仙途关卡地图
+function renderMap() {
+  const container = document.getElementById('xt-map-container');
+  if (!container) return;
+  const cn = ['一','二','三','四','五',' 六','七','八','九','十','十一','十二'];
+  const statuses = CHAPTERS.map(ch => {
+    const chWords = STORY_WORDS.filter(w => w.chapter === ch.id).map(w => w.word);
+    const learnedInCh = chWords.filter(w => state.learned.has(w)).length;
+    return { ch, learnedInCh, total: chWords.length };
+  });
+  for (let i = 0; i < statuses.length; i++) {
+    statuses[i].unlocked = (i === 0) || (statuses[i-1].learnedInCh >= Math.ceil(statuses[i-1].total * 0.6));
+  }
+  let currentIdx = 0;
+  for (let i = 0; i < statuses.length; i++) if (statuses[i].unlocked) currentIdx = i;
+  let html = '<div class="xt-map-path"></div>';
+  statuses.forEach((s, i) => {
+    let cls = 'locked';
+    if (s.unlocked && i === currentIdx) cls = 'current';
+    else if (s.unlocked) cls = 'done';
+    const lockedTxt = s.unlocked ? '' : `🔒 先学完「${CHAPTERS[i-1].title}」≥60%`;
+    const action = s.unlocked ? ` onclick="switchTab('read');setCurrentChapter(${s.ch.id})"` : '';
+    html += `<div class="xt-node ${cls}"><div class="xt-dot">${cn[i]}</div><div class="xt-card-box"${action}><div class="xt-ch">第${cn[i]}章</div><div class="xt-tt">${s.ch.title}</div><div class="xt-ds">${s.unlocked ? s.ch.desc : lockedTxt}</div></div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ============================================================ RANK ROAD
+function renderRankSteps() {
+  const container = document.getElementById('rank-steps-container');
+  let ri = 0;
+  for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (state.learned.size >= RANK_THRESHOLDS[i]) ri = i;
+  container.innerHTML = RANKS.map((r, i) => {
+    let cls = 'locked'; if (i < ri) cls = 'done'; if (i === ri) cls = 'current';
+    return `<div class="rank-step ${cls}" onclick="showToast('${r.name}：${r.desc}')"><div class="rank-step-icon">${r.icon}</div><div class="rank-step-name">${r.name}</div><div class="rank-step-desc">${RANK_THRESHOLDS[i]}词</div></div>`;
+  }).join('');
+}
+
+// ============================================================ UTILS
+function shuffleArray(arr) { const a = [...arr]; for (let i = a.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2400); }
+
+// ============================================================ 沉浸感：合成音效（Web Audio，无需素材）
+let sfxOn = true, _audioCtx = null, _lastRankIdx = 0, _justUnlockedCard = null;
+function _ac() { if (_audioCtx === null) { try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { _audioCtx = false; } } return _audioCtx || null; }
+function _tone(freq, start, dur, type, vol) {
+  const c = _ac(); if (!c) return;
+  const t = c.currentTime + start;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(vol || 0.14, t + 0.015);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.03);
+}
+function sfx(name) {
+  if (!sfxOn) return; const c = _ac(); if (!c) return;
+  if (c.state === 'suspended') { try { c.resume(); } catch (e) {} }
+  if (name === 'correct') { _tone(660, 0, 0.12, 'sine', 0.13); _tone(990, 0.08, 0.16, 'sine', 0.11); }
+  else if (name === 'wrong') { _tone(200, 0, 0.18, 'sawtooth', 0.09); _tone(150, 0.07, 0.2, 'sawtooth', 0.08); }
+  else if (name === 'unlock') { [523, 659, 784, 1047].forEach((f, i) => _tone(f, i * 0.07, 0.22, 'triangle', 0.12)); }
+  else if (name === 'rankup') { [392, 523, 659, 784, 1047, 1319].forEach((f, i) => _tone(f, i * 0.09, 0.3, 'sine', 0.13)); }
+  else if (name === 'choice') { _tone(440, 0, 0.1, 'triangle', 0.1); _tone(660, 0.07, 0.14, 'triangle', 0.09); }
+  else if (name === 'tap') { _tone(520, 0, 0.06, 'sine', 0.07); }
+}
+function toggleSfx() { sfxOn = !sfxOn; const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇'; if (sfxOn) sfx('tap'); saveState(); }
+function spawnBurst(cx, cy, n) {
+  n = n || 16;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span'); s.className = 'burst-particle';
+    s.style.left = cx + 'px'; s.style.top = cy + 'px';
+    const ang = Math.random() * Math.PI * 2, dist = 40 + Math.random() * 70;
+    s.style.setProperty('--dx', (Math.cos(ang) * dist) + 'px');
+    s.style.setProperty('--dy', (Math.sin(ang) * dist) + 'px');
+    const d = 0.6 + Math.random() * 0.5;
+    s.style.animation = `burstFly ${d}s ease-out forwards`;
+    document.body.appendChild(s); setTimeout(() => s.remove(), d * 1000 + 60);
+  }
+}
+function celebrateAt(el, n) { try { const r = el.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, n); } catch (e) {} }
+function screenFlash() { const f = document.createElement('div'); f.className = 'screen-flash'; document.body.appendChild(f); requestAnimationFrame(() => f.classList.add('go')); setTimeout(() => f.remove(), 1300); }
+function showBreakthrough(rankName) {
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ov = document.createElement('div');
+  ov.className = 'breakthrough';
+  let parts = '';
+  if (!reduce) { for (let i = 0; i < 20; i++) { const dx = (Math.random() * 2 - 1) * 42; const dl = (Math.random() * 0.7).toFixed(2); const lx = (24 + Math.random() * 52).toFixed(1); parts += `<span class="bt-p" style="--dx:${dx}vw;left:${lx}%;animation-delay:${dl}s"></span>`; } }
+  const esc = String(rankName || '').replace(/</g,'&lt;');
+  ov.innerHTML = `<div class="bt-ring"></div><div class="bt-ring2"></div><div class="bt-particles">${parts}</div><div class="bt-title">✦ 境 界 突 破 ✦</div><div class="bt-rank">${esc}</div><div class="bt-sub">修为更进一层 · 仙途再启新程</div>`;
+  document.body.appendChild(ov);
+  requestAnimationFrame(() => ov.classList.add('go'));
+  sfx('rankup');
+  if (!reduce) { try { spawnBurst(window.innerWidth / 2, window.innerHeight * 0.45, 26); } catch (e) {} }
+  setTimeout(() => { ov.classList.remove('go'); setTimeout(() => ov.remove(), 420); }, 2600);
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { hideWordModal(); closeShareModal(); } });
+document.getElementById('share-modal').addEventListener('click', function(e) { if (e.target === this) closeShareModal(); });
+
+// ============================================================ SHARE & LEADERBOARD
+function getCurrentRankIndex() {
+  let ri = 0; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (state.learned.size >= RANK_THRESHOLDS[i]) ri = i;
+  return ri;
+}
+function openShareModal() {
+  buildShareCard();
+  document.getElementById('share-modal').classList.add('show');
+}
+function closeShareModal() { document.getElementById('share-modal').classList.remove('show'); }
+function buildShareCard() {
+  const learned = state.learned.size, mastered = state.mastered.size;
+  const ri = getCurrentRankIndex();
+  const rank = RANKS[ri];
+  const content = document.getElementById('share-content');
+  content.innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:15px;color:var(--text-secondary);letter-spacing:2px;margin-bottom:6px">仙途十二阶 · 修仙逆袭考研录</div>
+      <canvas id="share-canvas" width="320" height="440" style="width:100%;border-radius:14px;box-shadow:0 4px 16px var(--shadow)"></canvas>
+      <div style="display:flex;gap:10px;margin:12px 0">
+        <button class="btn btn-outline" style="flex:1" onclick="copyShareText()">复制文案</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveShareImage()">保存战绩图</button>
+      </div>
+      <div style="background:var(--bg-card);border-radius:12px;padding:14px;text-align:left">
+        <div style="font-size:14px;font-weight:600;margin-bottom:8px;text-align:center">🏆 仙途榜（本地）</div>
+        <div id="leaderboard-list" style="font-size:12px;color:var(--text-secondary)"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input id="dao-name" placeholder="取个道号登榜" style="flex:1;padding:8px 10px;border:1px solid var(--border-color);border-radius:10px;font-size:13px;outline:none">
+          <button class="btn btn-red" style="flex-shrink:0" onclick="submitToLeaderboard()">登榜</button>
+        </div>
+      </div>
+    </div>`;
+  drawShareCanvas(rank, learned, mastered);
+  renderLeaderboard();
+}
+function drawShareCanvas(rank, learned, mastered) {
+  const c = document.getElementById('share-canvas'); if (!c) return;
+  let ctx; try { ctx = c.getContext('2d'); } catch (e) { ctx = null; }
+  if (!ctx) return; // 环境不支持 canvas 时跳过绘制，不影响其余功能
+  const W = c.width, H = c.height;
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#0E2A2A'); g.addColorStop(1, '#163C3A');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#C9A96E'; ctx.lineWidth = 3; ctx.strokeRect(8, 8, W - 16, H - 16);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#E8D5A8'; ctx.font = '600 17px sans-serif';
+  ctx.fillText('仙 途 十 二 阶', W / 2, 46);
+  ctx.font = '12px sans-serif'; ctx.fillStyle = 'rgba(234,240,241,0.6)';
+  ctx.fillText('修仙逆袭 · 考研单词录', W / 2, 66);
+  ctx.beginPath(); ctx.arc(W / 2, 138, 44, 0, Math.PI * 2);
+  ctx.strokeStyle = '#C9A96E'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.font = '38px sans-serif'; ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle';
+  ctx.fillText(rank.icon, W / 2, 138);
+  ctx.fillStyle = '#E8D5A8'; ctx.font = '600 22px sans-serif';
+  ctx.fillText(rank.name, W / 2, 200);
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#fff'; ctx.font = '600 32px sans-serif';
+  ctx.fillText(learned, W / 2, 262);
+  ctx.fillStyle = 'rgba(234,240,241,0.7)'; ctx.font = '13px sans-serif';
+  ctx.fillText('已修习词汇', W / 2, 282);
+  ctx.fillStyle = '#C9A96E'; ctx.font = '600 26px sans-serif';
+  ctx.fillText(state.collectedCards.size + ' / 18', W / 2, 332);
+  ctx.fillStyle = 'rgba(234,240,241,0.7)'; ctx.font = '13px sans-serif';
+  ctx.fillText('已集藏录', W / 2, 352);
+  ctx.fillStyle = 'rgba(234,240,241,0.45)'; ctx.font = '12px sans-serif';
+  ctx.fillText('凡女亦可逆天 · 道友共勉', W / 2, 412);
+}
+function copyShareText() {
+  const ri = getCurrentRankIndex();
+  const rank = RANKS[ri];
+  const txt = `【仙途十二阶】我已在修仙逆袭路上修至「${rank.name}」，习得 ${state.learned.size} 词，集得藏录 ${state.collectedCards.size}/${COLLECTION_CARDS.length}。凡女亦可逆天，道友共勉！`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(() => showToast('文案已复制 ✓')).catch(() => fallbackCopy(txt));
+  } else fallbackCopy(txt);
+}
+function fallbackCopy(txt) {
+  const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showToast('文案已复制 ✓'); } catch (e) { showToast('复制失败，请手动选择'); }
+  document.body.removeChild(ta);
+}
+function saveShareImage() {
+  const c = document.getElementById('share-canvas'); if (!c) return;
+  const url = c.toDataURL('image/png');
+  const a = document.createElement('a'); a.href = url; a.download = '仙途战绩.png'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast('战绩图已保存 ✓');
+}
+let memoryLeaderboard = [];
+function getLeaderboard() { try { const s = localStorage.getItem('xt12_leaderboard'); if (s) return JSON.parse(s); } catch (e) {} return memoryLeaderboard; }
+function renderLeaderboard() {
+  const list = document.getElementById('leaderboard-list'); if (!list) return;
+  const lb = getLeaderboard().sort((a, b) => b.learned - a.learned);
+  if (!lb.length) { list.innerHTML = '<div style="text-align:center;color:var(--text-light);padding:10px">尚无道友登榜，快取道号留名！</div>'; return; }
+  const medal = ['🥇', '🥈', '🥉'];
+  list.innerHTML = lb.slice(0, 8).map((e, i) => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border-color)"><span>${medal[i] || (i + 1 + '.')} ${e.name}</span><span>${e.learned}词 · ${e.rankName}</span></div>`).join('');
+}
+function submitToLeaderboard() {
+  const inp = document.getElementById('dao-name'); const name = (inp.value || '').trim();
+  if (!name) { showToast('请先取个道号'); return; }
+  const ri = getCurrentRankIndex();
+  const lb = getLeaderboard();
+  const entry = { name, learned: state.learned.size, mastered: state.mastered.size, cards: state.collectedCards.size, rankIndex: ri, rankName: RANKS[ri].name, date: Date.now() };
+  const ex = lb.findIndex(e => e.name === name);
+  if (ex >= 0) lb[ex] = entry; else lb.push(entry);
+  memoryLeaderboard = lb;
+  try { localStorage.setItem('xt12_leaderboard', JSON.stringify(lb)); } catch (e) {}
+  renderLeaderboard(); showToast('已登仙途榜 ✓');
+}
+
+// ============================================================ INIT
+loadState();
+/* 新手引导：首次打开显示教程 */
+(function() {
+  if (localStorage.getItem('xt12_tutorial_seen')) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'tutorial-overlay';
+  overlay.id = 'tutorial-overlay';
+  overlay.innerHTML = `
+<div class="tutorial-card">
+  <div class="tc-header"><div class="tc-title">✦ 仙途入门指引 ✦</div><div class="tc-sub">四步掌握修仙背词之法</div></div>
+  <div class="tc-step active" data-step="0">
+    <div class="tc-step-num">1</div>
+    <div class="tc-step-title">📖 剧情悟词</div>
+    <div class="tc-step-desc">在「卷」页阅读仙途剧情，点击<span style="color:var(--red-deep);font-weight:700">红色单词</span>查看释义并听发音。每学一个新词，你的道行就涨一分。</div>
+    <div class="tc-step-img">📜✨📝</div>
+    <div class="tc-step-tip">💡 提示：红词 = 本章节考纲词，点它就记住了！</div>
+  </div>
+  <div class="tc-step" data-step="1">
+    <div class="tc-step-num">2</div>
+    <div class="tc-step-title">⚔️ 试炼战斗</div>
+    <div class="tc-step-desc">在章节卡片上点「试炼（战斗）」进入 Boss 战！答对扣敌血、连击放大招；答错掉道心血。打赢解锁藏录卡。</div>
+    <div class="tc-step-img">⚔️🔥💀</div>
+    <div class="tc-step-tip">💡 提示：战斗也在记词，打怪 = 背题，一举两得！</div>
+  </div>
+  <div class="tc-step" data-step="2">
+    <div class="tc-step-num">3</div>
+    <div class="tc-step-title">✦ 抉择机缘</div>
+    <div class="tc-step-desc">剧情关键处会出现「道之抉择」。先通过小测验证明你认得这个词，再选择命运分支——不同选择解锁不同藏录。</div>
+    <div class="tc-step-img">🔮⚡🃏</div>
+    <div class="tc-step-tip">💡 提示：抉择前必须先过词，白送是不存在的～</div>
+  </div>
+  <div class="tc-step" data-step="3">
+    <div class="tc-step-num">4</div>
+    <div class="tc-step-title">🏆 境界晋升</div>
+    <div class="tc-step-desc">已学词数达到阈值自动突破境界（凡人→练气→筑基→…→飞升）。学完一章 ≥60% 的词才能解锁下一章。在「阶」页查看完整晋升路线。</div>
+    <div class="tc-step-img">🌟🚀☯️</div>
+    <div class="tc-step-tip">💡 提示：进度存于本机，换设备用首页「云端续缘」导出/导入。</div>
+  </div>
+  <div class="tc-dots"></div>
+  <div class="tc-actions"><button class="btn btn-outline" id="tc-skip" style="flex:0.6">跳过</button><button class="btn btn-primary" id="tc-next">下一步</button></div>
+</div>`;
+  document.body.appendChild(overlay);
+  const steps = overlay.querySelectorAll('.tc-step');
+  const dots = overlay.querySelector('.tc-dots');
+  const nextBtn = overlay.querySelector('#tc-next');
+  const skipBtn = overlay.querySelector('#tc-skip');
+  let curStep = 0;
+  // Create dots
+  for (let i = 0; i < steps.length; i++) {
+    const d = document.createElement('div'); d.className = 'tc-dot' + (i === 0 ? ' active' : ''); dots.appendChild(d);
+  }
+  function showStep(n) {
+    steps.forEach((s, i) => s.classList.toggle('active', i === n));
+    dots.querySelectorAll('.tc-dot').forEach((d, i) => d.classList.toggle('active', i === n));
+    nextBtn.textContent = n === steps.length - 1 ? '开始修仙' : '下一步';
+    curStep = n;
+  }
+  nextBtn.onclick = function() {
+    if (curStep < steps.length - 1) { showStep(curStep + 1); }
+    else { closeTutorial(); }
+  };
+  skipBtn.onclick = closeTutorial;
+  function closeTutorial() {
+    overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
+    setTimeout(() => { overlay.remove(); }, 300);
+    localStorage.setItem('xt12_tutorial_seen', '1');
+  }
+})();
+// 音效开关：同步按钮图标与持久化偏好
+(function () { const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇'; })();
+// 初始化境界索引：避免读档用户加载时误触「突破」特效
+(function () { let ri = 0; const learned = state.learned.size; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (learned >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri; })();
+renderAll();
+// 云端续缘：恢复配置显示 + 自动检测云端更新（已连接时）
+(function () { updateCloudStatus(); const c = getCloudCfg(); if (c.apiKey && c.binId) setTimeout(() => cloudPull(false), 1200); })();
+</script>
+</body>
+</html>
