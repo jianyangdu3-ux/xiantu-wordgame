@@ -1497,7 +1497,8 @@ function openExplore(sIdx) {
   if (!ev) return;
   const info = getWordInfo(ev.word);
   if (!info) return;
-  const correct = (info.contextMeaning || (info.def || '').split('；')[0]);
+  const correctRaw = info.contextMeaning || (info.def || '').split('；')[0];
+  const correct = info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw;
   const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== ev.word)).slice(0, 3).map(w => (w.def || '').split('；')[0]);
   const options = shuffleArray([correct, ...distractors]);
   const labels = ['A','B','C','D'];
@@ -1576,7 +1577,8 @@ function renderStoryContent() {
       // 道之试炼：先证明你认得本章一词，才显分支选项（杜绝白送抉择）
       const qWord = pickTrialWord(sIdx);
       const info = getWordInfo(qWord);
-      const correctMeaning = info.contextMeaning || (info.def || '').split('；')[0];
+      const correctRaw = info.contextMeaning || (info.def || '').split('；')[0];
+      const correctMeaning = info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw;
       const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== qWord)).slice(0, 3).map(w => (w.def || '').split('；')[0]);
       const options = shuffleArray([correctMeaning, ...distractors]);
       const labels = ['A', 'B', 'C', 'D'];
@@ -1853,7 +1855,9 @@ function showQuizQuestion() {
     setTimeout(() => document.getElementById('spell-input')?.focus(), 300);
     speakWord(word);
   } else {
-    const correctMeaning = info.contextMeaning || info.def.split('；')[0];
+    const correctRaw = info.contextMeaning || info.def.split('；')[0];
+    // 若剧情释义不含词性前缀，补上 info.pos 保持格式统一
+    const correctMeaning = info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw;
     const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => (w.def.split('；')[0]));
     const options = shuffleArray([correctMeaning, ...distractors]);
     const labels = ['A','B','C','D'];
