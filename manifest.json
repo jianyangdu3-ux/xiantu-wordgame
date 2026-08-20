@@ -1,0 +1,32 @@
+{
+  "name": "仙途十二阶 | 修仙逆袭考研单词",
+  "short_name": "仙途十二阶",
+  "description": "考研单词游戏互动背词：剧情悟词、Boss 试炼、秘境探索、词灵收集",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EAF0F1",
+  "theme_color": "#2E7D6B",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
