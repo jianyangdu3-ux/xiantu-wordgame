@@ -7,6 +7,7 @@
 <meta name="description" content="考研单词游戏互动背词：剧情悟词、Boss 试炼、秘境探索、词灵收集">
 <!-- PWA：添加到主屏幕 -->
 <link rel="manifest" href="manifest.json">
+<script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -516,6 +517,39 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   .bt-ring, .bt-ring2, .bt-p { animation: none !important; }
   .em-reward-drop { animation: none !important; }
 }
+
+/* ===== 论道台（异步切磋） ===== */
+.luntao-entry { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(24,61,54,.08), rgba(69,185,172,.06)); border: 1px solid rgba(24,61,54,.25); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; cursor: pointer; transition: transform .2s; }
+.luntao-entry:active { transform: scale(.98); }
+.luntao-entry .le-icon { font-size: 30px; }
+.luntao-entry .le-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.luntao-entry .le-desc { font-size: 11.5px; color: var(--text-light); margin-top: 2px; line-height: 1.5; }
+.luntao-entry .le-arrow { margin-left: auto; font-size: 22px; color: var(--gold); }
+.challenge-hud { margin-bottom: 12px; }
+.ch-hd-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px; }
+.ch-hd-row .ch-opp { color: var(--red-deep); font-weight: 700; }
+.ch-hd-row .ch-me { color: var(--gold-dark); font-weight: 700; }
+.ch-duel-bar { position: relative; height: 14px; border-radius: 7px; background: rgba(0,0,0,.14); overflow: hidden; display: flex; }
+.ch-duel-bar .cd-me { background: linear-gradient(90deg, #C9A96E, #E8D5A8); transition: width .35s; }
+.ch-duel-bar .cd-opp { background: linear-gradient(90deg, #A33, #D06); transition: width .35s; }
+.ch-combo { text-align: center; font-size: 13px; color: var(--red-deep); font-weight: 700; margin-top: 6px; min-height: 18px; }
+.ch-timer { text-align: center; font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.ch-opp-card { background: rgba(24,61,54,.07); border: 1px dashed rgba(24,61,54,.3); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.7; }
+.ch-opp-card b { color: var(--red-deep); }
+.ch-vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.ch-vs-card { border-radius: 12px; padding: 12px; text-align: center; }
+.ch-vs-card.me { background: rgba(24,61,54,.08); border: 1px solid rgba(24,61,54,.3); }
+.ch-vs-card.opp { background: rgba(216,50,47,.06); border: 1px solid rgba(216,50,47,.25); }
+.ch-vs-name { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
+.ch-vs-num { font-size: 24px; font-weight: 800; color: var(--text-primary); }
+.ch-vs-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.verdict { font-size: 22px; font-weight: 800; letter-spacing: 3px; padding: 10px 0; }
+.verdict.win { color: var(--red-deep); }
+.verdict.lose { color: var(--text-secondary); }
+.verdict.draw { color: var(--gold); }
+.sc-card-canvas { width: 100%; border-radius: 14px; box-shadow: 0 4px 16px var(--shadow); }
+.ch-rule { background: var(--bg-card); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.85; margin-bottom: 12px; }
+.ch-rule b { color: var(--gold-dark); }
 </style>
 </head>
 <body>
@@ -566,6 +600,11 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <div style="display:flex;gap:10px;margin-bottom:16px">
     <button class="btn btn-primary" style="flex:1" onclick="openShareModal()">📜 分享我的仙途</button>
     <button class="btn btn-outline" style="flex:1" onclick="switchTab('quiz')">🔄 温养（<span id="home-due">0</span>）</button>
+  </div>
+  <div class="luntao-entry" onclick="openChallengeHall()">
+    <span class="le-icon">⚔️</span>
+    <div><div class="le-title">论道台 · 与道友切磋</div><div class="le-desc">输入挑战码，同关比试词力；生成战绩卡，邀战群雄</div></div>
+    <span class="le-arrow">›</span>
   </div>
   <div class="save-sync">
     <div class="section-header" style="margin-bottom:8px"><h2>云端续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备同步</span></div>
@@ -722,7 +761,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v25 · 若页面异常请长按链接在浏览器打开</div>
+<div class="page-version">仙途十二阶 v26 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -734,6 +773,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 
 <div class="word-modal-overlay" id="word-modal"><div class="word-modal"><div class="word-modal-handle"></div><div id="word-modal-content"></div></div></div>
 <div class="word-modal-overlay" id="share-modal"><div class="word-modal"><div class="word-modal-handle"></div><div id="share-content"></div></div></div>
+<div class="word-modal-overlay" id="challenge-modal" onclick="if(event.target===this)closeChallengeHall()"><div class="word-modal"><div class="word-modal-handle"></div><div id="challenge-hall-content"></div></div></div>
+<div class="word-modal-overlay" id="score-card-modal" onclick="if(event.target===this)closeScoreCard()"><div class="word-modal"><div class="word-modal-handle"></div><div id="score-card-content"></div></div></div>
 <div class="word-modal-overlay" id="char-modal"><div class="word-modal"><div class="word-modal-handle"></div><div id="char-modal-content"></div></div></div>
 <div class="toast" id="toast"></div>
 </div>
@@ -3251,6 +3292,282 @@ function submitToLeaderboard() {
   renderLeaderboard(); showToast('已登仙途榜 ✓');
 }
 
+// ============================================================ 论道台（异步切磋 · 挑战码）
+let challenge = null; // { chId, questions, idx, correct, combo, maxCombo, startTime, opp, finished, timerId, _last }
+let _lastOpp = null;
+
+/* 挑战码：XT-C{章}-{正确率}-{用时秒}-{最高连击}-{3位随机}，如 XT-C5-90-128-15-A23 */
+function encodeChallengeCode(chId, acc, timeSec, combo) {
+  const rand = String(Math.random()).replace('.', '').slice(0, 3).toUpperCase();
+  return 'XT-C' + chId + '-' + Math.round(acc) + '-' + Math.round(timeSec) + '-' + Math.round(combo) + '-' + rand;
+}
+function parseChallengeCode(code) {
+  const m = String(code || '').trim().toUpperCase().match(/^XT-C(\d{1,2})-(\d{1,3})-(\d{1,4})-(\d{1,3})-([A-Z0-9]{3})$/);
+  if (!m) return null;
+  const chId = parseInt(m[1], 10);
+  if (chId < 1 || chId > CHAPTERS.length) return null;
+  return { chId: chId, acc: Math.min(100, parseInt(m[2], 10)), time: parseInt(m[3], 10), combo: parseInt(m[4], 10) };
+}
+
+function openChallengeHall() {
+  const content = document.getElementById('challenge-hall-content');
+  content.innerHTML = `
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="font-size:17px;font-weight:700;letter-spacing:2px">⚔️ 论道台 · 异步切磋</div>
+      <div style="font-size:12px;color:var(--text-light);margin-top:4px">同关十词，比正确、比手速、比连击</div>
+    </div>
+    <div class="ch-rule">
+      <b>如何切磋？</b><br>
+      ① 道友的「战绩卡」上印着挑战码与成绩（如 <b>XT-C5-90-128-15-A23</b>）<br>
+      ② 在此输入挑战码 → 进入同一章的 10 词切磋<br>
+      ③ 你的正确率 / 用时 / 连击将与之对比，胜过即胜<br>
+      ④ 全凭词力，本机判定，无需联网服务器
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input type="text" id="challenge-code-input" placeholder="输入挑战码，如 XT-C5-90-128-15-A23" autocomplete="off" style="flex:1;min-width:0;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text-primary);text-transform:uppercase">
+      <button class="btn btn-red" style="white-space:nowrap" onclick="submitChallengeCode()">应战</button>
+    </div>
+    <button class="btn btn-outline" style="width:100%" onclick="closeChallengeHall();startMyChallenge()">🏹 我先闯一关，生成战绩卡邀战</button>`;
+  document.getElementById('challenge-modal').classList.add('show');
+  setTimeout(() => document.getElementById('challenge-code-input')?.focus(), 300);
+}
+function closeChallengeHall() { document.getElementById('challenge-modal').classList.remove('show'); }
+function submitChallengeCode() {
+  const inp = document.getElementById('challenge-code-input');
+  const code = (inp ? inp.value : '').trim();
+  const parsed = parseChallengeCode(code);
+  if (!parsed) { showToast('挑战码格式不对，请从战绩卡上复制'); return; }
+  closeChallengeHall();
+  startChallenge(parsed.chId, { acc: parsed.acc, time: parsed.time, combo: parsed.combo });
+}
+function startMyChallenge() {
+  let chId = 1;
+  for (let i = 1; i <= CHAPTERS.length; i++) if (isChapterUnlocked(i)) chId = i;
+  startChallenge(chId, { acc: 60, time: 150, combo: 3 });
+  showToast('对阵「守关道友」，全力一战！');
+}
+
+function startChallenge(chId, opp) {
+  opp = opp || { acc: 60, time: 150, combo: 3 };
+  _lastOpp = opp;
+  const pool = chapterWords(chId).filter(w => { const i = getWordInfo(w); return i && i.def; });
+  if (pool.length < 10) {
+    const need = 10 - pool.length;
+    const extra = sampleQuizWords(need * 3).filter(w => !pool.includes(w));
+    pool.push(...extra.slice(0, need));
+  }
+  const questions = shuffleArray(pool).slice(0, 10);
+  challenge = { chId: chId, questions: questions, idx: 0, correct: 0, combo: 0, maxCombo: 0, startTime: Date.now(), opp: opp, finished: false, timerId: null };
+  switchTab('quiz');
+  const menu = document.getElementById('quiz-menu'); if (menu) menu.style.display = 'none';
+  const pa = document.getElementById('quiz-play-area'); if (pa) pa.style.display = 'block';
+  const qh = document.querySelector('.quiz-header'); if (qh) qh.style.display = 'none';
+  const qpb = document.querySelector('.quiz-progress-bar'); if (qpb) qpb.style.display = 'none';
+  renderChallengeHUD();
+  challenge.timerId = setInterval(updateChallengeHUD, 1000);
+  renderChallengeQuestion();
+}
+function renderChallengeHUD() {
+  const pa = document.getElementById('quiz-play-area');
+  let hud = document.getElementById('challenge-hud');
+  if (!hud) { hud = document.createElement('div'); hud.id = 'challenge-hud'; hud.className = 'challenge-hud'; pa.insertBefore(hud, pa.firstChild); }
+  const opp = challenge.opp;
+  hud.innerHTML = `
+    <div class="ch-opp-card">⚔ 道友战绩：<b>正确率 ${opp.acc}%</b> · 用时 ${opp.time}s · 最高连击 ×${opp.combo}<br>你需同关 10 词，胜过此战绩，方证道心。</div>
+    <div class="ch-hd-row"><span>☯ 对决进度</span><span class="ch-me">我 ${challenge.correct}/10</span><span class="ch-opp">对手 ${opp.acc}%</span></div>
+    <div class="ch-duel-bar"><div class="cd-me" id="cd-me" style="width:0%"></div><div class="cd-opp" id="cd-opp" style="width:${opp.acc}%"></div></div>
+    <div class="ch-combo" id="ch-combo"></div>
+    <div class="ch-timer" id="ch-timer">⏱ 用时 0s</div>`;
+  updateChallengeHUD();
+}
+function updateChallengeHUD() {
+  if (!challenge || challenge.finished) return;
+  const acc = challenge.idx > 0 ? Math.round(challenge.correct / challenge.idx * 100) : 0;
+  const me = document.getElementById('cd-me'); if (me) me.style.width = Math.min(100, acc) + '%';
+  const cb = document.getElementById('ch-combo'); if (cb) cb.textContent = challenge.combo >= 2 ? '🔥 连击 ×' + challenge.combo : '';
+  const tm = document.getElementById('ch-timer'); if (tm) tm.textContent = '⏱ 用时 ' + Math.round((Date.now() - challenge.startTime) / 1000) + 's';
+}
+function renderChallengeQuestion() {
+  if (!challenge) return;
+  if (challenge.idx >= challenge.questions.length) { finishChallenge(); return; }
+  const word = challenge.questions[challenge.idx];
+  currentQuizWord = word;
+  const info = getWordInfo(word);
+  const area = document.getElementById('quiz-question-area');
+  const optsArea = document.getElementById('quiz-options-area');
+  const correctRaw = info.contextMeaning || info.def.split('；')[0];
+  const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
+  const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
+  const options = shuffleArray([correctMeaning, ...distractors]);
+  const labels = ['A', 'B', 'C', 'D'];
+  area.innerHTML = `<div class="qq-type">论道 · 第${challenge.chId}章切磋</div>${buildQuizContext(word)}<div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">择其义，胜过道友！</div>`;
+  optsArea.innerHTML = options.map((opt, i) => `<button class="q-option" onclick="checkChallengeAnswer(this, '${opt.replace(/'/g, "\\'")}', '${correctMeaning.replace(/'/g, "\\'")}')"><span class="opt-label">${labels[i]}</span><span>${renderMeaning(opt)}</span></button>`).join('');
+  updateChallengeHUD();
+}
+function checkChallengeAnswer(btn, selected, correct) {
+  if (!challenge || challenge.finished) return;
+  document.querySelectorAll('.q-option').forEach(o => o.style.pointerEvents = 'none');
+  const ok = selected === correct;
+  if (ok) {
+    btn.classList.add('correct');
+    challenge.correct++; challenge.combo++;
+    challenge.maxCombo = Math.max(challenge.maxCombo, challenge.combo);
+    sfx('correct'); showToast('答对了 ✓ 词力 +1');
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.q-option').forEach(o => { if (o.textContent.includes(correct)) o.classList.add('correct'); });
+    challenge.combo = 0;
+    sfx('wrong'); showToast('正解：' + correct);
+    recordWrong(currentQuizWord);
+  }
+  markLearned(currentQuizWord);
+  saveState(); updateStats();
+  setTimeout(() => { if (challenge && !challenge.finished) { challenge.idx++; renderChallengeQuestion(); } }, 1100);
+}
+function finishChallenge() {
+  if (!challenge || challenge.finished) return;
+  challenge.finished = true;
+  if (challenge.timerId) { clearInterval(challenge.timerId); challenge.timerId = null; }
+  const timeSec = Math.max(1, Math.round((Date.now() - challenge.startTime) / 1000));
+  const acc = Math.round(challenge.correct / challenge.questions.length * 100);
+  const combo = challenge.maxCombo;
+  const opp = challenge.opp;
+  let verdict, vCls, vText;
+  if (acc > opp.acc) { verdict = 'win'; vCls = 'win'; vText = '🎉 道胜一筹！'; }
+  else if (acc < opp.acc) { verdict = 'lose'; vCls = 'lose'; vText = '道心未及，再战！'; }
+  else if (timeSec < opp.time) { verdict = 'win'; vCls = 'win'; vText = '🎉 以快制胜！'; }
+  else if (timeSec > opp.time) { verdict = 'lose'; vCls = 'lose'; vText = '略逊半息，再来！'; }
+  else if (combo > opp.combo) { verdict = 'win'; vCls = 'win'; vText = '🎉 连击制胜！'; }
+  else if (combo < opp.combo) { verdict = 'lose'; vCls = 'lose'; vText = '连击惜败，再战！'; }
+  else { verdict = 'draw'; vCls = 'draw'; vText = '棋逢对手，平局！'; }
+  const chId = challenge.chId, opp2 = challenge.opp;
+  challenge._last = { acc: acc, time: timeSec, combo: combo, verdict: verdict };
+  const area = document.getElementById('quiz-question-area');
+  const optsArea = document.getElementById('quiz-options-area');
+  area.innerHTML = `
+    <div style="text-align:center;padding:30px 16px">
+      <div class="verdict ${vCls}">${vText}</div>
+      <div class="qq-hint" style="margin-top:6px">切磋 · 第${chId}章「${CHAPTERS[chId - 1] ? CHAPTERS[chId - 1].title : ''}」· 10 词</div>
+      <div class="ch-vs-grid">
+        <div class="ch-vs-card me"><div class="ch-vs-name">☯ 我方</div><div class="ch-vs-num">${acc}%</div><div class="ch-vs-sub">${timeSec}s · 连击×${combo}</div></div>
+        <div class="ch-vs-card opp"><div class="ch-vs-name">⚔ 道友</div><div class="ch-vs-num">${opp2.acc}%</div><div class="ch-vs-sub">${opp2.time}s · 连击×${opp2.combo}</div></div>
+      </div>
+      <div style="margin-top:6px">
+        <button class="btn btn-primary" style="margin-right:8px" onclick="openScoreCard()">🃏 生成战绩卡</button>
+        <button class="btn btn-outline" style="margin-right:8px" onclick="startChallenge(${chId}, _lastOpp)">再战一场</button>
+        <button class="btn btn-outline" onclick="switchTab('home')">回宗</button>
+      </div>
+    </div>`;
+  optsArea.innerHTML = '';
+  const hud = document.getElementById('challenge-hud'); if (hud) hud.remove();
+}
+function openScoreCard() {
+  if (!challenge || !challenge._last) return;
+  const chId = challenge.chId, r = challenge._last;
+  const code = encodeChallengeCode(chId, r.acc, r.time, r.combo);
+  challenge._lastCode = code;
+  const content = document.getElementById('score-card-content');
+  content.innerHTML = `
+    <div style="text-align:center">
+      <canvas id="sc-canvas" width="720" height="960" class="sc-card-canvas"></canvas>
+      <div style="display:flex;gap:10px;margin:12px 0">
+        <button class="btn btn-outline" style="flex:1" onclick="copyChallengeCode()">复制挑战码</button>
+        <button class="btn btn-primary" style="flex:1" onclick="saveScoreCardImage()">保存战绩图</button>
+      </div>
+      <div style="background:var(--bg-card);border-radius:12px;padding:10px;font-size:12px;color:var(--text-secondary);line-height:1.7;text-align:left">
+        把战绩图发给道友，或把挑战码 <b style="color:var(--gold-dark)">${code}</b> 发到群里，对方在首页「论道台」输入即可应战。<br><span style="color:var(--text-light)">纯本地比拼：无服务器也能公平比试词力。</span>
+      </div>
+    </div>`;
+  drawScoreCardCanvas(code, r, chId);
+  document.getElementById('score-card-modal').classList.add('show');
+}
+function closeScoreCard() { document.getElementById('score-card-modal').classList.remove('show'); }
+function drawScoreCardCanvas(code, r, chId) {
+  const c = document.getElementById('sc-canvas'); if (!c) return;
+  let ctx; try { ctx = c.getContext('2d'); } catch (e) { ctx = null; }
+  if (!ctx) return;
+  const W = c.width, H = c.height;
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#0E2A2A'); g.addColorStop(1, '#163C3A');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#C9A96E'; ctx.lineWidth = 4; ctx.strokeRect(10, 10, W - 20, H - 20);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#E8D5A8'; ctx.font = '700 30px sans-serif';
+  ctx.fillText('仙途十二阶 · 论道切磋', W / 2, 62);
+  ctx.font = '15px sans-serif'; ctx.fillStyle = 'rgba(234,240,241,0.65)';
+  ctx.fillText('第' + chId + '章「' + (CHAPTERS[chId - 1] ? CHAPTERS[chId - 1].title : '') + '」', W / 2, 90);
+  const rows = [['正确率', r.acc + '%'], ['用时', r.time + ' 秒'], ['最高连击', '×' + r.combo]];
+  rows.forEach((row, i) => {
+    const y = 158 + i * 52;
+    ctx.fillStyle = 'rgba(234,240,241,0.6)'; ctx.font = '14px sans-serif';
+    ctx.fillText(row[0], W / 2, y);
+    ctx.fillStyle = '#E8D5A8'; ctx.font = '700 32px sans-serif';
+    ctx.fillText(row[1], W / 2, y + 34);
+  });
+  const v = r.verdict;
+  const vText = v === 'win' ? '此战：道胜一筹' : v === 'lose' ? '此战：惜败半招' : '此战：棋逢对手';
+  const vCol = v === 'win' ? '#E8D5A8' : v === 'lose' ? '#F0997B' : '#C9A96E';
+  ctx.fillStyle = vCol; ctx.font = '700 24px sans-serif';
+  ctx.fillText(vText, W / 2, 352);
+  ctx.fillStyle = 'rgba(255,255,255,0.07)';
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(W / 2 - 250, 388, 500, 82, 12); ctx.fill(); }
+  else { ctx.fillRect(W / 2 - 250, 388, 500, 82); }
+  ctx.strokeStyle = '#C9A96E'; ctx.lineWidth = 1.5;
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(W / 2 - 250, 388, 500, 82, 12); ctx.stroke(); }
+  else { ctx.strokeRect(W / 2 - 250, 388, 500, 82); }
+  ctx.fillStyle = '#E8D5A8'; ctx.font = '700 24px sans-serif';
+  ctx.fillText(code, W / 2, 424);
+  ctx.fillStyle = 'rgba(234,240,241,0.55)'; ctx.font = '12px sans-serif';
+  ctx.fillText('挑战码 · 首页论道台输入即可同关应战', W / 2, 454);
+  ctx.fillStyle = 'rgba(234,240,241,0.5)'; ctx.font = '14px sans-serif';
+  ctx.fillText('以词入道 · 邀战群雄', W / 2, H - 66);
+  ctx.fillStyle = 'rgba(234,240,241,0.35)'; ctx.font = '11px sans-serif';
+  ctx.fillText('仙途十二阶 · 考研单词修仙记', W / 2, H - 38);
+}
+function copyChallengeCode() {
+  const code = challenge && challenge._lastCode ? challenge._lastCode : '';
+  if (!code) { showToast('尚未生成战绩卡'); return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => showToast('挑战码已复制 ✓')).catch(() => fallbackCopy(code));
+  } else fallbackCopy(code);
+}
+function saveScoreCardImage() {
+  const c = document.getElementById('sc-canvas'); if (!c) return;
+  try {
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = '仙途十二阶_战绩卡.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showToast('战绩图已保存 ✓');
+  } catch (e) { showToast('保存失败，请长按图片保存'); }
+}
+function handleChallengeUrl() {
+  try {
+    const q = location.search || '';
+    const m = q.match(/[?&]chall=([^&]+)/);
+    if (!m) return;
+    const code = decodeURIComponent(m[1]);
+    const parsed = parseChallengeCode(code);
+    if (!parsed) { showToast('挑战链接无效'); return; }
+    setTimeout(() => {
+      openChallengeHall();
+      const inp = document.getElementById('challenge-code-input');
+      if (inp) inp.value = code;
+      showToast('⚔️ 道友邀战：第' + parsed.chId + '章 · 正确率 ' + parsed.acc + '%');
+    }, 600);
+  } catch (e) {}
+}
+function initBusuanzi() {
+  const box = document.getElementById('xt-visit');
+  if (!box) return;
+  let n = 0;
+  const t = setInterval(() => {
+    const v = document.getElementById('busuanzi_value_site_uv');
+    if (v && v.textContent && v.textContent.trim()) { box.style.display = 'inline'; clearInterval(t); }
+    else if (++n > 24) clearInterval(t);
+  }, 500);
+}
+
 // ============================================================ INIT
 loadState();
 /* 新手引导：首次打开显示教程 */
@@ -3341,6 +3658,9 @@ loadState();
 renderAll();
 // 云端续缘：恢复配置显示 + 自动检测云端更新（已连接时）
 (function () { updateCloudStatus(); const c = getCloudCfg(); if (c.apiKey && c.binId) setTimeout(() => cloudPull(false), 1200); })();
+// 论道台：URL 挑战直达 + 来访统计
+handleChallengeUrl();
+initBusuanzi();
 </script>
 </body>
 </html>
