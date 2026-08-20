@@ -204,7 +204,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .letter-index { display: flex; gap: 4px; overflow-x: auto; padding: 8px 0 12px; margin-bottom: 4px; }
 .letter-index .li-btn { flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-secondary); }
 .letter-index .li-btn.active { background: var(--red-deep); color: #fff; border-color: var(--red-deep); }
-.rank-road { background: linear-gradient(180deg, #0E2A2A 0%, #163C3A 100%); border-radius: 16px; padding: 24px 16px; margin-bottom: 20px; color: #EAF0F1; }
+.rank-road { background: linear-gradient(180deg, #0E2A2A 0%, #163C3A 100%); border-radius: 16px; padding: 24px 16px; margin-bottom: 20px; color: #EAF0F1; overflow: hidden; }
 .rank-road-title { text-align: center; font-size: 16px; font-weight: 600; letter-spacing: 3px; margin-bottom: 20px; color: var(--gold-light); }
 .rank-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
 .rank-step { width: 62px; text-align: center; cursor: pointer; transition: transform 0.2s; }
@@ -364,7 +364,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 /* ====== 仙途关卡地图 ====== */
 .xt-map { position: relative; padding: 8px 0 12px; }
 .xt-map-path { position: absolute; left: 28px; top: 28px; bottom: 28px; width: 4px; background: linear-gradient(180deg, var(--gold), rgba(180,45,45,.4)); border-radius: 2px; }
-.xt-node { position: relative; display: flex; align-items: center; gap: 14px; margin: 14px 0; padding-left: 52px; }
+.xt-node { position: relative; display: flex; align-items: center; gap: 14px; margin: 14px 0; padding: 0 16px 0 52px; }
 .xt-dot { position: absolute; left: 18px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-color); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text-light); z-index: 2; transition: all .3s; }
 .xt-node.done .xt-dot { background: var(--red-deep); border-color: var(--gold); color: #fff; }
 .xt-node.current .xt-dot { background: var(--gold); border-color: var(--red-deep); color: #fff; animation: nodePulse 1.4s ease-in-out infinite; }
