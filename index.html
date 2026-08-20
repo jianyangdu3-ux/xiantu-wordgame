@@ -1469,6 +1469,7 @@ function renderChapterList() {
 
 function setCurrentChapter(chId) {
   state.currentChapter = chId;
+  state.currentSection = chId - 1; // 同步小节索引，保证内容与导航一致
   const chLabel = ['一','二','三','四','五','六','七','八','九','十','十一','十二'][chId-1];
   document.getElementById('reader-title').textContent = `第${chLabel}章 · ${CHAPTERS[chId-1].title}`;
   const cover = document.getElementById('reader-cover');
@@ -1481,6 +1482,7 @@ function setCurrentChapter(chId) {
   const sc = document.getElementById('story-content');
   if (sc) sc.style.setProperty('--story-bg', `url('${coverUrl}')`);
   renderStoryContent();
+  renderStorySections(); // 同步导航高亮
 }
 
 /* 抉择机缘：跳到第一个尚未抉择的章节，定位到道之抉择并高亮提示 */
@@ -1510,9 +1512,10 @@ function renderStorySections() {
   ).join('');
 }
 function jumpToSection(idx) {
-  state.currentSection = idx; renderStorySections();
-  const el = document.getElementById('sec-' + idx);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (idx < 0 || idx >= STORY_SECTIONS.length) return;
+  state.currentSection = idx;
+  state.currentChapter = idx + 1; // 同步章节号
+  setCurrentChapter(idx + 1);     // 统一走 setCurrentChapter 刷新封面+内容+导航
 }
 
 // ============================================================ 互动探索点
@@ -1607,11 +1610,10 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
 
 function renderStoryContent() {
   const container = document.getElementById('story-content');
-  const activeCh = state.currentChapter;
-  const sections = STORY_SECTIONS.filter((s, i) => i === (activeCh - 1));
-  if (sections.length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">请选择左侧仙卷章节</div>'; return; }
-  const sIdx = activeCh - 1;
-  const section = sections[0];
+  const sIdx = state.currentSection; // 由 currentSection 决定显示哪一篇
+  if (sIdx < 0 || sIdx >= STORY_SECTIONS.length) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">请选择左侧仙卷章节</div>'; return; }
+  const section = STORY_SECTIONS[sIdx];
+  const activeCh = sIdx + 1; // 章节号 = 小节索引 + 1
   let html = `<div class="story-block" id="sec-${sIdx}">`;
   html += `<div class="story-chapter-label">${section.label}</div>`;
   html += `<div class="story-section-title">${section.title}</div>`;
@@ -1978,7 +1980,10 @@ function showQuizResult() {
     }
   }
   const title = isReview ? '温养圆满' : '试炼结算';
-  area.innerHTML = `<div style="text-align:center;padding:40px 20px"><div style="font-size:64px;margin-bottom:16px">${pct>=80?'🎉':pct>=60?'👍':'💪'}</div><div class="qq-word" style="font-size:28px">${title}</div><div style="font-size:32px;margin-top:8px">${state.quizScore}/${state.quizTotal}</div><div class="qq-hint" style="margin-top:8px">${isReview ? '旧词重历，根基更牢' : `已通 ${state.quizScore} 道试炼`}</div><div style="margin-top:24px"><button class="btn btn-primary" onclick="${isReview ? 'startReviewMode()' : 'startQuiz()'}" style="margin-right:8px">${isReview ? '再温一轮' : '再历一轮'}</button><button class="btn btn-outline" onclick="showQuizMenu()" style="margin-right:8px">返回选择</button><button class="btn btn-outline" onclick="switchTab('home')">返回</button></div></div>`;
+  const backToReadBtn = (!isReview && state.currentChapter)
+    ? `<button class="btn btn-outline" onclick="switchTab('read');setCurrentChapter(${state.currentChapter})" style="margin-right:8px">📖 返回阅读</button>`
+    : '';
+  area.innerHTML = `<div style="text-align:center;padding:40px 20px"><div style="font-size:64px;margin-bottom:16px">${pct>=80?'🎉':pct>=60?'👍':'💪'}</div><div class="qq-word" style="font-size:28px">${title}</div><div style="font-size:32px;margin-top:8px">${state.quizScore}/${state.quizTotal}</div><div class="qq-hint" style="margin-top:8px">${isReview ? '旧词重历，根基更牢' : `已通 ${state.quizScore} 道试炼`}</div><div style="margin-top:24px">${backToReadBtn}<button class="btn btn-primary" onclick="${isReview ? 'startReviewMode()' : 'startQuiz()'}" style="margin-right:8px">${isReview ? '再温一轮' : '再历一轮'}</button><button class="btn btn-outline" onclick="showQuizMenu()" style="margin-right:8px">返回选择</button><button class="btn btn-outline" onclick="switchTab('home')">返回首页</button></div></div>`;
   optsArea.innerHTML = '';
   document.getElementById('quiz-pf').style.width = '100%';
   if (!isReview && pct >= 60 && state.quizScore >= 5) {
@@ -2127,7 +2132,10 @@ function showBattleResult(kind) {
   }
   const title = kind === 'win' ? '🎉 大捷' : '💀 道心受创';
   const sub = kind === 'win' ? `你击溃了 ${enemyName}，仙途再进一阶。` : `心魔反噬，道心受损。整顿后再战！`;
-  area.innerHTML = `<div style="text-align:center;padding:40px 20px"><div style="font-size:64px;margin-bottom:16px">${kind === 'win' ? '🎉' : '💀'}</div><div class="qq-word" style="font-size:28px">${title}</div><div class="qq-hint" style="margin-top:8px">${sub}</div><div style="margin-top:24px"><button class="btn btn-primary" style="margin-right:8px" onclick="startChapterBattle(${chId})">${kind === 'win' ? '再战一场' : '重整旗鼓'}</button><button class="btn btn-outline" style="margin-right:8px" onclick="showQuizMenu()">返回</button><button class="btn btn-outline" onclick="switchTab('home')">回宗</button></div></div>`;
+  const backToReadBtn = (state.currentChapter)
+    ? `<button class="btn btn-outline" style="margin-right:8px" onclick="switchTab('read');setCurrentChapter(${state.currentChapter})">📖 返回阅读</button>`
+    : '';
+  area.innerHTML = `<div style="text-align:center;padding:40px 20px"><div style="font-size:64px;margin-bottom:16px">${kind === 'win' ? '🎉' : '💀'}</div><div class="qq-word" style="font-size:28px">${title}</div><div class="qq-hint" style="margin-top:8px">${sub}</div><div style="margin-top:24px">${backToReadBtn}<button class="btn btn-primary" style="margin-right:8px" onclick="startChapterBattle(${chId})">${kind === 'win' ? '再战一场' : '重整旗鼓'}</button><button class="btn btn-outline" style="margin-right:8px" onclick="showQuizMenu()">返回</button><button class="btn btn-outline" onclick="switchTab('home')">回宗</button></div></div>`;
   optsArea.innerHTML = '';
   const qh = document.querySelector('.quiz-header'); if (qh) qh.style.display = '';
   const qpb = document.querySelector('.quiz-progress-bar'); if (qpb) qpb.style.display = '';
