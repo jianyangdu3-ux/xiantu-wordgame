@@ -497,6 +497,9 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
         <input type="text" id="cloud-key" placeholder="填一串同步密码..." autocomplete="off" style="flex:1;min-width:0;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text-primary)">
         <button class="btn btn-outline" style="white-space:nowrap" onclick="cloudConnect()">🔗 连接</button>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input type="text" id="cloud-bin" placeholder="存档 ID（选填，换设备时填旧设备 ID 接管）" autocomplete="off" style="flex:1;min-width:0;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text-primary)">
+      </div>
       <div id="cloud-status" style="font-size:11px;color:var(--text-light);line-height:1.6">未连接 · 点「连接」即可开启自动同步</div>
       <details style="margin-top:8px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
         <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">📖 没有密码？点这里获取（免费·1分钟）</summary>
@@ -1160,12 +1163,28 @@ async function jsonbinReq(path, method, body) {
 async function cloudConnect() {
   if (_cloudBusy) return;
   const keyEl = document.getElementById('cloud-key');
+  const binEl = document.getElementById('cloud-bin');
   const apiKey = ((keyEl && keyEl.value.trim()) || getCloudCfg().apiKey || '').trim();
+  const binInput = (binEl && binEl.value.trim()) || '';
   if (!apiKey) { showToast('请先填入 JSONBin API Key'); return; }
   _cloudBusy = true;
   const cfg = getCloudCfg(); cfg.apiKey = apiKey; setCloudCfg(cfg); // 先落盘，jsonbinReq 才能读到 key
   try {
-    if (!cfg.binId) {
+    if (binInput) {
+      /* 换设备接管：用填写的存档 ID 连接旧档 */
+      cfg.binId = binInput; setCloudCfg(cfg);
+      const data = await jsonbinReq('/' + cfg.binId + '/latest', 'GET'); // 校验 bin 有效
+      const r = (data && data.record) || {};
+      if (!r.state) throw Object.assign(new Error('no-state'), { status: 404 });
+      localStorage.setItem('xt12_state_v2', r.state);
+      if (r.leaderboard) localStorage.setItem('xt12_leaderboard', r.leaderboard);
+      loadState();
+      const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇';
+      let ri = 0; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (state.learned.size >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri;
+      renderAll();
+      cfg.lastSync = r.updatedAt || Date.now(); setCloudCfg(cfg);
+      showToast('☁️ 已接管云端存档，进度恢复 ✓');
+    } else if (!cfg.binId) {
       saveState(); // 确保有初始存档再创建云端
       const data = await jsonbinReq('', 'POST', buildCloudPayload());
       cfg.binId = data.metadata && data.metadata.id;
@@ -1178,22 +1197,25 @@ async function cloudConnect() {
       cfg.lastSync = Date.now(); setCloudCfg(cfg);
       showToast('☁️ 云端已连接 ✓');
     }
+    if (binEl) binEl.value = cfg.binId || '';
     updateCloudStatus();
   } catch (e) {
-    showToast(e.status === 401 ? 'API Key 无效，请检查' : (e.status === 404 ? '云端存档不存在，请删除后重新连接' : '连接失败：' + e.message));
+    showToast(e.status === 401 ? 'API Key 无效，请检查' : (e.status === 404 ? '存档 ID 不存在，请检查（或删除后重新连接）' : '连接失败：' + e.message));
   }
   _cloudBusy = false;
 }
 function updateCloudStatus() {
   const cfg = getCloudCfg();
   const keyEl = document.getElementById('cloud-key');
+  const binEl = document.getElementById('cloud-bin');
   const el = document.getElementById('cloud-status');
   if (keyEl && cfg.apiKey && !keyEl.value) keyEl.value = cfg.apiKey;
+  if (binEl && cfg.binId && !binEl.value) binEl.value = cfg.binId;
   if (!el) return;
   if (cfg.apiKey && cfg.binId) {
     const t = new Date(cfg.lastSync || Date.now());
     const pad = n => String(n).padStart(2, '0');
-    el.textContent = '已连接 ✓ 云端存档 ' + cfg.binId.slice(0, 8) + '… · 上次同步 ' + pad(t.getMonth() + 1) + '/' + pad(t.getDate()) + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes());
+    el.textContent = '已连接 ✓ 存档 ID：' + cfg.binId + ' · 上次同步 ' + pad(t.getMonth() + 1) + '/' + pad(t.getDate()) + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes());
     el.style.color = '#3a8a5f';
   } else if (cfg.apiKey) {
     el.textContent = '已填 Key · 尚未连接，点「🔗 连接」创建云端存档';
