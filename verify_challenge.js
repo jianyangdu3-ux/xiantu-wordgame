@@ -20,7 +20,7 @@ function ok(cond, name) {
 const NET_ERR = /Could not load|busuanzi|favicon|net::ERR|HTMLMediaElement|not implemented/i;
 function cleanErrors() { return jsErrors.filter(e => !NET_ERR.test(String(e))); }
 
-function makeDom(url) {
+function makeDom(url, allowTutorial) {
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => jsErrors.push('jsdomError: ' + String(e.message || e).slice(0, 200)));
   return new JSDOM(html, {
@@ -31,6 +31,7 @@ function makeDom(url) {
         _store: {}, getItem(k) { return Object.prototype.hasOwnProperty.call(this._store, k) ? this._store[k] : null; },
         setItem(k, v) { this._store[k] = String(v); }, removeItem(k) { delete this._store[k]; }
       };
+      if (!allowTutorial) window.localStorage.setItem('xt12_tutorial_seen_2', '1');
       window.fetch = () => Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({}) });
       window.confirm = () => true;
       window.scrollTo = () => {};
@@ -216,6 +217,44 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const u2 = window.getUsageStats();
   ok(u2.challenge === 1 && u2.mystery === 1, '打开功能自动埋点计数');
   ok(cleanErrors().length === errList.filter(e => false).length || true, '修行手记无 JS 错误');
+
+  /* ========== 9.5 修行指北（新手引导） ========== */
+  console.log('== 9.5 修行指北 ==');
+  const guideEntry = document.querySelector('.guide-entry');
+  ok(guideEntry !== null, '首页修行指北入口渲染');
+  const gErrBefore = cleanErrors().length;
+  window.openTutorial();
+  await wait(80);
+  const tOverlay = document.getElementById('tutorial-overlay');
+  ok(tOverlay !== null, '指北弹窗打开');
+  ok(tOverlay.querySelectorAll('.tc-step').length === 7, '指北共 7 个步骤');
+  const stepTitles = [...tOverlay.querySelectorAll('.tc-step-title')].map(e => e.textContent);
+  ok(stepTitles.some(t => t.includes('第一步')), '步骤1 为"第一步从读剧情开始"');
+  ok(stepTitles.some(t => t.includes('温养')), '含"温养"详解步骤');
+  ok(stepTitles.some(t => t.includes('名词速查')), '含"名词速查"步骤');
+  ok(tOverlay.querySelector('.tc-glossary') !== null, '名词速查词典渲染');
+  const glossaryText = tOverlay.querySelector('.tc-glossary').textContent;
+  ok(['温养','心力','连击','生词本','错题本','境界','云同步','仙途榜','修行手记'].every(k => glossaryText.includes(k)), '词典含全部核心名词');
+  ok(tOverlay.querySelector('.tc-daily') !== null, '每日修行建议渲染');
+  ok(document.querySelector('.tc-step.active') !== null, '默认展示第 1 步');
+  // 切步：下一步 → 第 2 步
+  tOverlay.querySelector('#tc-next').click();
+  await wait(30);
+  ok(document.querySelectorAll('.tc-step.active').length === 1, '单步激活');
+  ok(cleanErrors().length === gErrBefore, '指北打开/切步无 JS 错误');
+  // 关闭后重新打开（可重入）
+  tOverlay.querySelector('#tc-skip').click();
+  await wait(400);
+  ok(document.getElementById('tutorial-overlay') === null, '跳过关闭弹窗');
+  window.openTutorial();
+  await wait(80);
+  ok(document.getElementById('tutorial-overlay') !== null, '入口可重复打开');
+  document.getElementById('tutorial-overlay').querySelector('#tc-skip').click();
+  await wait(400);
+  // 首次进入（未看过）应自动弹出
+  const dom3 = makeDom('http://localhost/?first=1', true);
+  await wait(1000);
+  ok(dom3.window.document.getElementById('tutorial-overlay') !== null, '首次进入自动弹出修行指北');
 
   /* ========== 10. URL 挑战直达（独立实例） ========== */
   console.log('== 10. URL 挑战直达 ==');

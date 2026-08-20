@@ -534,6 +534,20 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .luntao-entry .le-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
 .luntao-entry .le-desc { font-size: 11.5px; color: var(--text-light); margin-top: 2px; line-height: 1.5; }
 .luntao-entry .le-arrow { margin-left: auto; font-size: 22px; color: var(--gold); }
+/* ===== 修行指北（新手引导入口） ===== */
+.guide-entry { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(212,175,55,.12), rgba(212,175,55,.05)); border: 1px solid rgba(212,175,55,.38); border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; cursor: pointer; transition: transform .2s; }
+.guide-entry:active { transform: scale(.98); }
+.guide-entry .ge-icon { font-size: 30px; }
+.guide-entry .ge-title { font-size: 15px; font-weight: 700; color: var(--red-deep); }
+.guide-entry .ge-desc { font-size: 11.5px; color: var(--text-light); margin-top: 2px; line-height: 1.5; }
+.guide-entry .ge-arrow { margin-left: auto; font-size: 22px; color: var(--gold); }
+.tc-glossary { font-size: 12.5px; line-height: 2; color: var(--text-secondary); }
+.tc-glossary b { color: var(--text-primary); font-weight: 700; }
+.tc-glossary .tg-row { padding: 7px 10px; border-radius: 8px; background: rgba(0,0,0,0.035); margin-bottom: 5px; }
+.tc-glossary .tg-row:nth-child(odd) { background: rgba(212,175,55,0.07); }
+.tc-glossary .tg-row b { display: inline-block; min-width: 60px; color: var(--red-deep); }
+.tc-daily { background: linear-gradient(135deg, rgba(24,61,54,.10), rgba(69,185,172,.06)); border: 1px dashed rgba(24,61,54,.4); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.9; margin-bottom: 12px; }
+.tc-daily b { color: var(--red-deep); }
 .challenge-hud { margin-bottom: 12px; }
 .ch-hd-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px; }
 .ch-hd-row .ch-opp { color: var(--red-deep); font-weight: 700; }
@@ -568,7 +582,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <button class="menu-btn" onclick="showToast('藏经阁开发中')">☰</button>
   <div style="text-align:center"><h1>仙途十二阶</h1><div class="subtitle">凡女逆袭 · 5491词修仙录</div></div>
   <button class="menu-btn sound-btn" id="sound-btn" onclick="toggleSfx()" title="音效开关">🔊</button>
-  <button class="menu-btn" id="guide-btn" onclick="localStorage.removeItem('xt12_tutorial_seen_2');location.reload()" title="查看入门指引" style="font-size:16px">❓</button>
+  <button class="menu-btn" id="guide-btn" onclick="openTutorial()" title="修行指北 · 新手必读" style="font-size:16px">❓</button>
 </div>
 
 <div id="page-home" class="page active">
@@ -577,6 +591,11 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
       <div class="hh-title">仙途十二阶</div>
       <div class="hh-sub">凡尘弱女 · 逆袭飞升 · 以词证道</div>
     </div>
+  </div>
+  <div class="guide-entry" onclick="openTutorial()">
+    <span class="ge-icon">📜</span>
+    <div><div class="ge-title">新手必读 · 修行指北</div><div class="ge-desc">温养是什么？第一步从哪开始？七个步骤一册讲清</div></div>
+    <span class="ge-arrow">›</span>
   </div>
   <div class="today-card">
     <div class="tc-head"><span class="tc-streak">🔥 连续打卡 <b id="tc-streak">0</b> 天</span><span>☀️ 今日修行</span></div>
@@ -774,7 +793,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v27 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
+<div class="page-version">仙途十二阶 v28 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -3630,56 +3649,75 @@ function renderUsageStats() {
 
 // ============================================================ INIT
 loadState();
-/* 新手引导：首次打开显示教程 */
-(function() {
-  if (localStorage.getItem('xt12_tutorial_seen_2')) return;
+/* 修行指北（新手引导）：首次打开自动弹出，首页/❓ 按钮可随时重开 */
+function openTutorial() {
+  const old = document.getElementById('tutorial-overlay');
+  if (old) old.remove();
   const overlay = document.createElement('div');
   overlay.className = 'tutorial-overlay';
   overlay.id = 'tutorial-overlay';
   overlay.innerHTML = `
 <div class="tutorial-card">
-  <div class="tc-header"><div class="tc-title">✦ 仙途入门指引 ✦</div><div class="tc-sub">六步掌握修仙背词之法</div></div>
+  <div class="tc-header"><div class="tc-title">✦ 修行指北 ✦</div><div class="tc-sub">从入门到飞升 · 七个步骤看完全部玩法</div></div>
   <div class="tc-step active" data-step="0">
     <div class="tc-step-num">1</div>
-    <div class="tc-step-title">📖 剧情悟词</div>
-    <div class="tc-step-desc">在「卷」页阅读仙途剧情，点击<span style="color:var(--red-deep);font-weight:700">红色单词</span>查看释义并听发音。每章还埋着 25 句隐藏词句，边读边遇词，每学一个新词道行就涨一分。</div>
-    <div class="tc-step-img">📜✨📝</div>
-    <div class="tc-step-tip">💡 提示：红词 = 本章节考纲词，点它就记住了！</div>
+    <div class="tc-step-title">第一步 · 从读剧情开始</div>
+    <div class="tc-step-desc">现在就行动：点底部「<b>卷</b>」页签 → 点开「<b>第一章 · 杂役入宗</b>」→ 顺着剧情往下读。文中<b style="color:var(--red-deep)">红色单词</b>就是考研词，点一下立刻看释义、听发音，这个词就记进你的「已学词」。</div>
+    <div class="tc-step-img">📖👆📝</div>
+    <div class="tc-step-tip">💡 新手第一件事：读第一章，点完所有红词。一章读完，这章的试炼就解锁了。</div>
   </div>
   <div class="tc-step" data-step="1">
     <div class="tc-step-num">2</div>
     <div class="tc-step-title">⚔️ 试炼战斗</div>
-    <div class="tc-step-desc">在章节卡片上点「试炼（战斗）」进入 Boss 战！每道题都带一句话境，答对扣敌血、连击放大招；答错掉道心血并自动进错题本。</div>
+    <div class="tc-step-desc">章节卡片上点「<b>试炼（战斗）</b>」进 Boss 战！每道题都带一句话境，答对扣敌血、<b>连击</b>放大招；答错掉道心血并自动进错题本。全对通关有额外奖励，打完解锁下一章。</div>
     <div class="tc-step-img">⚔️🔥💀</div>
-    <div class="tc-step-tip">💡 提示：战斗也在记词，打怪 = 背题；错词必温养，绝不裸背！</div>
+    <div class="tc-step-tip">💡 战斗 = 做题，打怪 = 记词。上一章没学完的词，试炼会反复考你。</div>
   </div>
   <div class="tc-step" data-step="2">
     <div class="tc-step-num">3</div>
-    <div class="tc-step-title">🌌 秘境探索</div>
-    <div class="tc-step-desc">阅读页底部点「🌌 秘境探索」——全词库任意词都会化作一段微型奇遇：试炼塔、灵泉、上古洞府……答对收录仙册，解锁专属机缘。</div>
-    <div class="tc-step-img">🌌🗺️💫</div>
-    <div class="tc-step-tip">💡 提示：词库多大奇遇就有多少种，刷到的场景次次不重样！</div>
+    <div class="tc-step-title">🔄 温养 · 复习（重点！）</div>
+    <div class="tc-step-desc"><b>温养 = 复习旧词</b>。学过的词隔一阵会生疏，系统按遗忘节奏自动提醒，首页「待温养 N」就是欠下的旧词。点首页「🔄 温养」进入<b>飞花令</b>：屏幕给词义，你在限时内拼出单词——答对"回炉重炼"，生疏词重新记牢。</div>
+    <div class="tc-step-img">🔄✍️🧠</div>
+    <div class="tc-step-tip">💡 温养不是惩罚，是把短时记忆炼成长期记忆。每天 5 分钟温养，比一次狂背 100 词有效得多——这是"背了就忘"的解药。</div>
   </div>
   <div class="tc-step" data-step="3">
     <div class="tc-step-num">4</div>
-    <div class="tc-step-title">🔮 词灵收集</div>
-    <div class="tc-step-desc">词根同源之词自成「词灵家族」（名相族、互联族、抗天族…45 族）。在「词」页进词灵阁，集齐一族可顿悟一词；词卡上能看到每词的词灵归属。</div>
-    <div class="tc-step-img">🔮✨📿</div>
-    <div class="tc-step-tip">💡 提示：前缀后缀定家族，背一族的词 = 收一族词灵！</div>
+    <div class="tc-step-title">🌌 秘境探索</div>
+    <div class="tc-step-desc">阅读页底部点「<b>🌌 秘境探索</b>」——任意词都会化作一段微型奇遇：试炼塔、灵泉、上古洞府……答对收录仙册，解锁专属机缘。</div>
+    <div class="tc-step-img">🌌🗺️💫</div>
+    <div class="tc-step-tip">💡 词库多大奇遇就有多少种，刷到的场景次次不重样！</div>
   </div>
   <div class="tc-step" data-step="4">
     <div class="tc-step-num">5</div>
-    <div class="tc-step-title">✦ 抉择机缘</div>
-    <div class="tc-step-desc">剧情关键处会出现「道之抉择」。先通过小测验证明你认得这个词，再选择命运分支——不同选择解锁不同藏录。</div>
-    <div class="tc-step-img">🔮⚡🃏</div>
-    <div class="tc-step-tip">💡 提示：抉择前必须先过词，白送是不存在的～</div>
+    <div class="tc-step-title">🔮 词灵收集</div>
+    <div class="tc-step-desc">词根同源之词自成「<b>词灵家族</b>」（名相族、互联族、抗天族…45 族）。在「词」页进词灵阁，集齐一族可顿悟一词；词卡上能看到每词的词灵归属。</div>
+    <div class="tc-step-img">🔮✨📿</div>
+    <div class="tc-step-tip">💡 前缀后缀定家族，背一族的词 = 收一族词灵！</div>
   </div>
   <div class="tc-step" data-step="5">
     <div class="tc-step-num">6</div>
-    <div class="tc-step-title">🏆 境界晋升</div>
-    <div class="tc-step-desc">已学词数达到阈值自动突破境界（凡人→练气→筑基→…→飞升）。首页「今日修行」设每日目标、连续打卡不断！进度存本机，换设备用「云端续缘」同步。</div>
-    <div class="tc-step-img">🌟🚀☯️</div>
-    <div class="tc-step-tip">💡 提示：全对战斗有额外奖励，每日打卡别断——坚持就是飞升！</div>
+    <div class="tc-step-title">⚔️ 论道台 · 与道友切磋</div>
+    <div class="tc-step-desc">打完章节后，首页「<b>论道台</b>」可生成<b>战绩卡</b>和<b>挑战码</b>（如 XT-C5-90-128-15-A23），把挑战码发给道友；对方在首页论道台输入挑战码，就能与你<b>同关比试词力</b>，胜负由正确率/用时/连击自动判定。</div>
+    <div class="tc-step-img">⚔️🃏🏆</div>
+    <div class="tc-step-tip">💡 分享战绩卡图也行——对方长按扫码也能发起挑战！</div>
+  </div>
+  <div class="tc-step" data-step="6">
+    <div class="tc-step-num">7</div>
+    <div class="tc-step-title">📖 名词速查</div>
+    <div class="tc-daily">☀️ <b>每日修行建议</b>：读一章剧情 → 打一次试炼 → 温养到「待温养」清零 → 有空再探索秘境。</div>
+    <div class="tc-glossary">
+      <div class="tg-row"><b>温养</b>复习旧词，拼写飞花令</div>
+      <div class="tg-row"><b>心力</b>闯关体力，每日回满，失败会扣</div>
+      <div class="tg-row"><b>连击</b>连续答对触发的攻击倍率</div>
+      <div class="tg-row"><b>道之抉择</b>剧情里的考词选择，过词才给选</div>
+      <div class="tg-row"><b>生词本</b>阅读中主动收藏的词</div>
+      <div class="tg-row"><b>错题本</b>答错的词，自动收录</div>
+      <div class="tg-row"><b>境界</b>按已学词数晋升：凡人→练气→…→飞升</div>
+      <div class="tg-row"><b>云同步</b>填一次密码，换设备续进度</div>
+      <div class="tg-row"><b>仙途榜</b>提交战绩冲排行</div>
+      <div class="tg-row"><b>修行手记</b>藏录页统计你用过哪些功能</div>
+    </div>
+    <div class="tc-step-tip" style="margin-top:10px">💡 找不到功能？首页「功法殿 · 玩法一览」全都有入口。</div>
   </div>
   <div class="tc-dots"></div>
   <div class="tc-actions"><button class="btn btn-outline" id="tc-skip" style="flex:0.6">跳过</button><button class="btn btn-primary" id="tc-next">下一步</button></div>
@@ -3708,8 +3746,16 @@ loadState();
   function closeTutorial() {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
     setTimeout(() => { overlay.remove(); }, 300);
-    localStorage.setItem('xt12_tutorial_seen_2', '1');
+    try { localStorage.setItem('xt12_tutorial_seen_2', '1'); } catch (e) {}
   }
+  showStep(0);
+}
+/* 首次打开自动弹出修行指北 */
+(function() {
+  try {
+    if (localStorage.getItem('xt12_tutorial_seen_2')) return;
+    setTimeout(openTutorial, 400);
+  } catch (e) {}
 })();
 // 音效开关：同步按钮图标与持久化偏好
 (function () { const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇'; })();
