@@ -436,6 +436,18 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .em-reward-drop { display: inline-block; margin-top: 6px; padding: 5px 10px; border-radius: 10px; background: rgba(212,175,55,.16); border: 1px solid rgba(212,175,55,.45); color: var(--gold-dark); font-size: 12px; font-weight: 600; animation: emDrop .5s ease both; }
 @keyframes emDrop { 0%{transform:translateY(-8px) scale(.8);opacity:0} 100%{transform:translateY(0) scale(1);opacity:1} }
 
+/* 今日修行卡（每日目标 + 连续打卡） */
+.today-card { margin-bottom: 16px; padding: 14px 14px 12px; border-radius: 16px; background: linear-gradient(135deg, rgba(212,175,55,.14), rgba(212,175,55,.04)); border: 1px solid rgba(212,175,55,.4); }
+.tc-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; color: var(--gold-dark); }
+.tc-streak { font-size: 12.5px; color: var(--text-secondary); }
+.tc-bar { height: 8px; border-radius: 6px; background: rgba(0,0,0,.18); margin: 10px 0 6px; overflow: hidden; }
+.tc-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--gold), #ffd97a); transition: width .5s ease; }
+.tc-fill.done { background: linear-gradient(90deg, #43c99b, #7ee0b8); }
+.tc-text { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-light); }
+.tc-goal-btns { display: flex; gap: 6px; margin-top: 8px; }
+.tc-goal-btn { flex: 1; padding: 5px 0; border-radius: 8px; font-size: 11px; border: 1px solid var(--border-color); background: none; color: var(--text-secondary); cursor: pointer; }
+.tc-goal-btn.active { border-color: var(--gold); color: var(--gold-dark); background: rgba(212,175,55,.12); font-weight: 600; }
+
 @media (prefers-reduced-motion: reduce) {
   .bt-ring, .bt-ring2, .bt-p { animation: none !important; }
   .em-reward-drop { animation: none !important; }
@@ -457,6 +469,16 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <div class="hh-inner">
       <div class="hh-title">仙途十二阶</div>
       <div class="hh-sub">凡尘弱女 · 逆袭飞升 · 以词证道</div>
+    </div>
+  </div>
+  <div class="today-card">
+    <div class="tc-head"><span class="tc-streak">🔥 连续打卡 <b id="tc-streak">0</b> 天</span><span>☀️ 今日修行</span></div>
+    <div class="tc-bar"><div class="tc-fill" id="tc-fill" style="width:0%"></div></div>
+    <div class="tc-text"><span>今日新学 <b id="tc-done" style="color:var(--gold-dark)">0</b> 词</span><span id="tc-goal-text">目标 50 词</span></div>
+    <div class="tc-goal-btns">
+      <button class="tc-goal-btn" data-goal="20" onclick="setDailyGoal(20)">目标 20</button>
+      <button class="tc-goal-btn active" data-goal="50" onclick="setDailyGoal(50)">目标 50</button>
+      <button class="tc-goal-btn" data-goal="100" onclick="setDailyGoal(100)">目标 100</button>
     </div>
   </div>
   <div class="progress-overview palace-pattern">
@@ -606,6 +628,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <div class="letter-index" id="letter-index"></div>
   <div class="filter-row">
     <button class="filter-btn active" data-filter="all" onclick="setVocabFilter(this,'all')">全部</button>
+    <button class="filter-btn" data-filter="bookmark" onclick="setVocabFilter(this,'bookmark')">⭐ 生词</button>
+    <button class="filter-btn" data-filter="wrong" onclick="setVocabFilter(this,'wrong')">❌ 错题</button>
     <button class="filter-btn" data-filter="mastered" onclick="setVocabFilter(this,'mastered')">已悟</button>
     <button class="filter-btn" data-filter="learning" onclick="setVocabFilter(this,'learning')">温养中</button>
     <button class="filter-btn" data-filter="new" onclick="setVocabFilter(this,'new')">未习得</button>
@@ -623,7 +647,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v18 · 若页面异常请长按链接在浏览器打开</div>
+<div class="page-version">仙途十二阶 v19 · 若页面异常请长按链接在浏览器打开</div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -1126,7 +1150,38 @@ let state = {
   vocabFilter: 'all', vocabLetter: (LETTERS[0] || 'A'), madeChoices: {},
   choiceTrial: {}, // { 'sec0':true } 已通过「道之试炼」的章节
   reviewSchedule: {}, // { word: { level:int, nextDue:timestamp } }
+  dailyGoal: 50,           // 每日目标（20/50/100）
+  learnedDates: {},        // { word: 'YYYY-MM-DD' } 每个词学会的日期
+  streak: { lastDate: '', count: 0 }, // 连续打卡（count 含今日）
+  bookmarks: new Set(),    // ⭐ 生词本
+  wrongWords: {},          // 错题本 { word: 答错次数 }
 };
+function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+// 统一「学会」入口：记录 learned + 今日新学计数 + 连续打卡
+function markLearned(word) {
+  if (!state.learned.has(word)) {
+    state.learned.add(word);
+    const t = todayStr();
+    state.learnedDates[word] = t;
+    if (state.streak.lastDate !== t) {
+      state.streak.count = (state.streak.lastDate === yesterdayStr()) ? (state.streak.count || 0) + 1 : 1;
+      state.streak.lastDate = t;
+    }
+  }
+}
+// 答错记录（错题本）+ 保证进入温养
+function recordWrong(word) {
+  state.wrongWords[word] = (state.wrongWords[word] || 0) + 1;
+  scheduleReview(word, 0);
+}
+function todayLearnedCount() { const t = todayStr(); return Object.values(state.learnedDates).filter(d => d === t).length; }
+function setDailyGoal(n) { state.dailyGoal = n; saveState(); updateStats(); }
+function toggleBookmark(word) {
+  if (state.bookmarks.has(word)) { state.bookmarks.delete(word); showToast('已移出生词本'); }
+  else { state.bookmarks.add(word); if (!state.reviewSchedule[word]) scheduleReview(word, 0); showToast('⭐ 已收入生词本，明日进入温养'); }
+  saveState(); updateStats();
+}
 function loadState() {
   try {
     const saved = localStorage.getItem('xt12_state_v2');
@@ -1138,6 +1193,11 @@ function loadState() {
       state.madeChoices = p.madeChoices || {};
       state.choiceTrial = p.choiceTrial || {};
       state.reviewSchedule = p.reviewSchedule || {};
+      state.dailyGoal = (typeof p.dailyGoal === 'number') ? p.dailyGoal : 50;
+      state.learnedDates = p.learnedDates || {};
+      state.streak = p.streak || { lastDate: '', count: 0 };
+      state.bookmarks = new Set(p.bookmarks || []);
+      state.wrongWords = p.wrongWords || {};
       if (typeof p.sfxOn === 'boolean') sfxOn = p.sfxOn;
     }
   } catch(e) {}
@@ -1149,6 +1209,8 @@ function saveState() {
       collectedCards: [...state.collectedCards], madeChoices: state.madeChoices,
       choiceTrial: state.choiceTrial,
       reviewSchedule: state.reviewSchedule, sfxOn: sfxOn,
+      dailyGoal: state.dailyGoal, learnedDates: state.learnedDates,
+      streak: state.streak, bookmarks: [...state.bookmarks], wrongWords: state.wrongWords,
     }));
   } catch(e) {}
   scheduleCloudPush(); // 已连接云端时自动防抖上传
@@ -1384,6 +1446,17 @@ function renderAll() {
 
 function updateStats() {
   ensureReviewSchedule();
+  // 今日修行卡（每日目标 + 连续打卡）
+  const todayDone = todayLearnedCount();
+  const tcGoal = document.getElementById('tc-goal-text');
+  const tcDone = document.getElementById('tc-done');
+  const tcFill = document.getElementById('tc-fill');
+  const tcStreak = document.getElementById('tc-streak');
+  if (tcGoal) tcGoal.textContent = `目标 ${state.dailyGoal} 词`;
+  if (tcDone) tcDone.textContent = todayDone;
+  if (tcFill) { tcFill.style.width = Math.min(100, Math.round(todayDone / Math.max(1, state.dailyGoal) * 100)) + '%'; tcFill.classList.toggle('done', todayDone >= state.dailyGoal); }
+  if (tcStreak) tcStreak.textContent = state.streak.count || 0;
+  document.querySelectorAll('.tc-goal-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.goal) === state.dailyGoal));
   const learned = state.learned.size, mastered = state.mastered.size;
   const total = TOTAL || 5491;
   const remaining = total - learned, review = dueReviewCount();
@@ -1430,7 +1503,7 @@ function switchTab(tabName) {
   if (tabBtn) tabBtn.classList.add('active');
   try { window.scrollTo(0, 0); } catch (e) {}
   if (tabName === 'quiz') showQuizMenu();
-  if (tabName === 'home') renderChapterList();
+  if (tabName === 'home') updateStats(); // 刷新今日修行卡 + 章节列表（updateStats 末尾会渲染章节列表）
   if (tabName === 'rank') renderMap();
   if (tabName === 'vocab') { renderLetterIndex(); renderVocabList(); }
 }
@@ -1539,7 +1612,7 @@ const EXPLORE_REWARDS = [
   { name:'天降机缘', flavor:'天道垂青，一缕灵光为你录入新的仙缘词汇。', apply() {
     const un = window.VOCAB ? shuffleArray(window.VOCAB.filter(w => !state.learned.has(w.word))) : [];
     const w = un[0];
-    if (w) { state.learned.add(w.word); return `新词收录：${w.word} ${w.phonetic||''}`; }
+    if (w) { markLearned(w.word); return `新词收录：${w.word} ${w.phonetic||''}`; }
     return '仙缘已足，灵光散入金辉。';
   }},
   { name:'残卷馈赠', flavor:'尘封残卷中飞出一页藏录，落进你的袖中。', apply() {
@@ -1593,7 +1666,7 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
   if (sel === correct) {
     btn.classList.add('correct');
     const ev = EXPLORE_EVENTS[sIdx];
-    state.learned.add(ev.word);
+    markLearned(ev.word);
     const reward = rollExploreReward();
     const rewardMsg = reward.apply();
     saveState(); updateStats(); renderStoryContent(); renderCollectionCards();
@@ -1696,7 +1769,7 @@ function handleChoice(sIdx, ci) {
   const choiceKey = 'sec' + sIdx;
   const ch = STORY_SECTIONS[sIdx].choices[ci];
   state.madeChoices[choiceKey] = ci;
-  if (ch.markWords) ch.markWords.forEach(w => state.learned.add(w));
+  if (ch.markWords) ch.markWords.forEach(w => markLearned(w));
   if (ch.unlockCard) {
     state.collectedCards.add(ch.unlockCard);
     const card = COLLECTION_CARDS.find(c => c.id === ch.unlockCard);
@@ -1790,10 +1863,11 @@ function speakWord(word) {
 function openWordModal(word) {
   const info = getWordInfo(word);
   if (!info.def) { showToast('该词暂无释义'); return; }
-  state.learned.add(word); saveState(); updateStats();
+  // 点开词卡不直接算「学会」——须答对「试此一道」才计入已学（防止刷进度）
   // 若当前在剧情页，刷新高亮
   if (document.getElementById('page-read').classList.contains('active')) renderStoryContent();
   const isMastered = state.mastered.has(word);
+  const isBookmarked = state.bookmarks.has(word);
   const hasCollection = !!info.collectionType;
   const content = document.getElementById('word-modal-content');
   let html = `
@@ -1822,6 +1896,7 @@ function openWordModal(word) {
       <button class="qm-btn" onclick="quickQuizWord('${info.word.replace(/'/g,"\\'")}', 'cn2en')">中写英语</button>
     </div>
     <div class="wm-actions">
+      <button class="btn btn-outline" onclick="toggleBookmark('${info.word.replace(/'/g,"\\'")}')">${isBookmarked ? '⭐ 已收藏' : '⭐ 收藏生词'}</button>
       <button class="btn btn-outline" onclick="markRemembered('${info.word.replace(/'/g,"\\'")}')">收入温养</button>
       <button class="btn btn-red" onclick="quickQuizWord('${info.word.replace(/'/g,"\\'")}', 'en2cn')">试此一道</button>
     </div>`;
@@ -1836,7 +1911,7 @@ function toggleMastered(word, btn) {
   saveState(); updateStats();
 }
 function markRemembered(word) {
-  state.learned.add(word);
+  markLearned(word);
   if (!state.reviewSchedule[word]) scheduleReview(word, 0);
   saveState(); updateStats();
   showToast(`「${word}」已收入温养册，择日温养 ✓`); hideWordModal();
@@ -1940,12 +2015,13 @@ function showQuizQuestion() {
 }
 function checkMCAnswer(btn, selected, correct) {
   document.querySelectorAll('.q-option').forEach(o => o.style.pointerEvents = 'none');
-  if (selected === correct) { btn.classList.add('correct'); state.quizScore++; showToast('答对了！✓'); sfx('correct'); state.mastered.add(currentQuizWord); if (!state.reviewSchedule[currentQuizWord]) scheduleReview(currentQuizWord, 0); }
-  else { btn.classList.add('wrong'); document.querySelectorAll('.q-option').forEach(o => { if (o.textContent.includes(correct)) o.classList.add('correct'); }); showToast(`正解：${correct}`); sfx('wrong'); }
-  state.learned.add(currentQuizWord);
-  if (state.quizIsReview) applyReviewResult(currentQuizWord, selected === correct);
+  const ok = selected === correct;
+  if (ok) { btn.classList.add('correct'); state.quizScore++; showToast('答对了！✓'); sfx('correct'); state.mastered.add(currentQuizWord); if (!state.reviewSchedule[currentQuizWord]) scheduleReview(currentQuizWord, 0); }
+  else { btn.classList.add('wrong'); document.querySelectorAll('.q-option').forEach(o => { if (o.textContent.includes(correct)) o.classList.add('correct'); }); showToast(`正解：${correct}`); sfx('wrong'); recordWrong(currentQuizWord); }
+  markLearned(currentQuizWord);
+  if (state.quizIsReview) applyReviewResult(currentQuizWord, ok);
   saveState(); updateStats();
-  if (battle) { const ended = applyBattleHit(selected === correct); if (ended) return; }
+  if (battle) { const ended = applyBattleHit(ok); if (ended) return; }
   setTimeout(() => { state.quizCurrent++; showQuizQuestion(); }, 1200);
 }
 function checkSpellingAnswer() {
@@ -1953,8 +2029,8 @@ function checkSpellingAnswer() {
   if (!input || !currentQuizWord) return;
   const ok = input.value.trim().toLowerCase() === currentQuizWord.toLowerCase();
   if (ok) { state.quizScore++; state.mastered.add(currentQuizWord); if (!state.reviewSchedule[currentQuizWord]) scheduleReview(currentQuizWord, 0); showToast('拼写正确！✓'); sfx('correct'); }
-  else { showToast(`正解：${currentQuizWord}`); sfx('wrong'); }
-  state.learned.add(currentQuizWord);
+  else { showToast(`正解：${currentQuizWord}`); sfx('wrong'); recordWrong(currentQuizWord); }
+  markLearned(currentQuizWord);
   if (state.quizIsReview) applyReviewResult(currentQuizWord, ok);
   saveState(); updateStats();
   if (battle) { const ended = applyBattleHit(ok); if (ended) return; }
@@ -2044,9 +2120,14 @@ function startChapterBattle(chId) {
   switchTab('quiz');
   document.getElementById('quiz-menu').style.display = 'none';
   document.getElementById('quiz-play-area').style.display = 'block';
-  let pool = chapterWords(chId);
-  if (pool.length < 10) pool = pool.concat(sampleQuizWords(12));
-  battlePool = shuffleArray(pool);
+  // Boss 战词池：以本章词为主（保证与本章修习强关联），不足 20 题时用未掌握词补齐
+  let pool = chapterWords(chId).filter(w => { const i = getWordInfo(w); return i && i.def; });
+  if (pool.length < 20) {
+    const need = 20 - pool.length;
+    const extra = sampleQuizWords(need * 3).filter(w => !pool.includes(w));
+    pool = pool.concat(extra.slice(0, need));
+  }
+  battlePool = shuffleArray(pool.slice(0, 20));
   state.currentQuizWords = battlePool.slice();
   state.quizMode = 'en2cn'; state.quizCurrent = 0; state.quizIsReview = false;
   state._chapterQuizCard = CHAPTER_QUIZ_CARD[chId];
@@ -2200,12 +2281,14 @@ function renderVocabList() {
   if (filter === 'mastered') items = items.filter(v => state.mastered.has(v.word));
   else if (filter === 'learning') items = items.filter(v => state.learned.has(v.word) && !state.mastered.has(v.word));
   else if (filter === 'new') items = items.filter(v => !state.learned.has(v.word));
+  else if (filter === 'bookmark') items = items.filter(v => state.bookmarks.has(v.word));
+  else if (filter === 'wrong') items = items.filter(v => (state.wrongWords[v.word] || 0) > 0);
   document.getElementById('vocab-total-text').textContent = searchTerm
     ? `匹配 ${items.length}${items.length >= 300 ? '+ 词（仅显前300）' : ' 词'}`
     : `第 ${state.vocabLetter} 部 · 共 ${items.length} 词`;
   container.innerHTML = items.map(v => {
     const sc = wordStatus(v.word);
-    return `<div class="vocab-list-item" onclick="openWordModal('${v.word.replace(/'/g,"\\'")}')"><div class="vli-status ${sc}"></div><div class="vli-word">${v.word}</div><div class="vli-meaning">${renderMeaning(v.def)}</div><div class="vli-chapter">${sc === 'mastered' ? '已悟' : sc === 'learning' ? '温养' : '未学'}</div></div>`;
+    return `<div class="vocab-list-item" onclick="openWordModal('${v.word.replace(/'/g,"\\'")}')"><div class="vli-status ${sc}"></div><div class="vli-word">${state.bookmarks.has(v.word) ? '⭐ ' : ''}${v.word}</div><div class="vli-meaning">${renderMeaning(v.def)}</div><div class="vli-chapter">${sc === 'mastered' ? '已悟' : sc === 'learning' ? '温养' : '未学'}</div></div>`;
   }).join('');
   if (items.length === 0) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">暂无匹配词汇</div>';
 }
