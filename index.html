@@ -509,6 +509,25 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
           ③ 回来粘贴到上面输入框，点「连接」即可
         </div>
       </details>
+      <details style="margin-top:6px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
+        <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">📱 换手机 / 换电脑怎么接着玩？</summary>
+        <div style="margin-top:6px">
+          <b>① 旧设备：</b>连接成功后，记下状态栏里的「云端存档 ID」<br>
+          <b>② 新设备：</b>打开同一网址 → 粘贴<b>同一个密码</b> + 把存档 ID 填进第二行输入框<br>
+          <b>③</b> 点「连接」→ 自动拉回旧进度，无缝续玩 ✓<br>
+          <div style="background:rgba(0,0,0,0.05);border-radius:6px;padding:6px 8px;margin-top:6px">⚠ 不填存档 ID 直接连接会新建一份空档。换设备务必填旧设备的存档 ID。</div>
+        </div>
+      </details>
+      <details style="margin-top:6px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
+        <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">❓ 常见问题</summary>
+        <div style="margin-top:6px">
+          <b>密码是什么？</b>就是 jsonbin.io 的 API Key（X-Master-Key），相当于你云存档的钥匙<br>
+          <b>存档 ID 在哪看？</b>连接成功后，状态栏会显示完整 ID，随时可抄<br>
+          <b>存档 ID 丢了？</b>回旧设备打开云端区就能看到；两个都丢只能手动导出了<br>
+          <b>连接失败？</b>检查密码是否完整复制（别带空格）、网络是否可用<br>
+          <b>不想同步了？</b>清空两个输入框即可断开，本地进度不受影响
+        </div>
+      </details>
       <div style="display:flex;gap:10px;margin-top:10px">
         <button class="btn btn-outline" style="flex:1" onclick="cloudPush(true)">☁️ 手动上传</button>
         <button class="btn btn-outline" style="flex:1" onclick="cloudPull(true)">☁️ 手动拉取</button>
