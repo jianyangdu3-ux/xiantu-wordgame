@@ -1648,8 +1648,8 @@ function renderStoryContent() {
       const qWord = pickTrialWord(sIdx);
       const info = getWordInfo(qWord);
       const correctRaw = info.contextMeaning || (info.def || '').split('；')[0];
-      const correctMeaning = info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw;
-      const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== qWord)).slice(0, 3).map(w => (w.def || '').split('；')[0]);
+      const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
+      const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== qWord)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
       const options = shuffleArray([correctMeaning, ...distractors]);
       const labels = ['A', 'B', 'C', 'D'];
       const esc = s => String(s).replace(/'/g, "\\'");
@@ -1927,11 +1927,11 @@ function showQuizQuestion() {
   } else {
     const correctRaw = info.contextMeaning || info.def.split('；')[0];
     // 若剧情释义不含词性前缀，补上 info.pos 保持格式统一
-    const correctMeaning = info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw;
-    const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => (w.def.split('；')[0]));
+    const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
+    const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
     const options = shuffleArray([correctMeaning, ...distractors]);
     const labels = ['A','B','C','D'];
-    area.innerHTML = `<div class="qq-type">试词 · 英择中义</div><div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${info.pos || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
+    area.innerHTML = `<div class="qq-type">试词 · 英择中义</div><div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
     optsArea.innerHTML = options.map((opt, i) => `<button class="q-option" onclick="checkMCAnswer(this, '${opt.replace(/'/g,"\\'")}', '${correctMeaning.replace(/'/g,"\\'")}')"><span class="opt-label">${labels[i]}</span><span>${opt}</span></button>`).join('');
     speakWord(word);
   }
@@ -2249,6 +2249,23 @@ function renderRankSteps() {
 }
 
 // ============================================================ UTILS
+function humanizePOS(str) {
+  if (!str) return str;
+  return str
+    .replace(/(^|[\s；,])vi\./g, '$1不及物动词 ')
+    .replace(/(^|[\s；,])vt\./g, '$1及物动词 ')
+    .replace(/(^|[\s；,])adv\./g, '$1副词 ')
+    .replace(/(^|[\s；,])adj\./g, '$1形容词 ')
+    .replace(/(^|[\s；,])conj\./g, '$1连词 ')
+    .replace(/(^|[\s；,])prep\./g, '$1介词 ')
+    .replace(/(^|[\s；,])pron\./g, '$1代词 ')
+    .replace(/(^|[\s；,])num\./g, '$1数词 ')
+    .replace(/(^|[\s；,])art\./g, '$1冠词 ')
+    .replace(/(^|[\s；,])int\./g, '$1感叹词 ')
+    .replace(/(^|[\s；,])n\./g, '$1名词 ')
+    .replace(/(^|[\s；,])v\./g, '$1动词 ')
+    .replace(/(^|[\s；,])a\./g, '$1形容词 ');
+}
 function shuffleArray(arr) { const a = [...arr]; for (let i = a.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2400); }
 
