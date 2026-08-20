@@ -268,7 +268,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .char-card { position: relative; border-radius: 14px; overflow: hidden; background: var(--bg-card); box-shadow: 0 2px 10px var(--shadow); }
 .char-card img { width: 100%; height: 200px; object-fit: cover; display: block; background: #e8e0d2; }
 .char-card .cc-info { padding: 8px 10px 10px; }
-.char-card .cc-name { font-size: 14px; font-weight: 700; color: var(--text-color); }
+.char-card .cc-name { font-size: 14px; font-weight: 700; color: var(--text-primary); }
 .char-card .cc-role { font-size: 11px; color: var(--gold-dark); margin: 2px 0 4px; }
 .char-card .cc-desc { font-size: 11px; color: var(--text-light); line-height: 1.5; }
 /* 角色详情弹窗 */
@@ -391,7 +391,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .explore-modal, .mystery-modal { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; padding: 20px; }
 /* 动态弹窗(奇遇/秘境)盖在静态弹窗之上，独立类名避免与 #ling-hall-modal(.explore-modal) 冲突 */
 .mystery-modal { z-index: 9999; }
-.em-card { background: var(--bg-page); border-radius: 16px; width: 100%; max-width: 360px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.4); text-align: center; }
+.em-card { background: #ffffff; border: 1px solid rgba(0,0,0,.08); border-radius: 16px; width: 100%; max-width: 360px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.45); text-align: center; }
 .em-flavor { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
 .em-word { font-size: 26px; font-weight: 700; color: var(--red-deep); margin-bottom: 4px; }
 .em-phonetic { font-size: 13px; color: var(--text-light); font-style: italic; margin-bottom: 14px; }
@@ -488,13 +488,13 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .tc-goal-btn.active { border-color: var(--gold); color: var(--gold-dark); background: rgba(212,175,55,.12); font-weight: 600; }
 
 /* V6.11 语境题题干 */
-.qq-ctx { margin: 10px 16px 4px; padding: 10px 12px; border: 1px dashed rgba(212,175,55,.45); border-radius: 10px; background: rgba(255,255,255,.04); }
-.ctx-line { display: block; font-size: 13px; line-height: 1.7; color: var(--text-main); }
+.qq-ctx { margin: 10px 16px 4px; padding: 10px 12px; border: 1px dashed rgba(212,175,55,.45); border-radius: 10px; background: rgba(212,175,55,.06); }
+.ctx-line { display: block; font-size: 13px; line-height: 1.7; color: var(--text-secondary); }
 .ctx-trans { display: block; font-size: 11px; margin-top: 4px; color: var(--text-light); opacity: .85; }
 
 /* V6.11 词灵归属（词卡） */
-.wm-ling-hint { margin: 10px 16px 0; padding: 8px 10px; border-radius: 8px; background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.35); color: #C9B8F5; font-size: 12px; }
-.wm-ling-hint b { color: #DCC9FF; }
+.wm-ling-hint { margin: 10px 16px 0; padding: 8px 10px; border-radius: 8px; background: rgba(124,92,214,.10); border: 1px solid rgba(124,92,214,.35); color: #5B3FA8; font-size: 12px; }
+.wm-ling-hint b { color: #4A2F8F; }
 .wm-ling-hint small { opacity: .75; margin-left: 4px; }
 
 /* V6.11 词灵阁入口卡 */
@@ -573,7 +573,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .verdict.lose { color: var(--text-secondary); }
 .verdict.draw { color: var(--gold); }
 .sc-card-canvas { width: 100%; border-radius: 14px; box-shadow: 0 4px 16px var(--shadow); }
-.ch-rule { background: var(--bg-card); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.85; margin-bottom: 12px; }
+.ch-rule { background: rgba(24,61,54,.05); border: 1px solid rgba(24,61,54,.08); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.85; margin-bottom: 12px; }
 .ch-rule b { color: var(--gold-dark); }
 </style>
 </head>
@@ -660,7 +660,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
       <details style="margin-top:8px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
         <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">📖 没有密码？点这里获取（免费·1分钟）</summary>
         <div style="margin-top:6px">
-          ① 打开 <a href="https://jsonbin.io" target="_blank" style="color:var(--rank-gold)">jsonbin.io</a> → 用邮箱注册（免费）<br>
+          ① 打开 <a href="https://jsonbin.io" target="_blank" style="color:var(--gold-dark)">jsonbin.io</a> → 用邮箱注册（免费）<br>
           ② 点击左上角 <b>API Keys</b> → 复制长串字符（X-Master-Key）<br>
           ③ 回来粘贴到上面输入框，点「连接」即可
         </div>
@@ -3250,7 +3250,7 @@ function buildShareCard() {
         <button class="btn btn-outline" style="flex:1" onclick="copyShareText()">复制文案</button>
         <button class="btn btn-primary" style="flex:1" onclick="saveShareImage()">保存战绩图</button>
       </div>
-      <div style="background:var(--bg-card);border-radius:12px;padding:14px;text-align:left">
+      <div style="background:rgba(24,61,54,.05);border:1px solid rgba(24,61,54,.08);border-radius:12px;padding:14px;text-align:left">
         <div style="font-size:14px;font-weight:600;margin-bottom:8px;text-align:center">🏆 仙途榜（本地）</div>
         <div id="leaderboard-list" style="font-size:12px;color:var(--text-secondary)"></div>
         <div style="display:flex;gap:8px;margin-top:10px">
@@ -3519,7 +3519,7 @@ function openScoreCard() {
         <button class="btn btn-outline" style="flex:1" onclick="copyChallengeCode()">复制挑战码</button>
         <button class="btn btn-primary" style="flex:1" onclick="saveScoreCardImage()">保存战绩图</button>
       </div>
-      <div style="background:var(--bg-card);border-radius:12px;padding:10px;font-size:12px;color:var(--text-secondary);line-height:1.7;text-align:left">
+      <div style="background:rgba(24,61,54,.05);border:1px solid rgba(24,61,54,.08);border-radius:12px;padding:10px;font-size:12px;color:var(--text-secondary);line-height:1.7;text-align:left">
         把战绩图发给道友，或把挑战码 <b style="color:var(--gold-dark)">${code}</b> 发到群里，对方在首页「论道台」输入即可应战。<br><span style="color:var(--text-light)">纯本地比拼：无服务器也能公平比试词力。</span>
       </div>
     </div>`;

@@ -67,5 +67,33 @@ const backtickCount = (js.match(/`/g) || []).length;
 if (backtickCount % 2 !== 0) ok(false, `反引号数量为奇数 ${backtickCount}，存在未闭合模板字符串`);
 else ok(true, `反引号数量 ${backtickCount} 为偶数`);
 
+/* ---- 6. 弹窗卡片必须有实色背景（防浅色/透明弹窗回归，用户反馈"看不清"） ---- */
+console.log('== 6. 弹窗卡片实色背景检查 ==');
+const modalBgRules = [
+  ['.word-modal', '#ffffff', '单词/分享/论道台/战绩卡弹窗卡片须纯白背景'],
+  ['.tutorial-card', '#ffffff', '修行指北卡片须纯白背景'],
+  ['.em-card', '#ffffff', '秘境/奇遇卡片须纯白背景'],
+  ['.ling-hall', '#221A3F', '词灵阁卡片须深色背景'],
+];
+for (const [sel, expect, name] of modalBgRules) {
+  const re = new RegExp(sel.replace('.', '\\.') + '\\s*\\{[^}]*background:\\s*' + expect.replace('#', '#') + '\\b');
+  if (re.test(html)) ok(true, name);
+  else ok(false, name + `（期望 ${expect} 未匹配）`);
+}
+/* 遮罩层透明度检查：所有 overlay 遮罩 alpha ≥ .7 */
+console.log('== 7. 遮罩层透明度检查 ==');
+const overlayRules = [
+  ['.word-modal-overlay', 'rgba(0,0,0,0.72)', '单词/分享/论道台/战绩卡遮罩'],
+  ['.explore-modal, .mystery-modal', 'rgba(0,0,0,.75)', '词灵阁/秘境遮罩'],
+  ['.tutorial-overlay', 'rgba(0,0,0,.78)', '修行指北遮罩'],
+];
+for (const [sel, expect, name] of overlayRules) {
+  const esc = s => s.replace(/[.()]/g, ch => '\\' + ch);
+  const sels = sel.split(',').map(s => s.trim().replace('.', '\\.')).join('|');
+  const re = new RegExp('(?:' + sels + ')\\s*\\{[^}]*background:\\s*' + esc(expect));
+  if (re.test(html)) ok(true, name + ' 遮罩足够暗');
+  else ok(false, name + ` 期望 ${expect} 未匹配`);
+}
+
 console.log(`\n===== 审计结果 v2: ${pass} 通过 / ${fail} 失败 =====`);
 process.exit(fail ? 1 : 0);
