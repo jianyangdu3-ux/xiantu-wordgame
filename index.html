@@ -144,6 +144,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .q-option.wrong { border-color: var(--red-bright); background: rgba(63,160,136,0.06); }
 .q-option.correct .opt-label { border-color: #4A9D5E; color: #4A9D5E; }
 .q-option.wrong .opt-label { border-color: var(--red-bright); color: var(--red-bright); }
+.pos-tag { display: inline-block; font-size: 11px; line-height: 1.6; color: #8a6d3b; background: rgba(201,169,110,.16); border: 1px solid rgba(201,169,110,.4); border-radius: 4px; padding: 0 5px; margin-right: 6px; vertical-align: 1px; }
 .quiz-input-area { padding: 24px 16px; }
 .qi-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 18px; text-align: center; outline: none; transition: border-color 0.2s; background: var(--bg-card); }
 .qi-input:focus { border-color: var(--red-deep); }
@@ -1659,7 +1660,7 @@ function renderStoryContent() {
         <div class="trial-word">${qWord}</div>
         ${info.phonetic ? `<div class="qq-hint" style="font-size:12px;text-align:center">${info.phonetic}</div>` : ''}
         <div class="trial-q">请择其义：</div>
-        ${options.map((opt, i) => `<button class="q-option trial-opt" onclick="handleChoiceTrial(${sIdx}, '${esc(qWord)}', '${esc(opt)}', '${esc(correctMeaning)}')"><span class="opt-label">${labels[i]}</span><span>${opt}</span></button>`).join('')}
+        ${options.map((opt, i) => `<button class="q-option trial-opt" onclick="handleChoiceTrial(${sIdx}, '${esc(qWord)}', '${esc(opt)}', '${esc(correctMeaning)}')"><span class="opt-label">${labels[i]}</span><span>${renderMeaning(opt)}</span></button>`).join('')}
       </div>`;
     } else {
       html += `<div class="choice-block">
@@ -1805,7 +1806,7 @@ function openWordModal(word) {
   if (info.contextMeaning && info.contextMeaning !== info.def) {
     html += `<div class="wm-context-label">仙途语境义</div><div class="wm-context-meaning">${info.contextMeaning}</div>`;
   }
-  html += `<div class="wm-context-label">${info.contextMeaning && info.contextMeaning !== info.def ? '完整释义' : '释义'}</div><div class="wm-full-meaning">${info.def}</div>`;
+  html += `<div class="wm-context-label">${info.contextMeaning && info.contextMeaning !== info.def ? '完整释义' : '释义'}</div><div class="wm-full-meaning">${renderMeaning(info.def)}</div>`;
   if (info.example) html += `<div class="wm-example"><div class="ex-sentence">"${info.example}"</div><div class="ex-translate">${info.exampleTrans}</div></div>`;
   if (info.difficulty) html += `<div class="wm-difficulty">难度评级：${'★'.repeat(info.difficulty)}${'☆'.repeat(5-info.difficulty)}</div>`;
   if (state.reviewSchedule[info.word]) {
@@ -1932,7 +1933,7 @@ function showQuizQuestion() {
     const options = shuffleArray([correctMeaning, ...distractors]);
     const labels = ['A','B','C','D'];
     area.innerHTML = `<div class="qq-type">试词 · 英择中义</div><div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
-    optsArea.innerHTML = options.map((opt, i) => `<button class="q-option" onclick="checkMCAnswer(this, '${opt.replace(/'/g,"\\'")}', '${correctMeaning.replace(/'/g,"\\'")}')"><span class="opt-label">${labels[i]}</span><span>${opt}</span></button>`).join('');
+    optsArea.innerHTML = options.map((opt, i) => `<button class="q-option" onclick="checkMCAnswer(this, '${opt.replace(/'/g,"\\'")}', '${correctMeaning.replace(/'/g,"\\'")}')"><span class="opt-label">${labels[i]}</span><span>${renderMeaning(opt)}</span></button>`).join('');
     speakWord(word);
   }
   document.getElementById('quiz-score').textContent = state.quizScore;
@@ -2204,7 +2205,7 @@ function renderVocabList() {
     : `第 ${state.vocabLetter} 部 · 共 ${items.length} 词`;
   container.innerHTML = items.map(v => {
     const sc = wordStatus(v.word);
-    return `<div class="vocab-list-item" onclick="openWordModal('${v.word.replace(/'/g,"\\'")}')"><div class="vli-status ${sc}"></div><div class="vli-word">${v.word}</div><div class="vli-meaning">${v.def}</div><div class="vli-chapter">${sc === 'mastered' ? '已悟' : sc === 'learning' ? '温养' : '未学'}</div></div>`;
+    return `<div class="vocab-list-item" onclick="openWordModal('${v.word.replace(/'/g,"\\'")}')"><div class="vli-status ${sc}"></div><div class="vli-word">${v.word}</div><div class="vli-meaning">${renderMeaning(v.def)}</div><div class="vli-chapter">${sc === 'mastered' ? '已悟' : sc === 'learning' ? '温养' : '未学'}</div></div>`;
   }).join('');
   if (items.length === 0) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">暂无匹配词汇</div>';
 }
@@ -2265,6 +2266,24 @@ function humanizePOS(str) {
     .replace(/(^|[\s；,])n\./g, '$1名词 ')
     .replace(/(^|[\s；,])v\./g, '$1动词 ')
     .replace(/(^|[\s；,])a\./g, '$1形容词 ');
+}
+// 把释义中的中文词性词渲染成小徽章，与释义内容分开（避免"形容词 狭窄"式歧义）
+function renderMeaning(opt) {
+  const posList = ['不及物动词','及物动词','形容词','名词','动词','副词','连词','介词','代词','数词','冠词','感叹词'];
+  const posRe = new RegExp('(?:' + posList.join('|') + ')');
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let rest = String(opt || ''), html = '';
+  while (rest) {
+    const idx = rest.search(posRe);
+    if (idx === -1) { html += esc(rest); rest = ''; }
+    else {
+      html += esc(rest.slice(0, idx));
+      const m = rest.slice(idx).match(posRe);
+      html += '<span class="pos-tag">' + m[0] + '</span>';
+      rest = rest.slice(idx + m[0].length);
+    }
+  }
+  return html;
 }
 function shuffleArray(arr) { const a = [...arr]; for (let i = a.length-1; i>0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2400); }
