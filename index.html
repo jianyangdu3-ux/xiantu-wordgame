@@ -80,13 +80,15 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .btn-primary { background: linear-gradient(135deg, #C9A050, #E0C078); color: #3D2914; box-shadow: 0 2px 8px rgba(201, 160, 80, 0.3); }
 .btn-red { background: linear-gradient(135deg, var(--red-deep), var(--red-bright)); color: #fff; box-shadow: 0 2px 8px rgba(46, 125, 107, 0.3); }
 .btn:active { transform: scale(0.97); }
-.feature-highlights { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
-.feature-item { background: var(--bg-card); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); cursor: pointer; transition: all .2s; touch-action: manipulation; -webkit-tap-highlight-color: rgba(201,169,110,0.25); user-select: none; }
+.feature-highlights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.feature-item { position: relative; background: var(--bg-card); border-radius: 10px; padding: 14px 8px 12px; text-align: center; border: 1px solid var(--border-color); cursor: pointer; transition: all .2s; touch-action: manipulation; -webkit-tap-highlight-color: rgba(201,169,110,0.25); user-select: none; }
 .feature-item:hover { border-color: var(--gold); background: rgba(217,168,111,0.04); transform: translateY(-2px); }
 .feature-item:active { transform: translateY(0); }
-.feature-item .fi-icon { font-size: 28px; margin-bottom: 6px; }
+.feature-item .fi-icon { font-size: 26px; margin-bottom: 6px; }
 .feature-item .fi-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-.feature-item .fi-desc { font-size: 11px; color: var(--text-light); }
+.feature-item .fi-desc { font-size: 10.5px; color: var(--text-light); line-height: 1.4; }
+.fi-badge { position: absolute; top: 6px; right: 8px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--red-deep); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+.fb-count { display: inline-block; min-width: 16px; padding: 0 3px; height: 16px; line-height: 16px; border-radius: 8px; background: var(--gold-light); color: var(--gold-dark); font-size: 10px; font-weight: 700; text-align: center; margin-left: 2px; }
 .reader-page { padding: 0 !important; }
 .reader-nav { display: flex; align-items: center; padding: 12px 16px; gap: 12px; border-bottom: 1px solid var(--border-color); background: var(--bg-card); position: sticky; top: 44px; z-index: 50; }
 .reader-nav .back-btn { font-size: 20px; cursor: pointer; color: var(--text-secondary); background: none; border: none; }
@@ -622,10 +624,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <div id="chapter-list-container"></div>
   </div>
   <div class="feature-highlights">
-    <div class="feature-item" onclick="switchTab('read');setCurrentChapter(1)"><div class="fi-icon">📖</div><div class="fi-title">剧情悟词</div><div class="fi-desc">仙途历险，记得更牢</div></div>
-    <div class="feature-item" onclick="switchTab('vocab')"><div class="fi-icon">🔄</div><div class="fi-title">词库全本</div><div class="fi-desc">5491 考研词，A-Z 检索</div></div>
-    <div class="feature-item" onclick="switchTab('cards')"><div class="fi-icon">💎</div><div class="fi-title">道心相印</div><div class="fi-desc">你即主角，更有动力</div></div>
-    <div class="feature-item" onclick="goToChoiceSpot()"><div class="fi-icon">🎮</div><div class="fi-title">抉择机缘</div><div class="fi-desc">每段剧情由你定</div></div>
+    <div class="section-header" style="grid-column:1/-1;margin-bottom:2px"><h2>🗺️ 功法殿 · 玩法一览</h2><span class="view-all" onclick="showToast('所有玩法都从这里进，找不到功能就回这里')">都在这里</span></div>
+    <div id="feature-grid" style="display:contents"></div>
   </div>
 </div>
 
@@ -693,11 +693,11 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <div class="letter-index" id="letter-index"></div>
   <div class="filter-row">
     <button class="filter-btn active" data-filter="all" onclick="setVocabFilter(this,'all')">全部</button>
-    <button class="filter-btn" data-filter="bookmark" onclick="setVocabFilter(this,'bookmark')">⭐ 生词</button>
-    <button class="filter-btn" data-filter="wrong" onclick="setVocabFilter(this,'wrong')">❌ 错题</button>
-    <button class="filter-btn" data-filter="mastered" onclick="setVocabFilter(this,'mastered')">已悟</button>
-    <button class="filter-btn" data-filter="learning" onclick="setVocabFilter(this,'learning')">温养中</button>
-    <button class="filter-btn" data-filter="new" onclick="setVocabFilter(this,'new')">未习得</button>
+    <button class="filter-btn" data-filter="bookmark" onclick="setVocabFilter(this,'bookmark')">⭐ 生词<span class="fb-count" id="fb-bookmark"></span></button>
+    <button class="filter-btn" data-filter="wrong" onclick="setVocabFilter(this,'wrong')">❌ 错题<span class="fb-count" id="fb-wrong"></span></button>
+    <button class="filter-btn" data-filter="mastered" onclick="setVocabFilter(this,'mastered')">已悟<span class="fb-count" id="fb-mastered"></span></button>
+    <button class="filter-btn" data-filter="learning" onclick="setVocabFilter(this,'learning')">温养中<span class="fb-count" id="fb-learning"></span></button>
+    <button class="filter-btn" data-filter="new" onclick="setVocabFilter(this,'new')">未习得<span class="fb-count" id="fb-new"></span></button>
   </div>
   <div id="vocab-list-container"></div>
 </div>
@@ -720,7 +720,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v23 · 若页面异常请长按链接在浏览器打开</div>
+<div class="page-version">仙途十二阶 v24 · 若页面异常请长按链接在浏览器打开</div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -1520,6 +1520,46 @@ function renderAll() {
   renderCollectionCards(); renderVocabList(); renderRankSteps(); renderMap(); renderLetterIndex(); renderCharGallery(); updateStats();
 }
 
+// ============================================================ 功法殿（首页玩法总导航）
+function goVocabFilter(filter) {
+  state.vocabFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+  switchTab('vocab');
+}
+function renderFeatureGrid() {
+  const el = document.getElementById('feature-grid');
+  if (!el) return;
+  const due = Math.max(0, dueReviewCount());
+  const bookmarks = state.bookmarks.size;
+  const wrong = Object.keys(state.wrongWords).length;
+  const mastered = state.mastered.size;
+  const items = [
+    { icon:'📖', title:'剧情悟词', desc:'边读边记红词', act:"switchTab('read')" },
+    { icon:'⚔️', title:'章节试炼', desc:'Boss 战中考词', act:`quizChapter(${state.currentChapter})` },
+    { icon:'🌌', title:'秘境探索', desc:'全词库随机奇遇', act:'openMystery()' },
+    { icon:'🔮', title:'词灵阁', desc:'收服词灵领奖', act:'openLingHall()' },
+    { icon:'🔄', title:'温养复习', desc: due > 0 ? `${due} 词待复习` : '按遗忘曲线', act:"switchTab('quiz')", badge: due > 0 ? due : 0 },
+    { icon:'⭐', title:'生词本', desc:'收藏的生词', act:"goVocabFilter('bookmark')", badge: bookmarks > 0 ? bookmarks : 0 },
+    { icon:'❌', title:'错题本', desc:'答错的词', act:"goVocabFilter('wrong')", badge: wrong > 0 ? wrong : 0 },
+    { icon:'💎', title:'藏录图鉴', desc:'人物与收藏卡', act:"switchTab('cards')" },
+    { icon:'🎮', title:'抉择机缘', desc:'每段剧情由你定', act:'goToChoiceSpot()' },
+  ];
+  el.innerHTML = items.map(it => `
+    <div class="feature-item" onclick="${it.act}">
+      ${it.badge ? `<span class="fi-badge">${it.badge > 99 ? '99+' : it.badge}</span>` : ''}
+      <div class="fi-icon">${it.icon}</div>
+      <div class="fi-title">${it.title}</div>
+      <div class="fi-desc">${it.desc}</div>
+    </div>`).join('');
+}
+function updateFilterCounts() {
+  const set = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n > 0 ? n : ''; };
+  set('fb-bookmark', state.bookmarks.size);
+  set('fb-wrong', Object.keys(state.wrongWords).length);
+  set('fb-mastered', state.mastered.size);
+  set('fb-learning', [...state.learned].filter(w => !state.mastered.has(w)).length);
+  set('fb-new', Math.max(0, (TOTAL || 5491) - state.learned.size));
+}
 function updateStats() {
   ensureReviewSchedule();
   // 今日修行卡（每日目标 + 连续打卡）
@@ -1567,6 +1607,8 @@ function updateStats() {
   }
   _lastRankIdx = ri;
   renderChapterList();
+  renderFeatureGrid();
+  updateFilterCounts();
 }
 
 function switchTab(tabName) {

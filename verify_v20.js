@@ -136,7 +136,8 @@ function parseArgs(expr) {
   ok(mOpts.length === 4, '秘境选项恰为 4 个');
   const flavor = document.querySelector('.explore-modal .em-flavor');
   ok(!!flavor && flavor.textContent.includes(mWord), '秘境场景句包含该词');
-  ok(sel0 !== correct, '选项含干扰项（正确项可辨）');
+  const mOptTexts = [...mOpts].map(b => b.textContent);
+  ok(new Set(mOptTexts).size >= 2 && mOptTexts.some(t => t.includes(correct)), '选项含干扰项且正确项可辨');
   // 答错：不入已学
   window.handleMysteryAnswer(firstBtn, '___错误答案___', correct, mWord);
   ok(!st().learned.has(mWord), '秘境答错不入已学');
@@ -156,6 +157,28 @@ function parseArgs(expr) {
   window.localStorage.setItem('xt12_state_v2', JSON.stringify({ learned: ['abandon'], mastered: [], reviewSchedule: {} }));
   window.loadState();
   ok(st().learned.has('abandon') && Object.keys(st().lingRewarded).length === 0, '老存档加载兼容（lingRewarded 默认 {}）');
+
+  /* ================= F. 功法殿玩法总导航（可发现性） ================= */
+  window.eval('state.bookmarks = new Set(["abandon","ability"]); state.wrongWords = { abandon: 1 }; state.learned = new Set(["abandon","abide"]); state.mastered = new Set(["abandon"]);');
+  window.updateStats();
+  const fg = $('feature-grid');
+  ok(!!fg, '功法殿容器存在');
+  const fItems = fg ? fg.querySelectorAll('.feature-item') : [];
+  ok(fItems.length === 9, '功法殿渲染 9 个玩法入口（当前 ' + fItems.length + '）');
+  const fText = fg ? fg.textContent : '';
+  ok(fText.includes('秘境探索'), '功法殿含「秘境探索」直达');
+  ok(fText.includes('词灵阁'), '功法殿含「词灵阁」直达');
+  ok(fText.includes('章节试炼'), '功法殿含「章节试炼」直达');
+  ok(fText.includes('生词本') && fText.includes('错题本'), '功法殿含「生词本/错题本」直达');
+  ok(fg && fg.querySelector('.fi-badge'), '生词/错题等状态显示角标');
+  // 词库筛选计数徽标
+  window.updateFilterCounts();
+  const fbB = $('fb-bookmark'), fbW = $('fb-wrong');
+  ok(!!fbB && fbB.textContent === '2', '词库「⭐ 生词」筛选显示数量 2（实际 ' + (fbB && fbB.textContent) + '）');
+  ok(!!fbW && fbW.textContent === '1', '词库「❌ 错题」筛选显示数量 1（实际 ' + (fbW && fbW.textContent) + '）');
+  // 跳转辅助：生词本直达
+  window.goVocabFilter('bookmark');
+  ok(st().vocabFilter === 'bookmark' && $('page-vocab').classList.contains('active'), '功法殿跳生词本：切页 + 筛选生效');
 
   console.log('\n=== 结果: ' + pass + ' 通过, ' + fail + ' 失败 ===');
   process.exit(fail ? 1 : 0);
