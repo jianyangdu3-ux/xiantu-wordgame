@@ -448,6 +448,43 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .tc-goal-btn { flex: 1; padding: 5px 0; border-radius: 8px; font-size: 11px; border: 1px solid var(--border-color); background: none; color: var(--text-secondary); cursor: pointer; }
 .tc-goal-btn.active { border-color: var(--gold); color: var(--gold-dark); background: rgba(212,175,55,.12); font-weight: 600; }
 
+/* V6.11 语境题题干 */
+.qq-ctx { margin: 10px 16px 4px; padding: 10px 12px; border: 1px dashed rgba(212,175,55,.45); border-radius: 10px; background: rgba(255,255,255,.04); }
+.ctx-line { display: block; font-size: 13px; line-height: 1.7; color: var(--text-main); }
+.ctx-trans { display: block; font-size: 11px; margin-top: 4px; color: var(--text-light); opacity: .85; }
+
+/* V6.11 词灵归属（词卡） */
+.wm-ling-hint { margin: 10px 16px 0; padding: 8px 10px; border-radius: 8px; background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.35); color: #C9B8F5; font-size: 12px; }
+.wm-ling-hint b { color: #DCC9FF; }
+.wm-ling-hint small { opacity: .75; margin-left: 4px; }
+
+/* V6.11 词灵阁入口卡 */
+.ling-hall-card { display: flex; align-items: center; gap: 12px; margin: 0 16px 14px; padding: 12px 14px; border-radius: 12px; background: linear-gradient(135deg, rgba(124,92,214,.18), rgba(55,40,110,.25)); border: 1px solid rgba(167,139,250,.35); cursor: pointer; }
+.lh-icon { font-size: 26px; }
+.lh-info { flex: 1; }
+.lh-title { font-size: 14px; font-weight: 500; color: #DCC9FF; }
+.lh-desc { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.lh-arrow { font-size: 20px; color: rgba(220,201,255,.6); }
+
+/* V6.11 词灵阁弹层 */
+.ling-hall { width: 100%; max-width: 400px; max-height: 78vh; overflow-y: auto; border-radius: 16px; background: #221A3F; border: 1px solid rgba(167,139,250,.4); padding: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+.ling-hall-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.lh-title-lg { font-size: 18px; font-weight: 500; color: #DCC9FF; }
+.ling-hall-sub { font-size: 12px; color: var(--text-light); margin-bottom: 12px; }
+.ling-hall-body { display: flex; flex-direction: column; gap: 10px; }
+.ling-card { padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }
+.ling-card.done { border-color: rgba(93,202,165,.5); background: rgba(93,202,165,.08); }
+.ling-head { display: flex; justify-content: space-between; align-items: baseline; }
+.ling-name { font-size: 13px; font-weight: 500; color: #C9B8F5; }
+.ling-desc { font-size: 11px; color: var(--text-light); }
+.ling-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.1); margin: 8px 0; overflow: hidden; }
+.ling-fill { height: 100%; border-radius: 3px; background: #7F77DD; }
+.ling-card.done .ling-fill { background: #5DCAA5; }
+.ling-foot { display: flex; justify-content: space-between; align-items: center; }
+.ling-need { font-size: 12px; color: var(--text-light); }
+.ling-done { font-size: 12px; color: #5DCAA5; font-weight: 500; }
+.ling-master { font-size: 11px; color: var(--text-light); opacity: .8; }
+
 @media (prefers-reduced-motion: reduce) {
   .bt-ring, .bt-ring2, .bt-p { animation: none !important; }
   .em-reward-drop { animation: none !important; }
@@ -624,6 +661,11 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 
 <div id="page-vocab" class="page">
   <div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">◇ 悟道册 ◇</h2><p style="font-size:13px;color:var(--text-light)" id="vocab-total-text">已收录 5491 词</p></div>
+  <div class="ling-hall-card" onclick="openLingHall()">
+    <div class="lh-icon">🔮</div>
+    <div class="lh-info"><div class="lh-title">词灵阁</div><div class="lh-desc" id="ling-hall-desc">每掌握一词，便收服一只词灵</div></div>
+    <div class="lh-arrow">›</div>
+  </div>
   <div class="search-box"><span style="color:var(--text-light);margin-right:8px">🔍</span><input type="text" placeholder="搜索英文或中文释义" id="vocab-search" oninput="renderVocabList()"></div>
   <div class="letter-index" id="letter-index"></div>
   <div class="filter-row">
@@ -637,6 +679,14 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <div id="vocab-list-container"></div>
 </div>
 
+<div id="ling-hall-modal" class="explore-modal" style="display:none" onclick="if(event.target===this)closeLingHall()">
+  <div class="ling-hall" onclick="event.stopPropagation()">
+    <div class="ling-hall-head"><div class="lh-title-lg">🔮 词灵阁</div><button class="btn btn-outline" style="font-size:12px;padding:4px 10px" onclick="closeLingHall()">✕ 关闭</button></div>
+    <div class="ling-hall-sub">掌握一词，收服一灵；集齐一族，天降顿悟。</div>
+    <div id="ling-hall-body" class="ling-hall-body"></div>
+  </div>
+</div>
+
 <div id="page-rank" class="page">
   <div class="rank-road">
     <div class="rank-road-title">✦ 仙途地图 · 十二章 ✦</div>
@@ -647,7 +697,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v19 · 若页面异常请长按链接在浏览器打开</div>
+<div class="page-version">仙途十二阶 v20 · 若页面异常请长按链接在浏览器打开</div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -1150,6 +1200,7 @@ let state = {
   vocabFilter: 'all', vocabLetter: (LETTERS[0] || 'A'), madeChoices: {},
   choiceTrial: {}, // { 'sec0':true } 已通过「道之试炼」的章节
   reviewSchedule: {}, // { word: { level:int, nextDue:timestamp } }
+  lingRewarded: {}, // { familyName: true } 词灵家族集齐奖励已领
   dailyGoal: 50,           // 每日目标（20/50/100）
   learnedDates: {},        // { word: 'YYYY-MM-DD' } 每个词学会的日期
   streak: { lastDate: '', count: 0 }, // 连续打卡（count 含今日）
@@ -1193,6 +1244,7 @@ function loadState() {
       state.madeChoices = p.madeChoices || {};
       state.choiceTrial = p.choiceTrial || {};
       state.reviewSchedule = p.reviewSchedule || {};
+      state.lingRewarded = p.lingRewarded || {};
       state.dailyGoal = (typeof p.dailyGoal === 'number') ? p.dailyGoal : 50;
       state.learnedDates = p.learnedDates || {};
       state.streak = p.streak || { lastDate: '', count: 0 };
@@ -1208,7 +1260,7 @@ function saveState() {
       learned: [...state.learned], mastered: [...state.mastered],
       collectedCards: [...state.collectedCards], madeChoices: state.madeChoices,
       choiceTrial: state.choiceTrial,
-      reviewSchedule: state.reviewSchedule, sfxOn: sfxOn,
+      reviewSchedule: state.reviewSchedule, sfxOn: sfxOn, lingRewarded: state.lingRewarded,
       dailyGoal: state.dailyGoal, learnedDates: state.learnedDates,
       streak: state.streak, bookmarks: [...state.bookmarks], wrongWords: state.wrongWords,
     }));
@@ -1592,6 +1644,530 @@ function jumpToSection(idx) {
   setCurrentChapter(idx + 1);     // 统一走 setCurrentChapter 刷新封面+内容+导航
 }
 
+// ============================================================ V6.11 全词库剧情化数据
+
+// 秘境场景模板：为任意词生成剧情风味（{word} 插槽）
+const SCENE_TEMPLATES = [
+  { place:'藏经阁三层', pre:'你拂开经架上的积灰，一卷残破玉简滚落，朱砂书着「{word}」二字，灵光微闪。' },
+  { place:'试炼塔第七层', pre:'石壁轰然开启，现出一行古篆——「{word}」。' },
+  { place:'灵兽园深处', pre:'草丛里一只白猿递来一片龟甲，上面刻着「{word}」。' },
+  { place:'拍卖行雅间', pre:'拍卖师展开一轴残卷，卷首题着「{word}」二字，众人屏息。' },
+  { place:'炼丹房', pre:'丹炉火焰跳动，炉壁上隐约浮现一字——「{word}」。' },
+  { place:'后山灵泉', pre:'泉水倒映天光，水面上缓缓浮现一个古字「{word}」。' },
+  { place:'藏剑阁', pre:'万剑壁上，一柄古剑嗡鸣，剑身铭文闪烁：「{word}」。' },
+  { place:'星象台', pre:'星轨流转，星图上某一颗星辰忽然大亮，旁注「{word}」。' },
+  { place:'悬棺崖', pre:'崖壁悬棺的缝隙间露出一角帛书，写着一个古字「{word}」。' },
+  { place:'万兽围猎场', pre:'狩猎归来的长老赠你一枚兽骨令，背面刻着「{word}」。' },
+  { place:'幻阵入口', pre:'阵门前青石碑刻着「{word}」，以此字为钥，方可入阵。' },
+  { place:'演武场', pre:'木人桩上贴着一张泛黄的符纸，符上画着「{word}」二字。' },
+  { place:'药圃', pre:'一株灵草叶脉之上，天然生着「{word}」的纹路。' },
+  { place:'藏书塔顶', pre:'顶层书架最深处，一册无题古卷扉页写着「{word}」。' },
+  { place:'渡口驿站', pre:'渡船老板的竹签上刻着一个字——「{word}」，据说是避浪的咒文。' },
+  { place:'矿洞深处', pre:'灵矿壁上嵌着一块墨玉，玉上天然形成「{word}」二字。' },
+  { place:'比武擂台', pre:'擂台旗幡上绣着「{word}」，是这场比试的题眼。' },
+  { place:'无名碑林', pre:'一座无字碑忽然现出刻痕，正是「{word}」二字。' },
+  { place:'百草堂', pre:'药柜最底层压着一封旧信，落款处写着「{word}」。' },
+  { place:'雷池边', pre:'雷池水面上电弧勾勒出「{word}」二字，转瞬即逝。' },
+  { place:'地火窟', pre:'地火石壁上，火舌舔出「{word}」的古字。' },
+  { place:'问心桥', pre:'桥头石碑上刻着「{word}」，过桥者须以此字自省。' },
+  { place:'花谷', pre:'谷中奇花的花瓣纹路，恰似「{word}」二字。' },
+  { place:'玉简作坊', pre:'匠人正将「{word}」二字刻入一枚空白玉简，说是新出的考题。' },
+];
+
+// 词灵家族：后缀 / 前缀 → 家族（prefix 按长度降序防误配）
+const LING_SUFFIX = [
+  ['tion','神通·名相族','凝形为名，道果自成'],
+  ['sion','神通·名相族','凝形为名，道果自成'],
+  ['ment','迹显·果报族','行必有迹，果报昭然'],
+  ['ness','道境·纯质族','返璞归真，质本天然'],
+  ['ity','道境·纯质族','返璞归真，质本天然'],
+  ['ism','宗派·教义族','立言成派，各执一理'],
+  ['able','可及·形质族','可为可受，皆具其形'],
+  ['ible','可及·形质族','可为可受，皆具其形'],
+  ['ous','渊渟·性相族','性相外显，渊深难测'],
+  ['ive','灵动·趋势族','趋而未止，灵动若风'],
+  ['ful','盈怀·满溢族','盈满于怀，溢而为情'],
+  ['less','空寂·无有族','绝诸所有，空寂入道'],
+  ['ize','化生·衍变族','化生衍变，万物易形'],
+  ['ate','化生·衍变族','化生衍变，万物易形'],
+  ['er','行者·职司族','执事者行，司职者立'],
+  ['or','行者·职司族','执事者行，司职者立'],
+  ['ly','律动·情状族','依律而动，情状自明'],
+  ['al','形质·性状族','性状附形，名实相副'],
+];
+const LING_PREFIX = [
+  ['inter','交济·互联族','交相济济，互联成网'],
+  ['trans','渡虚·越界族','渡虚越界，彼岸可期'],
+  ['super','凌霄·至上族','凌霄而上，居高临下'],
+  ['under','沉渊·隐伏族','沉渊隐伏，蓄势待发'],
+  ['multi','万象·众妙族','万象森罗，众妙毕备'],
+  ['micro','微尘·芥子族','微尘芥子，纳须弥山'],
+  ['counter','逆伐·抗天族','逆势而伐，与天相抗'],
+  ['auto','自性·独行族','自性自足，独行无碍'],
+  ['anti','逆伐·抗天族','逆势而伐，与天相抗'],
+  ['bio','生机·草木族','生机盎然，草木有情'],
+  ['geo','厚土·山岳族','厚土载物，山岳不移'],
+  ['tele','远望·千里族','远望千里，心随目至'],
+  ['over','盈溢·极盛族','盈溢则损，极盛而衰'],
+  ['re','再世·回环族','往复回环，重头再来'],
+  ['un','否极·逆道族','否极泰来，反转为道'],
+  ['dis','分崩·离析族','分崩离析，各归其位'],
+  ['de','坠逆·沉降族','沉降坠逆，去而复返'],
+  ['pre','先机·前瞻族','先知先觉，抢占先机'],
+  ['ex','出离·超脱族','出离尘表，超脱物外'],
+  ['post','后来·迟序族','后来居上，序次分明'],
+  ['sub','潜渊·次第族','潜渊次第，由下而上'],
+  ['mis','错谬·歧途族','错谬歧途，迷而知返'],
+  ['non','无相·寂灭族','无相无我，寂灭归真'],
+  ['pro','顺行·前驱族','顺行前驱，直道而行'],
+  ['con','合道·同契族','合道同契，众志归一'],
+  ['com','合道·同契族','合道同契，众志归一'],
+  ['im','否极·逆道族','否极泰来，反转为道'],
+  ['in','否极·逆道族','否极泰来，反转为道'],
+];
+const LING_FALLBACK = { family:'散修·无门族', desc:'无门无派，独行其道' };
+function getLingFamily(word) {
+  const w = String(word).toLowerCase();
+  for (let i = 0; i < LING_SUFFIX.length; i++) {
+    const r = LING_SUFFIX[i];
+    if (w.length > r[0].length + 1 && w.endsWith(r[0])) return { family: r[1], desc: r[2] };
+  }
+  for (let i = 0; i < LING_PREFIX.length; i++) {
+    const r = LING_PREFIX[i];
+    if (w.length > r[0].length + 2 && w.startsWith(r[0])) return { family: r[1], desc: r[2] };
+  }
+  return { family: LING_FALLBACK.family, desc: LING_FALLBACK.desc };
+}
+function lingHallStats() {
+  const famMap = {};
+  (window.VOCAB || []).forEach(v => {
+    const f = getLingFamily(v.word);
+    if (!famMap[f.family]) famMap[f.family] = { family: f.family, desc: f.desc, total: 0, got: 0, master: 0 };
+    famMap[f.family].total++;
+    if (state.learned.has(v.word)) famMap[f.family].got++;
+    if (state.mastered.has(v.word)) famMap[f.family].master++;
+  });
+  return Object.values(famMap).sort((a, b) => b.total - a.total);
+}
+function openLingHall() {
+  const stats = lingHallStats();
+  const totalGot = stats.reduce((s, f) => s + f.got, 0);
+  const totalAll = stats.reduce((s, f) => s + f.total, 0);
+  const descEl = document.getElementById('ling-hall-desc');
+  if (descEl) descEl.textContent = `已收服 ${totalGot}/${totalAll} 只词灵 · 点击查看家族`;
+  const container = document.getElementById('ling-hall-body');
+  if (!container) return;
+  container.innerHTML = stats.map(f => {
+    const complete = f.got >= f.total;
+    const rewarded = !!state.lingRewarded[f.family];
+    const pct = Math.round((f.got / f.total) * 100);
+    const btn = complete
+      ? (rewarded ? '<span class="ling-done">已集齐 ✓</span>' : `<button class="btn btn-primary" style="font-size:12px;padding:6px 10px" onclick="claimLingReward('${f.family.replace(/'/g, "\\'")}')">🎁 领取集齐奖励</button>`)
+      : `<span class="ling-need">${f.got}/${f.total}</span>`;
+    return `<div class="ling-card ${complete ? 'done' : ''}">
+      <div class="ling-head"><span class="ling-name">${f.family}</span><span class="ling-desc">${f.desc}</span></div>
+      <div class="ling-bar"><div class="ling-fill" style="width:${pct}%"></div></div>
+      <div class="ling-foot">${btn}<span class="ling-master">已悟 ${f.master}</span></div>
+    </div>`;
+  }).join('');
+  const modal = document.getElementById('ling-hall-modal');
+  if (modal) modal.style.display = 'flex';
+}
+function claimLingReward(family) {
+  if (state.lingRewarded[family]) return;
+  const cand = shuffleArray((window.VOCAB || []).filter(v => getLingFamily(v.word).family === family && !state.mastered.has(v.word)));
+  const w = cand[0];
+  if (!w) { state.lingRewarded[family] = true; saveState(); openLingHall(); showToast('该族词灵已尽数悟透'); return; }
+  state.mastered.add(w.word);
+  if (!state.reviewSchedule[w.word]) scheduleReview(w.word, 0);
+  state.lingRewarded[family] = true;
+  saveState(); updateStats(); openLingHall();
+  showToast(`🎁 「${family}」集齐！顿悟一词：${w.word} ✓`);
+}
+function closeLingHall() {
+  const modal = document.getElementById('ling-hall-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+// 语境句架（引用式，任意词嵌入语法安全）
+const CTX_TEMPLATES = {
+  'n.': ['老修士把「{w}」二字刻在竹简上，递给来问道的弟子。','秘府藏书中有一册，扉页只写着一个词：「{w}」。','破解此局的关键，就藏在那「{w}」一词的真义里。'],
+  'v.': ['试炼第一关，便是明悟「{w}」究竟意味着什么。','残卷铭文开篇即言：「{w}」，是此道的第一步。','长老命众弟子用心体会「{w}」的道理。'],
+  'a.': ['那位前辈评点此物，只说了一个字：「{w}」。','玉简将此宝标为「{w}」，引得众人围观。','云台上有人低声议论：此等景象，当真「{w}」。'],
+  'ad.': ['功法注解说：行功需「{w}」，不可急躁。','阵旗布列，须「{w}」推进，方能成阵。'],
+  'prep.': ['这道符箓只在「{w}」阵光之内生效。','小径蜿蜒「{w}」竹林深处，通向一处洞府。'],
+};
+function matchCtxQuote(word, pos) {
+  const key = String(pos || '').replace(/^[a-zA-Z]+\./, s => s).trim();
+  const group = CTX_TEMPLATES[key] || null;
+  if (!group || !group.length) return null;
+  const s = group[Math.floor(Math.random() * group.length)];
+  return s.replace('{w}', word);
+}
+
+// 题干语境：真实例句 > 引用句架 > 秘境场景（保证全词库有语境呈现）
+function buildQuizContext(word) {
+  const info = getWordInfo(word);
+  if (info.example) {
+    return `<div class="qq-ctx"><span class="ctx-line">"${info.example}"</span>${info.exampleTrans ? `<span class="ctx-trans">${info.exampleTrans}</span>` : ''}</div>`;
+  }
+  const quote = matchCtxQuote(word, info.pos);
+  if (quote) {
+    return `<div class="qq-ctx"><span class="ctx-line">${quote}</span><span class="ctx-trans">—— 出自秘境残卷 · 择其词义</span></div>`;
+  }
+  const sc = SCENE_TEMPLATES[Math.floor(Math.random() * SCENE_TEMPLATES.length)];
+  return `<div class="qq-ctx"><span class="ctx-line">📍 ${sc.place} · ${sc.pre.replace('{word}', word)}</span></div>`;
+}
+
+// ============================================================ V6.11 主线剧情扩词（12章 × 25词 = 300词）
+// 插叙句直接嵌入英文词（与现有剧情风格一致），运行时会并入 STORY_SECTIONS 并注册到 STORY_WORDS
+const STORY_INSERT = {
+  1: [
+    { text:'瓦罐底刻着一行 ancient 铭文，字体早已斑驳。', words:['ancient'] },
+    { text:'她告诉自己，只要 endure 过这个冬天，一切都会不同。', words:['endure'] },
+    { text:'测灵石前，长老叹息：你的 destiny 已定，莫要妄想。', words:['destiny'] },
+    { text:'同门弟子 mock 她杂灵根的资质，笑声刺耳。', words:['mock'] },
+    { text:'寒夜里她冻得 tremble，却仍攥紧那本残破心法。', words:['tremble'] },
+    { text:'角落里传来 whisper：听说她就是当年那桩旧案的孩子。', words:['whisper'] },
+    { text:'她于心中 promise：终有一日，要让所有人仰视。', words:['promise'] },
+    { text:'灵根尽废的绝望压来，她几乎陷入 despair。', words:['despair'] },
+    { text:'柴房缝隙透进 dim 的月光，落在瓦罐上。', words:['dim'] },
+    { text:'据说练成那门功法者，可 ascend 九霄，直入天门。', words:['ascend'] },
+    { text:'混沌灵根似在沉睡，只待一朝 wake。', words:['wake'] },
+    { text:'她将心法抄录在一页 sheet 上，贴身藏好。', words:['sheet'] },
+    { text:'采药时她识得百余种 herb，这便是她的天赋。', words:['herb'] },
+    { text:'清早的 frost 覆满药圃，她小心翼翼拨开叶片。', words:['frost'] },
+    { text:'每日 dawn 前她便起身，于后山枯坐吐纳。', words:['dawn'] },
+    { text:'药汤 bitter 入喉，她却一饮而尽。', words:['bitter'] },
+    { text:'被逐出内门那天，她的心像被掏空般 hollow。', words:['hollow'] },
+    { text:'灵脉测试时，众人只觉一股寒意 shiver 过脊背。', words:['shiver'] },
+    { text:'掌教 deny 了她修习上等功法的请求。', words:['deny'] },
+    { text:'她依旧 humble 地清扫柴房，面无怨色。', words:['humble'] },
+    { text:'那枚旧玉佩，是她唯一 cherish 之物。', words:['cherish'] },
+    { text:'她不信命，偏要与 fate 争上一争。', words:['fate'] },
+    { text:'她像 invisible 的影子，无人注意。', words:['invisible'] },
+    { text:'她与命运 struggle，从不认输。', words:['struggle'] },
+    { text:'她 reject 了施舍，转身离去。', words:['reject'] },
+  ],
+  2: [
+    { text:'她以混沌灵根 absorb 天地灵气，速度骇人。', words:['absorb'] },
+    { text:'残魂一缕神识 instruct 她行功路线。', words:['instruct'] },
+    { text:'经脉淤塞是第一道 obstacle。', words:['obstacle'] },
+    { text:'她 pursue 的从来不是安逸，而是真相。', words:['pursue'] },
+    { text:'她学会 conceal 自己的修为波动。', words:['conceal'] },
+    { text:'那道功法运行之法 peculiar 至极，与诸派皆不同。', words:['peculiar'] },
+    { text:'冥冥中似有力量 compel 她走向后山禁地。', words:['compel'] },
+    { text:'密室空荡，只有一枚 vacant 的玉座。', words:['vacant'] },
+    { text:'残魂的记忆 vivid 地涌入她脑海。', words:['vivid'] },
+    { text:'她向残魂 pledge，必报此恩。', words:['pledge'] },
+    { text:'残魂 reluctant 地说出半句遗言，便消散了。', words:['reluctant'] },
+    { text:'混沌灵根的气息 subtle 得几乎无法察觉。', words:['subtle'] },
+    { text:'两股灵气在她体内 merge，旋成漩涡。', words:['merge'] },
+    { text:'胸口传来 urgent 的刺痛，是旧伤发作。', words:['urgent'] },
+    { text:'她以清灵诀 calm 翻涌的气血。', words:['calm'] },
+    { text:'玉佩上残留着一缕神识 trace，指向北方。', words:['trace'] },
+    { text:'这或许就是查明身世的唯一 clue。', words:['clue'] },
+    { text:'她对残魂的身份仍保留一丝 reserve。', words:['reserve'] },
+    { text:'清灵诀能 restore 受损的灵脉。', words:['restore'] },
+    { text:'突破那刻，灵力如潮，带来 immense 的快意。', words:['immense'] },
+    { text:'她终于摸到炼气三层的 threshold。', words:['threshold'] },
+    { text:'密室复归 silent，唯余她一人呼吸可闻。', words:['silent'] },
+    { text:'她能 perceive 到空气中灵气的流向。', words:['perceive'] },
+    { text:'残魂的身世是一个 mystery。', words:['mystery'] },
+    { text:'真相正在 unfold。', words:['unfold'] },
+  ],
+  3: [
+    { text:'灵兽园的老龟，是这片灵田最年长的 elder。', words:['elder'] },
+    { text:'雪团护主时露出 fierce 的獠牙。', words:['fierce'] },
+    { text:'想 tame 灵兽，先得让它认你为主。', words:['tame'] },
+    { text:'灵兽一旦认主，便最是 loyal。', words:['loyal'] },
+    { text:'他们设下陷阱，意图 capture 那只幼兽。', words:['capture'] },
+    { text:'雪团险险 escape，躲进你的袖中。', words:['escape'] },
+    { text:'身后的 pursuit 越来越近。', words:['pursuit'] },
+    { text:'你抱着雪团 swift 穿过石桥。', words:['swift'] },
+    { text:'前方是一道幽深 valley，云雾缭绕。', words:['valley'] },
+    { text:'山洞是你暂避的 shelter。', words:['shelter'] },
+    { text:'雪团前爪有一道 wound，血流不止。', words:['wound'] },
+    { text:'你以灵草为它 heal 伤口。', words:['heal'] },
+    { text:'你 gently 抚过它的脊背，它渐渐平静。', words:['gently'] },
+    { text:'要建立 trust，须以真心换真心。', words:['trust'] },
+    { text:'一人一兽之间，渐渐生出奇异的 tie。', words:['tie'] },
+    { text:'雾散时，你 glimpse 到谷底一座石门。', words:['glimpse'] },
+    { text:'石门上是上古 ritual 留下的纹路。', words:['ritual'] },
+    { text:'这座谷底藏着宗门最大的 secret。', words:['secret'] },
+    { text:'你决心 venture 进入石门一探。', words:['venture'] },
+    { text:'门内 darkness 中潜伏着未知的 danger。', words:['danger'] },
+    { text:'你步步 cautious，不敢惊动任何存在。', words:['cautious'] },
+    { text:'石门之后，等待你的是一场莫大的 reward。', words:['reward'] },
+    { text:'雪团的 instinct 告诉她危险将至。', words:['instinct'] },
+    { text:'灵兽只 obey 强者。', words:['obey'] },
+    { text:'她豁出性命也要 protect 它。', words:['protect'] },
+  ],
+  4: [
+    { text:'宗门大比将至，各峰弟子摩拳擦掌，只待 contest。', words:['contest'] },
+    { text:'你的头号 rival 是内门大师兄。', words:['rival'] },
+    { text:'硬拼不智，你需谋定 strategy。', words:['strategy'] },
+    { text:'大师兄神色 confident，视你如无物。', words:['confident'] },
+    { text:'你第一轮胜出，台下 applause 如潮。', words:['applause'] },
+    { text:'有人押你黑马，也有人笑你 fortune 使然。', words:['fortune'] },
+    { text:'你的一手剑法 brilliant 得令长老侧目。', words:['brilliant'] },
+    { text:'大师兄终于 defeat 在你剑下，满场寂静。', words:['defeat'] },
+    { text:'你为柴房出身的杂役弟子挣得莫大 glory。', words:['glory'] },
+    { text:'大师兄眼底是掩不住的 envy。', words:['envy'] },
+    { text:'掌教宣布你是本届 supreme 魁首。', words:['supreme'] },
+    { text:'长老们 praise 你心性坚毅。', words:['praise'] },
+    { text:'你的表现 outstanding，惊动外门长老。', words:['outstanding'] },
+    { text:'你于胜处仍守 dignity，不骄不躁。', words:['dignity'] },
+    { text:'比试胜负，终要 fair 分明。', words:['fair'] },
+    { text:'这一战是你的 triumph，也是新局的开始。', words:['triumph'] },
+    { text:'下一轮的 opponent 竟是上界来的贵客。', words:['opponent'] },
+    { text:'纵败亦须 honorable，不可堕了宗门声名。', words:['honorable'] },
+    { text:'你需要的不是蛮力，而是 courage。', words:['courage'] },
+    { text:'关键时刻，你做出 decisive 的判断。', words:['decisive'] },
+    { text:'唯有以心胜，方能 prevail 于强敌。', words:['prevail'] },
+    { text:'授印 ceremony 上，你接过那枚宗门令。', words:['ceremony'] },
+    { text:'这场 competition 比她想象中更残酷。', words:['competition'] },
+    { text:'她日复一日地 discipline 自己。', words:['discipline'] },
+    { text:'她要的，是一份实至名归的 success。', words:['success'] },
+  ],
+  5: [
+    { text:'宗门组织 expedition 前往上古秘境。', words:['expedition'] },
+    { text:'秘境入口立着石碑，严禁外人 approach。', words:['approach'] },
+    { text:'传闻其中有仙人遗落的 treasure。', words:['treasure'] },
+    { text:'入洞第一步，你就触发了一处 trap。', words:['trap'] },
+    { text:'你滑入一条幽暗 tunnel，直坠深处。', words:['tunnel'] },
+    { text:'你点燃一支 torch，照亮四壁。', words:['torch'] },
+    { text:'壁上的 record，记载着此地的来历。', words:['record'] },
+    { text:'铭文末句是一则 forecast：持印者，当破天规。', words:['forecast'] },
+    { text:'黑暗中传来 monster 的低吼。', words:['monster'] },
+    { text:'你拔出那柄随身的 sword，寒光凛冽。', words:['sword'] },
+    { text:'你挥剑 defend，且战且退。', words:['defend'] },
+    { text:'肩头被利爪划过，你受了 hurt。', words:['hurt'] },
+    { text:'绝境之下，你 desperate 挥出那一剑。', words:['desperate'] },
+    { text:'那一剑竟引动气血，你的修为意外 progress。', words:['progress'] },
+    { text:'石台中央供奉着一枚上古 jewel。', words:['jewel'] },
+    { text:'你终于 claim 了那枚镇魂珠。', words:['claim'] },
+    { text:'洞口处，你的 enemy 早已等候多时。', words:['enemy'] },
+    { text:'你不得不与他 confront，一战定宝。', words:['confront'] },
+    { text:'此战 victory，你带着镇魂珠扬长而去。', words:['victory'] },
+    { text:'他不甘就此 chase 出秘境。', words:['chase'] },
+    { text:'你足尖一点，身影 fade 在雾中。', words:['fade'] },
+    { text:'自此，秘境中多了一段你的 legend。', words:['legend'] },
+    { text:'你大胆 explore 秘境的每一处角落。', words:['explore'] },
+    { text:'这条路线极其 dangerous。', words:['dangerous'] },
+    { text:'秘境深处藏着无尽的 wealth。', words:['wealth'] },
+  ],
+  6: [
+    { text:'掌教终于吐露：你并非孤儿 orphan，而是故人之子。', words:['orphan'] },
+    { text:'你的血脉 heritage 来自上界一个没落的姓氏。', words:['heritage'] },
+    { text:'你决心 investigate 当年那桩惨案。', words:['investigate'] },
+    { text:'残魂曾 witness 那一夜的屠杀。', words:['witness'] },
+    { text:'一夜之间，全族遭 massacre，唯你被藏下。', words:['massacre'] },
+    { text:'告密者就在宗门之内，他 betray 了你的家族。', words:['betray'] },
+    { text:'蛛丝马迹，皆是当年案情的 evidence。', words:['evidence'] },
+    { text:'你开始 suspect 那位看似忠厚的执事长老。', words:['suspect'] },
+    { text:'为查真相，你时常 disguise 成杂役四处走动。', words:['disguise'] },
+    { text:'你暗中 question 当年侥幸存活的老人。', words:['question'] },
+    { text:'老人临死前，终于 admit 出当年的真相。', words:['admit'] },
+    { text:'幕后 criminal 竟与上界天庭有关。', words:['criminal'] },
+    { text:'你攥紧拳头，心中燃起 revenge 的火。', words:['revenge'] },
+    { text:'你所要的，不只是复仇，而是 justice。', words:['justice'] },
+    { text:'越查越深，你 uncover 出一个惊天阴谋。', words:['uncover'] },
+    { text:'有人一直在暗中 manipulate 宗门棋局。', words:['manipulate'] },
+    { text:'这场 conspiracy 横跨两界，牵涉无数人命。', words:['conspiracy'] },
+    { text:'你的家族，从来都是 innocent 的。', words:['innocent'] },
+    { text:'他们是被人 frame 陷害的。', words:['frame'] },
+    { text:'你终于 reveal 了执事长老的罪证。', words:['reveal'] },
+    { text:'你要他为这场血案负起 responsibility。', words:['responsibility'] },
+    { text:'你学会 suppress 心头的恨意，静待时机。', words:['suppress'] },
+    { text:'她的 identity 始终是谜。', words:['identity'] },
+    { text:'凶手作案的 motive 是什么？', words:['motive'] },
+    { text:'谎言与真相之间，她选择撕开那层 lie。', words:['lie'] },
+  ],
+  7: [
+    { text:'上界 messenger 驾临青云宗，全宗震动。', words:['messenger'] },
+    { text:'掌教 summon 各峰长老议事。', words:['summon'] },
+    { text:'来使开口便索要宗门 tribute。', words:['tribute'] },
+    { text:'他眉宇间满是 contempt，视下界如蝼蚁。', words:['contempt'] },
+    { text:'他 demand 宗门交出秘境镇魂珠。', words:['demand'] },
+    { text:'掌教 refuse 得斩钉截铁。', words:['refuse'] },
+    { text:'来使 threaten 要踏平青云宗。', words:['threaten'] },
+    { text:'你暗中联络了几位可信的 ally。', words:['ally'] },
+    { text:'全宗上下，同仇敌忾，誓要 resist。', words:['resist'] },
+    { text:'正面为虚，奇兵为实，此为 tactic。', words:['tactic'] },
+    { text:'一场 meeting 在山门展开。', words:['meeting'] },
+    { text:'来使开出的 condition 苛刻至极。', words:['condition'] },
+    { text:'你表面上 concede 三分，暗地里却布下后手。', words:['concede'] },
+    { text:'你故意 provoke 他，引他露出破绽。', words:['provoke'] },
+    { text:'来使 furious 拂袖而去，约定三日后再战。', words:['furious'] },
+    { text:'你亲自 safeguard 护山大阵的阵眼。', words:['safeguard'] },
+    { text:'三日后，来使率众 assault 山门。', words:['assault'] },
+    { text:'各峰弟子尽数出列，结阵 guard 宗门。', words:['guard'] },
+    { text:'强攻不下，来使只得 retreat。', words:['retreat'] },
+    { text:'此战虽未定胜负，却大涨了全宗 pride。', words:['pride'] },
+    { text:'来使败退后，你心中却隐隐 uneasy。', words:['uneasy'] },
+    { text:'他的背影，像是一道 signal。', words:['signal'] },
+    { text:'来使所恃者，不过是天庭的 power。', words:['power'] },
+    { text:'她试图 negotiate 出和平的余地。', words:['negotiate'] },
+    { text:'这场 argument 之争，胜负在言谈之间。', words:['argument'] },
+  ],
+  8: [
+    { text:'天庭一纸 law，命青云宗交出灵根榜。', words:['law'] },
+    { text:'原来天庭一直在 harvest 各派天才的灵根。', words:['harvest'] },
+    { text:'那套灵根筛选的 mechanism，藏着天大的秘密。', words:['mechanism'] },
+    { text:'所谓大比，不过是 eliminate 异己的借口。', words:['eliminate'] },
+    { text:'被标记为 inferior 灵根的弟子，皆被暗中收割。', words:['inferior'] },
+    { text:'天庭 authority 之下，众生噤声。', words:['authority'] },
+    { text:'你成了天庭眼中必须清除的 object。', words:['object'] },
+    { text:'他们派来的杀手，意在 assassinate 你。', words:['assassinate'] },
+    { text:'夜半山路，一场 surprise 悄然布下。', words:['surprise'] },
+    { text:'你以残魂相助，才得以 survive。', words:['survive'] },
+    { text:'残魂留下的记忆，就是最硬的 proof。', words:['proof'] },
+    { text:'你于仙盟大会上 denounce 天庭暴行。', words:['denounce'] },
+    { text:'仙盟众修，过半 support 于你。', words:['support'] },
+    { text:'青云宗率先发出 protest 之声。', words:['protest'] },
+    { text:'天庭怒而 sanction 青云宗，断其仙缘。', words:['sanction'] },
+    { text:'他们企图 isolate 你，让你众叛亲离。', words:['isolate'] },
+    { text:'你举旗 rebel，天地为之变色。', words:['rebel'] },
+    { text:'这场 revolution，从青云宗燃向八荒。', words:['revolution'] },
+    { text:'同门弟子以 loyalty 相许，誓死相随。', words:['loyalty'] },
+    { text:'你深知，成大事者必有 faith。', words:['faith'] },
+    { text:'风暴的中心，你望向更远的 horizon。', words:['horizon'] },
+    { text:'你离 truth 越来越近了。', words:['truth'] },
+    { text:'她要终结的是天庭的 control。', words:['control'] },
+    { text:'被 oppress 的修士，需要一个声音。', words:['oppress'] },
+    { text:'她要 liberate 所有被收割的天才。', words:['liberate'] },
+  ],
+  9: [
+    { text:'天庭大军压境，青云宗陷入 siege。', words:['siege'] },
+    { text:'你是这支守军的 head。', words:['head'] },
+    { text:'你下令 strengthen 各峰关隘。', words:['strengthen'] },
+    { text:'粮草 supply 被切断，只能自给。', words:['supply'] },
+    { text:'你定下 share 之法，共渡难关。', words:['share'] },
+    { text:'你于阵前演说，重振全宗 spirit。', words:['spirit'] },
+    { text:'护山大阵 withstand 了一轮轮轰击。', words:['withstand'] },
+    { text:'阵眼将 collapse 之际，你以身补阵。', words:['collapse'] },
+    { text:'关键时刻，故人率 army 赶到。', words:['army'] },
+    { text:'这一场 crucial 之战，改写两界格局。', words:['crucial'] },
+    { text:'你以五行 formation 阵法困住敌军前锋。', words:['formation'] },
+    { text:'你亲率一支奇兵绕击敌军 side。', words:['side'] },
+    { text:'敌军大乱，作鸟兽 scatter。', words:['scatter'] },
+    { text:'战事 brutal，尸横遍野。', words:['brutal'] },
+    { text:'战后，你于峰顶立下 memorial，祭奠亡者。', words:['memorial'] },
+    { text:'胜利的喜悦之下，是深沉的 grief。', words:['grief'] },
+    { text:'你 solemn 献上一杯酒。', words:['solemn'] },
+    { text:'这场浩劫，教会全宗 unity 的可贵。', words:['unity'] },
+    { text:'只要道统不灭，仙途便可 persist。', words:['persist'] },
+    { text:'你望向远方，心中已有 future 的蓝图。', words:['future'] },
+    { text:'你要重写这片 realm 的规则。', words:['realm'] },
+    { text:'你在亡者碑前立下 oath：此仇必报。', words:['oath'] },
+    { text:'她以 resolve 稳住军心。', words:['resolve'] },
+    { text:'守土护宗，是每个弟子的 duty。', words:['duty'] },
+    { text:'这一战，虽败犹 noble。', words:['noble'] },
+  ],
+  10: [
+    { text:'九重雷劫，是飞升前最后的 pain。', words:['pain'] },
+    { text:'第一道 bolt 劈落，山岳震颤。', words:['bolt'] },
+    { text:'你以肉身 sustain 雷火淬炼。', words:['sustain'] },
+    { text:'雷火 purify 你体内的杂质。', words:['purify'] },
+    { text:'混沌灵根在雷海中 transform，愈发明亮。', words:['transform'] },
+    { text:'传说渡劫成功者，可 forever 长存不死。', words:['forever'] },
+    { text:'天穹之上， divine 仙乐隐隐传来。', words:['divine'] },
+    { text:'劫云深处，一扇天门 gate 缓缓开启。', words:['gate'] },
+    { text:'天门前，一名 ancient 的 god 拦路。', words:['god'] },
+    { text:'这是 final 一关，只问本心。', words:['final'] },
+    { text:'他问你：修仙所求，是力，还是 virtue？', words:['virtue'] },
+    { text:'你 answer 得毫不犹豫。', words:['answer'] },
+    { text:'watcher 微微颔首，表示 approve。', words:['approve'] },
+    { text:'你终于 enter 那道天门。', words:['enter'] },
+    { text:'门后是另一重 dimension，灵气如海。', words:['dimension'] },
+    { text:'你触及 eternal 的法则，心有所悟。', words:['eternal'] },
+    { text:'俯瞰之下， cosmic 万象皆在掌中。', words:['cosmic'] },
+    { text:'越登高处，越须保持 modest。', words:['modest'] },
+    { text:'这并非终点，而是 wisdom 的开始。', words:['wisdom'] },
+    { text:'一念 awake，万法皆通。', words:['awake'] },
+    { text:'你要 transcend 的，从来不只是境界。', words:['transcend'] },
+    { text:'你要为后世留下自己的 legacy。', words:['legacy'] },
+    { text:'每一次 rise，都是一次脱胎换骨。', words:['rise'] },
+    { text:'她终究不再是 mortal 之躯。', words:['mortal'] },
+    { text:'劫后，她神色 peaceful。', words:['peaceful'] },
+  ],
+  11: [
+    { text:'天庭设下终局 chess，以天下为盘。', words:['chess'] },
+    { text:'众生皆是棋子 piece，而你偏要做执棋人。', words:['piece'] },
+    { text:'你以退为进，布下天大的 move。', words:['move'] },
+    { text:'你的 master，正是那篡改天道之人。', words:['master'] },
+    { text:'他谋划万年的 scheme，被你一眼看穿。', words:['scheme'] },
+    { text:'你 solve 了他布下的每一道因果。', words:['solve'] },
+    { text:'你步步 counter，逼他现出真身。', words:['counter'] },
+    { text:'天地失衡，你需要重新掌定 balance。', words:['balance'] },
+    { text:'你欲 change 天道法则，还众生自由。', words:['change'] },
+    { text:'规则的反噬是最后的 resistance。', words:['resistance'] },
+    { text:'你愿意 lose 自身的力量，换天地清明。', words:['lose'] },
+    { text:'这一局，你要赢得 grace，不辱道心。', words:['grace'] },
+    { text:'你始终守着一条 principle：道不欺心。', words:['principle'] },
+    { text:'你要给这方天地真正的 freedom。', words:['freedom'] },
+    { text:'破而后立，重建新的 order。', words:['order'] },
+    { text:'以 heart 为剑，可斩一切虚妄。', words:['heart'] },
+    { text:'天地之大，远比你想象的 infinite。', words:['infinite'] },
+    { text:'你与 universe 同呼吸，感应每一条法则。', words:['universe'] },
+    { text:'这才是修行的 ultimate 意义。', words:['ultimate'] },
+    { text:'你开启了一个新的 epoch。', words:['epoch'] },
+    { text:'你立于万道 summit，俯瞰苍生。', words:['summit'] },
+    { text:'然而你知，这不过是另一个 beginning。', words:['beginning'] },
+    { text:'她步步为营，每一步都 careful 算计。', words:['careful'] },
+    { text:'一着 maneuver，满盘皆活。', words:['maneuver'] },
+    { text:'执棋者，贵在 sight。', words:['sight'] },
+  ],
+  12: [
+    { text:'天道崩毁，天地重归 chaos。', words:['chaos'] },
+    { text:'你以道身 build 山河。', words:['build'] },
+    { text:'大地重新 breathe，万物复苏。', words:['breathe'] },
+    { text:'灵花再度 bloom，溪流重响。', words:['bloom'] },
+    { text:'两界终于重归 harmony。', words:['harmony'] },
+    { text:'万修仰望，得享 peace。', words:['peace'] },
+    { text:'你回望那位 teacher 般的残魂，他已化入天地。', words:['teacher'] },
+    { text:'心中满是 gratitude，却无从言说。', words:['gratitude'] },
+    { text:'雪团已成你的第一个 student。', words:['student'] },
+    { text:'你 guide 后来者，走过你走过的路。', words:['guide'] },
+    { text:'你 nurture 新一代的修士。', words:['nurture'] },
+    { text:'青云宗的 tradition，将由你延续。', words:['tradition'] },
+    { text:'道法 permanent，薪火相传。', words:['permanent'] },
+    { text:'你的 influence，将绵延万世。', words:['influence'] },
+    { text:'后人于峰顶立碑 commemorate 你。', words:['commemorate'] },
+    { text:'你的故事，成了新的 myth。', words:['myth'] },
+    { text:'风过竹林，似在 murmur 你的名字。', words:['murmur'] },
+    { text:'这一卷仙途，至此 conclude。', words:['conclude'] },
+    { text:'你与旧友一一 farewell，踏上新的旅程。', words:['farewell'] },
+    { text:'前方 vast 天地，任你遨游。', words:['vast'] },
+    { text:'故事并未结束，它将继续 continue。', words:['continue'] },
+    { text:'而你的道，将 ever 延续。', words:['ever'] },
+    { text:'天地 renew，万象更新。', words:['renew'] },
+    { text:'灵脉 recover，重归丰盈。', words:['recover'] },
+    { text:'这是新世界的 birth。', words:['birth'] },
+  ],
+};
+// 运行时：把插叙词注册进 STORY_WORDS，并拼入各章剧情
+(function mountStoryInsert() {
+  try {
+    Object.keys(STORY_INSERT).forEach(chKey => {
+      const chId = +chKey;
+      const sIdx = chId - 1;
+      const sec = STORY_SECTIONS[sIdx];
+      if (!sec) return;
+      const ins = STORY_INSERT[chKey];
+      ins.forEach(item => {
+        (item.words || []).forEach(w => {
+          if (!STORY_WORDS.find(v => v.word === w)) {
+            STORY_WORDS.push({ word: w, chapter: chId, storyContext: item.text });
+          }
+        });
+      });
+      sec.content = sec.content + '\n\n' + ins.map(i => i.text).join('\n\n');
+    });
+  } catch (e) { /* 剧情扩展失败不影响主流程 */ }
+})();
+
 // ============================================================ 互动探索点
 const EXPLORE_EVENTS = {
   0:  { word:'damp',     flavor:'你拨开柴房角落的蛛网，发现一本残破药典，墨迹沾着 damp 的潮气……' },
@@ -1601,7 +2177,7 @@ const EXPLORE_EVENTS = {
   4:  { word:'fragile',   flavor:'绝境中你护住那 fragile 的本命灯，灵气却逆流而上，破而后立。' },
   5:  { word:'tremendous', flavor:'雷劫压下，你感到 tremendous 的威压，血脉却在轰鸣中苏醒。' },
   6:  { word:'arrogant',  flavor:'上界使者面目 arrogant，却在你剑意下弯了脊背，世道颠倒。' },
-  7:  { word:'devastating', flavor:'宗门倾覆，那 devastating 的火光中，你转身逆行驰援。' },
+  7:  { word:'intense',   flavor:'宗门倾覆，那 intense 的火光中，你转身逆行驰援。' },
   8:  { word:'humble',    flavor:'上界使者竟 humble 求你收徒，这一局，反客为主。' },
   9:  { word:'profound',  flavor:'生死边缘，你参透一道 profound 的大道，修为暴涨三重。' },
   10: { word:'inevitable', flavor:'九霄天劫如期而至，那是 inevitable 的试炼，也是登顶的阶梯。' },
@@ -1682,6 +2258,56 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
   }
 }
 
+// 随机秘境：全词库 × 场景模板，让每个词都可能成为一段剧情奇遇
+function openMystery() {
+  const pool = (window.VOCAB && window.VOCAB.length) ? window.VOCAB : STORY_WORDS;
+  const unmastered = pool.filter(v => !state.mastered.has(v.word));
+  const src = unmastered.length ? unmastered : pool;
+  const v = src[Math.floor(Math.random() * src.length)];
+  if (!v) return;
+  const sc = SCENE_TEMPLATES[Math.floor(Math.random() * SCENE_TEMPLATES.length)];
+  const flavor = sc.pre.replace('{word}', v.word);
+  const correctRaw = (v.def || '').split('；')[0];
+  const posTag = extractPOS(v.def || '');
+  const correct = humanizePOS(posTag && !correctRaw.match(/^[a-zA-Z]+\./) ? `${posTag} ${correctRaw}` : correctRaw);
+  const distractors = shuffleArray(pool.filter(w => w.word !== v.word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
+  const options = shuffleArray([correct, ...distractors]);
+  const labels = ['A', 'B', 'C', 'D'];
+  const esc = s => String(s).replace(/'/g, "\\'");
+  const overlay = document.createElement('div');
+  overlay.className = 'explore-modal';
+  overlay.innerHTML = `<div class="em-card">
+    <div class="em-flavor">🌌 ${flavor}</div>
+    <div class="em-word">${v.word}</div>
+    ${v.phonetic ? `<div class="em-phonetic">${v.phonetic}</div>` : ''}
+    <div class="em-q">择其义，方得机缘：</div>
+    <div class="em-opts">${options.map((o, i) => `<button onclick="handleMysteryAnswer(this,'${esc(o)}','${esc(correct)}','${esc(v.word)}')">${labels[i]}. ${o}</button>`).join('')}</div>
+    <div class="em-reward" id="em-reward"></div>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+function handleMysteryAnswer(btn, sel, correct, word) {
+  if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+  if (sel === correct) {
+    btn.classList.add('correct');
+    markLearned(word);
+    const reward = rollExploreReward();
+    const rewardMsg = reward.apply();
+    saveState(); updateStats();
+    const rw = document.getElementById('em-reward');
+    if (rw) rw.innerHTML = `✨ 机缘已得 · 「${word}」已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span>`;
+    sfx('unlock'); screenFlash();
+    try { const r = btn.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, 14); } catch (e) {}
+    setTimeout(() => { const o = document.querySelector('.explore-modal'); if (o) o.remove(); }, 2200);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.em-opts button').forEach(b => { if (b.textContent.includes(correct)) b.classList.add('correct'); });
+    const rw = document.getElementById('em-reward');
+    if (rw) rw.textContent = `✗ 正解：${correct} —— 此词已入温养，改日再战`;
+  }
+}
+
 function renderStoryContent() {
   const container = document.getElementById('story-content');
   const sIdx = state.currentSection; // 由 currentSection 决定显示哪一篇
@@ -1746,10 +2372,11 @@ function renderStoryContent() {
       html += `</div>`;
     }
   }
-  // 互动探索点：本章有可探索机缘则插入「探索」按钮
-  if (EXPLORE_EVENTS[sIdx]) {
-    html += `<div style="text-align:center"><button class="explore-btn" onclick="openExplore(${sIdx})">🔍 探索此处 · 觅机缘</button></div>`;
-  }
+  // 互动探索点：本章奇遇 + 随机秘境（全词库剧情化——每个词都可能成为机缘）
+  const exploreBtns = [];
+  if (EXPLORE_EVENTS[sIdx]) exploreBtns.push(`<button class="explore-btn" onclick="openExplore(${sIdx})">🔍 本章奇遇</button>`);
+  exploreBtns.push(`<button class="explore-btn" onclick="openMystery()">🌌 秘境探索</button>`);
+  html += `<div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">${exploreBtns.join('')}</div>`;
   html += `</div>`;
   // 阅读页底部：本章学词进度条
   const chId = section.chapter;
@@ -1890,6 +2517,8 @@ function openWordModal(word) {
     const txt = due ? '⏰ 温养到期，速去「试词·温养」' : `下次温养：${d.getMonth()+1}月${d.getDate()}日（第 ${s.level+1} 轮）`;
     html += `<div class="wm-collection-hint" style="border-color:${due?'var(--red-bright)':'var(--gold)'};color:${due?'var(--red-deep)':'var(--gold-dark)'}">🔄 ${txt}</div>`;
   }
+  const ling = getLingFamily(info.word);
+  if (ling) html += `<div class="wm-ling-hint">🔮 词灵归属：<b>${ling.family}</b><small> · ${ling.desc}</small></div>`;
   if (hasCollection) html += `<div class="wm-collection-hint">🔒 归属藏录 · 待解锁<br><small>试词通关后，此词归入「${info.collectionName}」录中。</small></div>`;
   html += `<div class="quiz-mode-toggle">
       <button class="qm-btn" onclick="quickQuizWord('${info.word.replace(/'/g,"\\'")}', 'en2cn')">英择中义</button>
@@ -2007,7 +2636,7 @@ function showQuizQuestion() {
     const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
     const options = shuffleArray([correctMeaning, ...distractors]);
     const labels = ['A','B','C','D'];
-    area.innerHTML = `<div class="qq-type">试词 · 英择中义</div><div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
+    area.innerHTML = `<div class="qq-type">试词 · 英择中义</div>${buildQuizContext(word)}<div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
     optsArea.innerHTML = options.map((opt, i) => `<button class="q-option" onclick="checkMCAnswer(this, '${opt.replace(/'/g,"\\'")}', '${correctMeaning.replace(/'/g,"\\'")}')"><span class="opt-label">${labels[i]}</span><span>${renderMeaning(opt)}</span></button>`).join('');
     speakWord(word);
   }
