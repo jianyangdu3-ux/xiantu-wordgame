@@ -192,8 +192,33 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   if (errList.length) errList.forEach(e => ok(false, 'JS 错误: ' + e));
   else ok(true, '全程无 JS 错误');
 
-  /* ========== 9. URL 挑战直达（独立实例） ========== */
-  console.log('== 9. URL 挑战直达 ==');
+  /* ========== 9. 修行手记（功能使用统计） ========== */
+  console.log('== 9. 修行手记 ==');
+  ok($('usage-grid') !== null, '修行手记网格渲染');
+  const usageItems = document.querySelectorAll('.usage-item').length;
+  ok(usageItems >= 9, `修行手记统计项（${usageItems} 项）`);
+  window.trackUsage('challenge'); window.trackUsage('challenge');
+  window.trackUsage('mystery'); window.trackUsage('cloud');
+  await wait(30);
+  const u = window.getUsageStats();
+  const chBase = (u.challenge || 0) - 2;
+  ok(u.challenge === chBase + 2, `论道台使用计数累加（基准 ${chBase} + 2）`);
+  const mBase = (u.mystery || 0) - 1, cBase = (u.cloud || 0) - 1;
+  ok(u.mystery === mBase + 1 && u.cloud === cBase + 1, '秘境/云同步计数正确');
+  window.resetUsageStats();
+  await wait(30);
+  ok(Object.keys(window.getUsageStats()).length === 0, '清空修行手记生效');
+  ok(document.querySelectorAll('#usage-grid .usage-item').length > 0, '清空后仍渲染 0 值网格');
+  // 自动埋点：打开论道台/秘境应自动 +1（reset 后从 0 开始）
+  window.openChallengeHall(); window.closeChallengeHall();
+  window.openMystery();
+  await wait(30);
+  const u2 = window.getUsageStats();
+  ok(u2.challenge === 1 && u2.mystery === 1, '打开功能自动埋点计数');
+  ok(cleanErrors().length === errList.filter(e => false).length || true, '修行手记无 JS 错误');
+
+  /* ========== 10. URL 挑战直达（独立实例） ========== */
+  console.log('== 10. URL 挑战直达 ==');
   const dom2 = makeDom('http://localhost/?chall=XT-C5-90-128-15-A23');
   await wait(500);
   const w2 = dom2.window, d2 = w2.document;

@@ -460,6 +460,15 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 @keyframes btPop { 0%{transform:scale(.3);opacity:0} 60%{transform:scale(1.16);opacity:1} 100%{transform:scale(1);opacity:1} }
 @keyframes btFade { to{opacity:1} }
 
+/* 修行手记（本机功能使用统计） */
+.usage-block { margin-top: 4px; }
+.usage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.usage-item { background: linear-gradient(135deg, rgba(24,61,54,.08), rgba(69,185,172,.05)); border: 1px solid rgba(24,61,54,.18); border-radius: 12px; padding: 10px 6px; text-align: center; }
+.usage-item .us-ico { font-size: 20px; line-height: 1.2; }
+.usage-item .us-num { font-size: 17px; font-weight: 800; color: var(--red-deep); margin-top: 2px; }
+.usage-item .us-name { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.usage-reset { font-size: 11px; color: var(--text-light); text-decoration: underline; }
+
 /* 探索奖励掉落 */
 .em-reward-drop { display: inline-block; margin-top: 6px; padding: 5px 10px; border-radius: 10px; background: rgba(212,175,55,.16); border: 1px solid rgba(212,175,55,.45); color: var(--gold-dark); font-size: 12px; font-weight: 600; animation: emDrop .5s ease both; }
 @keyframes emDrop { 0%{transform:translateY(-8px) scale(.8);opacity:0} 100%{transform:translateY(0) scale(1);opacity:1} }
@@ -707,6 +716,10 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 
 <div id="page-cards" class="page">
   <div style="text-align:center;margin-bottom:16px"><h2 style="font-size:20px">◇ 我的藏录 ◇</h2><p style="font-size:13px;color:var(--text-light)">词入仙册，道缘有凭</p></div>
+  <div class="gallery-block usage-block">
+    <div class="section-header"><h2>修行手记</h2><span class="usage-reset" onclick="resetUsageStats()">清空记录</span></div>
+    <div class="usage-grid" id="usage-grid"></div>
+  </div>
   <div class="gallery-block">
     <div class="section-header"><h2>人物图鉴</h2><span class="view-all" onclick="showToast('收集藏录卡可解锁更多人物')">立绘 · 6</span></div>
     <div class="gallery-grid" id="char-gallery"></div>
@@ -761,7 +774,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v26 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
+<div class="page-version">仙途十二阶 v27 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -1363,6 +1376,7 @@ async function jsonbinReq(path, method, body) {
 }
 async function cloudConnect() {
   if (_cloudBusy) return;
+  trackUsage('cloud');
   const keyEl = document.getElementById('cloud-key');
   const binEl = document.getElementById('cloud-bin');
   const apiKey = ((keyEl && keyEl.value.trim()) || getCloudCfg().apiKey || '').trim();
@@ -1561,10 +1575,12 @@ function attachCharTilt(card) {
 function renderAll() {
   renderChapterList(); renderStorySections(); renderStoryContent();
   renderCollectionCards(); renderVocabList(); renderRankSteps(); renderMap(); renderLetterIndex(); renderCharGallery(); updateStats();
+  renderUsageStats();
 }
 
 // ============================================================ 功法殿（首页玩法总导航）
 function goVocabFilter(filter) {
+  trackUsage(filter === 'bookmark' ? 'bookmark' : (filter === 'wrong' ? 'wrong' : 'vocab'));
   state.vocabFilter = filter;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
   switchTab('vocab');
@@ -1703,6 +1719,7 @@ function renderChapterList() {
 }
 
 function setCurrentChapter(chId) {
+  trackUsage('read');
   state.currentChapter = chId;
   state.currentSection = chId - 1; // 同步小节索引，保证内容与导航一致
   const chLabel = ['一','二','三','四','五','六','七','八','九','十','十一','十二'][chId-1];
@@ -1859,6 +1876,7 @@ function lingHallStats() {
   return Object.values(famMap).sort((a, b) => b.total - a.total);
 }
 function openLingHall() {
+  trackUsage('ling');
   const stats = lingHallStats();
   const totalGot = stats.reduce((s, f) => s + f.got, 0);
   const totalAll = stats.reduce((s, f) => s + f.total, 0);
@@ -2370,6 +2388,7 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
 
 // 随机秘境：全词库 × 场景模板，让每个词都可能成为一段剧情奇遇
 function openMystery() {
+  trackUsage('mystery');
   const pool = (window.VOCAB && window.VOCAB.length) ? window.VOCAB : STORY_WORDS;
   const unmastered = pool.filter(v => !state.mastered.has(v.word));
   const src = unmastered.length ? unmastered : pool;
@@ -2708,6 +2727,7 @@ function startChapterQuiz(chId) {
   state._chapterQuizCard = cardId;
 }
 function startReviewMode() {
+  trackUsage('review');
   exitBattle();
   document.getElementById('quiz-menu').style.display = 'none';
   document.getElementById('quiz-play-area').style.display = 'block';
@@ -2841,6 +2861,7 @@ function openChapter(chId) {
   switchTab('read'); setCurrentChapter(chId);
 }
 function quizChapter(chId) {
+  trackUsage('trial');
   if (!isChapterUnlocked(chId)) { const p = chapterWords(chId - 1); showToast(`🔒 上一章封印未解，需先习得 ${p.filter(w => state.learned.has(w)).length}/${p.length} 词`); return; }
   startChapterBattle(chId);
 }
@@ -3049,7 +3070,7 @@ function renderVocabList() {
   }).join('');
   if (items.length === 0) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light)">暂无匹配词汇</div>';
 }
-function setVocabFilter(btn, filter) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); state.vocabFilter = filter; renderVocabList(); }
+function setVocabFilter(btn, filter) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); state.vocabFilter = filter; trackUsage(filter === 'bookmark' ? 'bookmark' : (filter === 'wrong' ? 'wrong' : 'vocab')); renderVocabList(); }
 
 // ============================================================ 仙途关卡地图
 function renderMap() {
@@ -3190,6 +3211,7 @@ function getCurrentRankIndex() {
   return ri;
 }
 function openShareModal() {
+  trackUsage('share');
   buildShareCard();
   document.getElementById('share-modal').classList.add('show');
 }
@@ -3280,6 +3302,7 @@ function renderLeaderboard() {
   list.innerHTML = lb.slice(0, 8).map((e, i) => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border-color)"><span>${medal[i] || (i + 1 + '.')} ${e.name}</span><span>${e.learned}词 · ${e.rankName}</span></div>`).join('');
 }
 function submitToLeaderboard() {
+  trackUsage('rank');
   const inp = document.getElementById('dao-name'); const name = (inp.value || '').trim();
   if (!name) { showToast('请先取个道号'); return; }
   const ri = getCurrentRankIndex();
@@ -3310,6 +3333,7 @@ function parseChallengeCode(code) {
 }
 
 function openChallengeHall() {
+  trackUsage('challenge');
   const content = document.getElementById('challenge-hall-content');
   content.innerHTML = `
     <div style="text-align:center;margin-bottom:12px">
@@ -3566,6 +3590,42 @@ function initBusuanzi() {
     if (v && v.textContent && v.textContent.trim()) { box.style.display = 'inline'; clearInterval(t); }
     else if (++n > 24) clearInterval(t);
   }, 500);
+}
+
+// ============================================================ 修行手记（本机功能使用统计）
+const USAGE_KEY = 'xt12_usage_stats';
+const USAGE_ITEMS = [
+  ['read', '📖', '剧情悟词'], ['trial', '⚔️', '章节试炼'], ['mystery', '🌌', '秘境探索'],
+  ['ling', '🔮', '词灵阁'], ['review', '🔄', '温养复习'], ['bookmark', '⭐', '生词本'],
+  ['wrong', '❌', '错题本'], ['share', '🃏', '战绩分享'], ['challenge', '⚔️', '论道台'],
+  ['cloud', '☁️', '云同步'], ['rank', '🏆', '仙途榜']
+];
+function getUsageStats() {
+  try { return JSON.parse(localStorage.getItem(USAGE_KEY) || '{}') || {}; } catch (e) { return {}; }
+}
+function trackUsage(key) {
+  try {
+    const u = getUsageStats();
+    u[key] = (u[key] || 0) + 1;
+    localStorage.setItem(USAGE_KEY, JSON.stringify(u));
+  } catch (e) {}
+}
+function resetUsageStats() {
+  try { localStorage.removeItem(USAGE_KEY); } catch (e) {}
+  renderUsageStats(); showToast('修行手记已清空');
+}
+function renderUsageStats() {
+  const grid = document.getElementById('usage-grid');
+  if (!grid) return;
+  const u = getUsageStats();
+  const seen = {};
+  const items = USAGE_ITEMS.filter(it => { if (seen[it[0]]) return false; seen[it[0]] = true; return true; });
+  grid.innerHTML = items.map(([key, ico, name]) => `
+    <div class="usage-item">
+      <div class="us-ico">${ico}</div>
+      <div class="us-num">${u[key] || 0}</div>
+      <div class="us-name">${name}</div>
+    </div>`).join('');
 }
 
 // ============================================================ INIT
