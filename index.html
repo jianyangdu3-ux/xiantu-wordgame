@@ -498,7 +498,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <button class="menu-btn" onclick="showToast('藏经阁开发中')">☰</button>
   <div style="text-align:center"><h1>仙途十二阶</h1><div class="subtitle">凡女逆袭 · 5491词修仙录</div></div>
   <button class="menu-btn sound-btn" id="sound-btn" onclick="toggleSfx()" title="音效开关">🔊</button>
-  <button class="menu-btn" id="guide-btn" onclick="localStorage.removeItem('xt12_tutorial_seen');location.reload()" title="查看入门指引" style="font-size:16px">❓</button>
+  <button class="menu-btn" id="guide-btn" onclick="localStorage.removeItem('xt12_tutorial_seen_2');location.reload()" title="查看入门指引" style="font-size:16px">❓</button>
 </div>
 
 <div id="page-home" class="page active">
@@ -697,7 +697,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v20 · 若页面异常请长按链接在浏览器打开</div>
+<div class="page-version">仙途十二阶 v21 · 若页面异常请长按链接在浏览器打开</div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -3168,40 +3168,54 @@ function submitToLeaderboard() {
 loadState();
 /* 新手引导：首次打开显示教程 */
 (function() {
-  if (localStorage.getItem('xt12_tutorial_seen')) return;
+  if (localStorage.getItem('xt12_tutorial_seen_2')) return;
   const overlay = document.createElement('div');
   overlay.className = 'tutorial-overlay';
   overlay.id = 'tutorial-overlay';
   overlay.innerHTML = `
 <div class="tutorial-card">
-  <div class="tc-header"><div class="tc-title">✦ 仙途入门指引 ✦</div><div class="tc-sub">四步掌握修仙背词之法</div></div>
+  <div class="tc-header"><div class="tc-title">✦ 仙途入门指引 ✦</div><div class="tc-sub">六步掌握修仙背词之法</div></div>
   <div class="tc-step active" data-step="0">
     <div class="tc-step-num">1</div>
     <div class="tc-step-title">📖 剧情悟词</div>
-    <div class="tc-step-desc">在「卷」页阅读仙途剧情，点击<span style="color:var(--red-deep);font-weight:700">红色单词</span>查看释义并听发音。每学一个新词，你的道行就涨一分。</div>
+    <div class="tc-step-desc">在「卷」页阅读仙途剧情，点击<span style="color:var(--red-deep);font-weight:700">红色单词</span>查看释义并听发音。每章还埋着 25 句隐藏词句，边读边遇词，每学一个新词道行就涨一分。</div>
     <div class="tc-step-img">📜✨📝</div>
     <div class="tc-step-tip">💡 提示：红词 = 本章节考纲词，点它就记住了！</div>
   </div>
   <div class="tc-step" data-step="1">
     <div class="tc-step-num">2</div>
     <div class="tc-step-title">⚔️ 试炼战斗</div>
-    <div class="tc-step-desc">在章节卡片上点「试炼（战斗）」进入 Boss 战！答对扣敌血、连击放大招；答错掉道心血。打赢解锁藏录卡。</div>
+    <div class="tc-step-desc">在章节卡片上点「试炼（战斗）」进入 Boss 战！每道题都带一句话境，答对扣敌血、连击放大招；答错掉道心血并自动进错题本。</div>
     <div class="tc-step-img">⚔️🔥💀</div>
-    <div class="tc-step-tip">💡 提示：战斗也在记词，打怪 = 背题，一举两得！</div>
+    <div class="tc-step-tip">💡 提示：战斗也在记词，打怪 = 背题；错词必温养，绝不裸背！</div>
   </div>
   <div class="tc-step" data-step="2">
     <div class="tc-step-num">3</div>
+    <div class="tc-step-title">🌌 秘境探索</div>
+    <div class="tc-step-desc">阅读页底部点「🌌 秘境探索」——全词库任意词都会化作一段微型奇遇：试炼塔、灵泉、上古洞府……答对收录仙册，解锁专属机缘。</div>
+    <div class="tc-step-img">🌌🗺️💫</div>
+    <div class="tc-step-tip">💡 提示：词库多大奇遇就有多少种，刷到的场景次次不重样！</div>
+  </div>
+  <div class="tc-step" data-step="3">
+    <div class="tc-step-num">4</div>
+    <div class="tc-step-title">🔮 词灵收集</div>
+    <div class="tc-step-desc">词根同源之词自成「词灵家族」（名相族、互联族、抗天族…45 族）。在「词」页进词灵阁，集齐一族可顿悟一词；词卡上能看到每词的词灵归属。</div>
+    <div class="tc-step-img">🔮✨📿</div>
+    <div class="tc-step-tip">💡 提示：前缀后缀定家族，背一族的词 = 收一族词灵！</div>
+  </div>
+  <div class="tc-step" data-step="4">
+    <div class="tc-step-num">5</div>
     <div class="tc-step-title">✦ 抉择机缘</div>
     <div class="tc-step-desc">剧情关键处会出现「道之抉择」。先通过小测验证明你认得这个词，再选择命运分支——不同选择解锁不同藏录。</div>
     <div class="tc-step-img">🔮⚡🃏</div>
     <div class="tc-step-tip">💡 提示：抉择前必须先过词，白送是不存在的～</div>
   </div>
-  <div class="tc-step" data-step="3">
-    <div class="tc-step-num">4</div>
+  <div class="tc-step" data-step="5">
+    <div class="tc-step-num">6</div>
     <div class="tc-step-title">🏆 境界晋升</div>
-    <div class="tc-step-desc">已学词数达到阈值自动突破境界（凡人→练气→筑基→…→飞升）。学完一章 ≥60% 的词才能解锁下一章。在「阶」页查看完整晋升路线。</div>
+    <div class="tc-step-desc">已学词数达到阈值自动突破境界（凡人→练气→筑基→…→飞升）。首页「今日修行」设每日目标、连续打卡不断！进度存本机，换设备用「云端续缘」同步。</div>
     <div class="tc-step-img">🌟🚀☯️</div>
-    <div class="tc-step-tip">💡 提示：进度存于本机，换设备用首页「云端续缘」导出/导入。</div>
+    <div class="tc-step-tip">💡 提示：全对战斗有额外奖励，每日打卡别断——坚持就是飞升！</div>
   </div>
   <div class="tc-dots"></div>
   <div class="tc-actions"><button class="btn btn-outline" id="tc-skip" style="flex:0.6">跳过</button><button class="btn btn-primary" id="tc-next">下一步</button></div>
@@ -3230,7 +3244,7 @@ loadState();
   function closeTutorial() {
     overlay.style.opacity = '0'; overlay.style.transition = 'opacity .3s';
     setTimeout(() => { overlay.remove(); }, 300);
-    localStorage.setItem('xt12_tutorial_seen', '1');
+    localStorage.setItem('xt12_tutorial_seen_2', '1');
   }
 })();
 // 音效开关：同步按钮图标与持久化偏好
