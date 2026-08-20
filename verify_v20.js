@@ -126,24 +126,39 @@ function parseArgs(expr) {
 
   /* ================= D. 秘境奇遇 ================= */
   window.openMystery();
-  const card = document.querySelector('.explore-modal .em-card');
+  const card = document.querySelector('.mystery-modal .em-card');
   ok(!!card, 'openMystery 生成秘境弹层');
-  const firstBtn = document.querySelector('.explore-modal .em-opts button');
+  const firstBtn = document.querySelector('.mystery-modal .em-opts button');
   const args = parseArgs(firstBtn.getAttribute('onclick'));
   const sel0 = args[1], correct = args[2], mWord = args[3];
   ok(!!mWord && vocabSet.has(mWord), '秘境词来自词库（' + mWord + '）');
-  const mOpts = document.querySelectorAll('.explore-modal .em-opts button');
+  const mOpts = document.querySelectorAll('.mystery-modal .em-opts button');
   ok(mOpts.length === 4, '秘境选项恰为 4 个');
-  const flavor = document.querySelector('.explore-modal .em-flavor');
+  const flavor = document.querySelector('.mystery-modal .em-flavor');
   ok(!!flavor && flavor.textContent.includes(mWord), '秘境场景句包含该词');
   const mOptTexts = [...mOpts].map(b => b.textContent);
   ok(new Set(mOptTexts).size >= 2 && mOptTexts.some(t => t.includes(correct)), '选项含干扰项且正确项可辨');
-  // 答错：不入已学
+  // 答错：不入已学 + 揭示正确项（作用域内）+ 不误删词灵阁
   window.handleMysteryAnswer(firstBtn, '___错误答案___', correct, mWord);
   ok(!st().learned.has(mWord), '秘境答错不入已学');
-  // 答对：收录仙册
-  window.handleMysteryAnswer(document.createElement('button'), correct, correct, mWord);
-  ok(st().learned.has(mWord), '秘境答对后收录仙册');
+  ok(document.getElementById('ling-hall-modal') !== null, '答错后词灵阁弹窗 DOM 未被误删');
+  const revealed = [...mOpts].some(b => b.classList.contains('correct'));
+  ok(revealed, '答错后揭示正确项（作用域内）');
+  // 答错弹窗不自动关，手动清掉；重新开新秘境答对
+  document.querySelectorAll('.mystery-modal').forEach(o => o.remove());
+  window.openMystery();
+  const m2 = document.querySelector('.mystery-modal');
+  const m2Btns = m2 ? [...m2.querySelectorAll('.em-opts button')] : [];
+  const m2Args = m2Btns.length ? parseArgs(m2Btns[0].getAttribute('onclick')) : [];
+  const m2Word = m2Args[3];
+  const m2Correct = m2Args[2];
+  const winBtn = m2Btns.find(b => b.textContent.includes(m2Correct));
+  if (winBtn) window.handleMysteryAnswer(winBtn, m2Correct, m2Correct, m2Word);
+  ok(!!m2Word && st().learned.has(m2Word), '秘境答对后收录仙册（' + m2Word + '）');
+  ok(document.getElementById('ling-hall-modal') !== null, '答对后词灵阁弹窗 DOM 未被误删');
+  await wait(2300);
+  ok(document.querySelectorAll('.mystery-modal').length === 0, '秘境答对后弹窗自动关闭（不再残留）');
+  ok(document.getElementById('ling-hall-modal') !== null, '关闭动作不误删词灵阁弹窗');
 
   /* ================= E. 探索区双按钮 + 老存档兼容 ================= */
   window.eval('state.currentSection = 0; state.currentChapter = 1;');

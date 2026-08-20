@@ -385,7 +385,9 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 /* ====== 互动探索点 ====== */
 .explore-btn { display: inline-flex; align-items: center; gap: 6px; margin: 16px auto; padding: 10px 18px; border-radius: 20px; border: 1px dashed var(--gold); background: rgba(212,175,55,.1); color: var(--gold-dark); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
 .explore-btn:hover { background: rgba(212,175,55,.2); transform: translateY(-1px); }
-.explore-modal { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.explore-modal, .mystery-modal { position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 20px; }
+/* 动态弹窗(奇遇/秘境)盖在静态弹窗之上，独立类名避免与 #ling-hall-modal(.explore-modal) 冲突 */
+.mystery-modal { z-index: 9999; }
 .em-card { background: var(--bg-page); border-radius: 16px; width: 100%; max-width: 360px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.4); text-align: center; }
 .em-flavor { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
 .em-word { font-size: 26px; font-weight: 700; color: var(--red-deep); margin-bottom: 4px; }
@@ -720,7 +722,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v24 · 若页面异常请长按链接在浏览器打开</div>
+<div class="page-version">仙途十二阶 v25 · 若页面异常请长按链接在浏览器打开</div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -2291,20 +2293,21 @@ function openExplore(sIdx) {
   const labels = ['A','B','C','D'];
   const esc = s => String(s).replace(/'/g, "\\'");
   const overlay = document.createElement('div');
-  overlay.className = 'explore-modal';
+  overlay.className = 'mystery-modal';
   overlay.innerHTML = `<div class="em-card">
     <div class="em-flavor">🔍 ${ev.flavor}</div>
     <div class="em-word">${info.word}</div>
     ${info.phonetic ? `<div class="em-phonetic">${info.phonetic}</div>` : ''}
     <div class="em-q">择其义，方得机缘：</div>
     <div class="em-opts">${options.map((o,i)=>`<button onclick="handleExploreAnswer(this,'${esc(o)}','${esc(correct)}',${sIdx})">${labels[i]}. ${o}</button>`).join('')}</div>
-    <div class="em-reward" id="em-reward"></div>
+    <div class="em-reward"></div>
   </div>`;
   document.body.appendChild(overlay);
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
 function handleExploreAnswer(btn, sel, correct, sIdx) {
   if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+  const ov = btn.closest('.mystery-modal');
   if (sel === correct) {
     btn.classList.add('correct');
     const ev = EXPLORE_EVENTS[sIdx];
@@ -2312,14 +2315,14 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
     const reward = rollExploreReward();
     const rewardMsg = reward.apply();
     saveState(); updateStats(); renderStoryContent(); renderCollectionCards();
-    const rw = document.getElementById('em-reward');
+    const rw = ov ? ov.querySelector('.em-reward') : null;
     if (rw) rw.innerHTML = `✨ 机缘已得 · 该词已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span>`;
     sfx('unlock'); screenFlash();
     try { const r = btn.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, 14); } catch (e) {}
-    setTimeout(() => { const o = document.querySelector('.explore-modal'); if (o) o.remove(); }, 2200);
+    setTimeout(() => { if (ov && ov.parentNode) ov.remove(); }, 2200);
   } else {
     btn.classList.add('wrong');
-    const rw = document.getElementById('em-reward');
+    const rw = ov ? ov.querySelector('.em-reward') : null;
     if (rw) rw.textContent = '✗ 似是而非，再斟酌一二';
   }
 }
@@ -2341,35 +2344,36 @@ function openMystery() {
   const labels = ['A', 'B', 'C', 'D'];
   const esc = s => String(s).replace(/'/g, "\\'");
   const overlay = document.createElement('div');
-  overlay.className = 'explore-modal';
+  overlay.className = 'mystery-modal';
   overlay.innerHTML = `<div class="em-card">
     <div class="em-flavor">🌌 ${flavor}</div>
     <div class="em-word">${v.word}</div>
     ${v.phonetic ? `<div class="em-phonetic">${v.phonetic}</div>` : ''}
     <div class="em-q">择其义，方得机缘：</div>
     <div class="em-opts">${options.map((o, i) => `<button onclick="handleMysteryAnswer(this,'${esc(o)}','${esc(correct)}','${esc(v.word)}')">${labels[i]}. ${o}</button>`).join('')}</div>
-    <div class="em-reward" id="em-reward"></div>
+    <div class="em-reward"></div>
   </div>`;
   document.body.appendChild(overlay);
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
 function handleMysteryAnswer(btn, sel, correct, word) {
   if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+  const ov = btn.closest('.mystery-modal');
   if (sel === correct) {
     btn.classList.add('correct');
     markLearned(word);
     const reward = rollExploreReward();
     const rewardMsg = reward.apply();
     saveState(); updateStats();
-    const rw = document.getElementById('em-reward');
+    const rw = ov ? ov.querySelector('.em-reward') : null;
     if (rw) rw.innerHTML = `✨ 机缘已得 · 「${word}」已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span>`;
     sfx('unlock'); screenFlash();
     try { const r = btn.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, 14); } catch (e) {}
-    setTimeout(() => { const o = document.querySelector('.explore-modal'); if (o) o.remove(); }, 2200);
+    setTimeout(() => { if (ov && ov.parentNode) ov.remove(); }, 2200);
   } else {
     btn.classList.add('wrong');
-    document.querySelectorAll('.em-opts button').forEach(b => { if (b.textContent.includes(correct)) b.classList.add('correct'); });
-    const rw = document.getElementById('em-reward');
+    if (ov) ov.querySelectorAll('.em-opts button').forEach(b => { if (b.textContent.includes(correct)) b.classList.add('correct'); });
+    const rw = ov ? ov.querySelector('.em-reward') : null;
     if (rw) rw.textContent = `✗ 正解：${correct} —— 此词已入温养，改日再战`;
   }
 }
