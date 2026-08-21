@@ -548,6 +548,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .tc-glossary .tg-row { padding: 7px 10px; border-radius: 8px; background: rgba(0,0,0,0.035); margin-bottom: 5px; }
 .tc-glossary .tg-row:nth-child(odd) { background: rgba(212,175,55,0.07); }
 .tc-glossary .tg-row b { display: inline-block; min-width: 60px; color: var(--red-deep); }
+.tc-glossary .tg-head { font-size: 11.5px; font-weight: 700; color: var(--gold-dark); letter-spacing: 1.5px; margin: 12px 0 5px; }
+.tc-glossary .tg-head:first-child { margin-top: 0; }
 .tc-daily { background: linear-gradient(135deg, rgba(24,61,54,.10), rgba(69,185,172,.06)); border: 1px dashed rgba(24,61,54,.4); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; color: var(--text-secondary); line-height: 1.9; margin-bottom: 12px; }
 .tc-daily b { color: var(--red-deep); }
 .challenge-hud { margin-bottom: 12px; }
@@ -3708,14 +3710,26 @@ function openTutorial() {
     <div class="tc-step-title">📖 名词速查</div>
     <div class="tc-daily">☀️ <b>每日修行建议</b>：读一章剧情 → 打一次试炼 → 温养到「待温养」清零 → 有空再探索秘境。</div>
     <div class="tc-glossary">
-      <div class="tg-row"><b>温养</b>复习旧词，拼写飞花令</div>
-      <div class="tg-row"><b>心力</b>闯关体力，每日回满，失败会扣</div>
-      <div class="tg-row"><b>连击</b>连续答对触发的攻击倍率</div>
+      <div class="tg-head">—— 记词核心 ——</div>
+      <div class="tg-row"><b>悟词</b>读剧情点高亮词，一词一悟</div>
+      <div class="tg-row"><b>温养</b>复习旧词：按 1→2→4→7→15→30→60 天节奏排期，答对间隔拉长、答错重置回首日</div>
+      <div class="tg-row"><b>待温养</b>首页数字=今天欠的复习词，清零即功课圆满</div>
+      <div class="tg-row"><b>飞花令</b>温养里的拼写题：看词义拼单词，非选择题</div>
       <div class="tg-row"><b>道之抉择</b>剧情里的考词选择，过词才给选</div>
-      <div class="tg-row"><b>生词本</b>阅读中主动收藏的词</div>
-      <div class="tg-row"><b>错题本</b>答错的词，自动收录</div>
-      <div class="tg-row"><b>境界</b>按已学词数晋升：凡人→练气→…→飞升</div>
-      <div class="tg-row"><b>云同步</b>填一次密码，换设备续进度</div>
+      <div class="tg-row"><b>生词本</b>⭐ 收藏的词，明日自动进入温养</div>
+      <div class="tg-row"><b>错题本</b>答错的词自动收录，攻克即出</div>
+      <div class="tg-head">—— 战斗试炼 ——</div>
+      <div class="tg-row"><b>试炼</b>章节 Boss 战：双方各 100 血，答题即出招</div>
+      <div class="tg-row"><b>连击</b>连对叠伤害倍率（最高 2.5 倍），连对 3 题放大招+回血，答错清零</div>
+      <div class="tg-row"><b>秘境探索</b>全词库随机奇遇，任何词都能刷出一段剧情</div>
+      <div class="tg-head">—— 境界与收集 ——</div>
+      <div class="tg-row"><b>境界</b>按已学词数晋升：凡人→练气→…→飞升共十二阶</div>
+      <div class="tg-row"><b>词灵阁</b>每掌握一词收服一只词灵（修士/秘境/法宝/奇遇/功法）</div>
+      <div class="tg-row"><b>今日修行</b>每日目标 20/50/100 词，连续打卡</div>
+      <div class="tg-head">—— 切磋与数据 ——</div>
+      <div class="tg-row"><b>论道台</b>生成挑战码与战绩卡，与道友同关比词力</div>
+      <div class="tg-row"><b>挑战码</b>如 XT-C5-90-128-15-A23，胜负比正确率→用时→连击</div>
+      <div class="tg-row"><b>云同步</b>记一个密码，换设备续进度</div>
       <div class="tg-row"><b>仙途榜</b>提交战绩冲排行</div>
       <div class="tg-row"><b>修行手记</b>藏录页统计你用过哪些功能</div>
     </div>

@@ -234,7 +234,9 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(stepTitles.some(t => t.includes('名词速查')), '含"名词速查"步骤');
   ok(tOverlay.querySelector('.tc-glossary') !== null, '名词速查词典渲染');
   const glossaryText = tOverlay.querySelector('.tc-glossary').textContent;
-  ok(['温养','心力','连击','生词本','错题本','境界','云同步','仙途榜','修行手记'].every(k => glossaryText.includes(k)), '词典含全部核心名词');
+  ok(['悟词','温养','待温养','飞花令','道之抉择','生词本','错题本','试炼','连击','秘境探索','境界','词灵阁','今日修行','论道台','挑战码','云同步','仙途榜','修行手记'].every(k => glossaryText.includes(k)), '词典含全部核心名词');
+  ok(!glossaryText.includes('心力'), '词典已删除幽灵词条「心力」（未实现的体力系统）');
+  ok(tOverlay.querySelectorAll('.tg-head').length === 4, '词典含 4 个分组标题');
   ok(tOverlay.querySelector('.tc-daily') !== null, '每日修行建议渲染');
   ok(document.querySelector('.tc-step.active') !== null, '默认展示第 1 步');
   // 切步：下一步 → 第 2 步
