@@ -639,57 +639,30 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <span class="le-arrow">›</span>
   </div>
   <div class="save-sync">
-    <div class="section-header" style="margin-bottom:8px"><h2>云端续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备同步</span></div>
-    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度默认存于本机。接上云端后，本地版与网页版自动互通，换设备也不丢进度。</p>
+    <div class="section-header" style="margin-bottom:8px"><h2>存档续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备续玩</span></div>
+    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度<b>自动保存在本机</b>，无需注册任何账号。换手机/换电脑/换浏览器时，导出存档文件到新设备导入即可延续进度。</p>
     <div style="display:flex;gap:10px;margin-bottom:10px">
       <button class="btn btn-outline" style="flex:1" onclick="exportSave()">⬇️ 导出存档</button>
       <button class="btn btn-outline" style="flex:1" onclick="document.getElementById('save-file').click()">⬆️ 导入存档</button>
     </div>
     <input type="file" id="save-file" accept="application/json,.json" style="display:none" onchange="importSave(this)">
     <div class="cloud-box">
-      <div style="font-size:13px;font-weight:600;margin-bottom:6px">☁️ 云端自动同步</div>
-      <p style="font-size:11px;color:var(--text-light);line-height:1.7;margin-bottom:8px">
-        手机换了、电脑换了，打开还是那个第三关。填一次密码，所有设备进度自动同步。
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">📱 换手机 / 换电脑怎么接着玩？</div>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.8;margin-bottom:8px">
+        <b>① 旧设备：</b>点上方「⬇️ 导出存档」→ 浏览器会下载一个<b>带日期的存档文件</b>（如 仙途十二阶存档_20260821.json），用微信/QQ 发给自己、或存到网盘均可<br>
+        <b>② 新设备：</b>打开同一网址 → 点「⬆️ 导入存档」→ 选中那个文件 → 进度即刻恢复 ✓
       </p>
-      <div style="display:flex;gap:8px;margin-bottom:6px">
-        <input type="text" id="cloud-key" placeholder="填一串同步密码..." autocomplete="off" style="flex:1;min-width:0;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text-primary)">
-        <button class="btn btn-outline" style="white-space:nowrap" onclick="cloudConnect()">🔗 连接</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:6px">
-        <input type="text" id="cloud-bin" placeholder="存档 ID（选填，换设备时填旧设备 ID 接管）" autocomplete="off" style="flex:1;min-width:0;background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text-primary)">
-      </div>
-      <div id="cloud-status" style="font-size:11px;color:var(--text-light);line-height:1.6">未连接 · 点「连接」即可开启自动同步</div>
-      <details style="margin-top:8px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
-        <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">📖 没有密码？点这里获取（免费·1分钟）</summary>
-        <div style="margin-top:6px">
-          ① 打开 <a href="https://jsonbin.io" target="_blank" style="color:var(--gold-dark)">jsonbin.io</a> → 用邮箱注册（免费）<br>
-          ② 点击左上角 <b>API Keys</b> → 复制长串字符（X-Master-Key）<br>
-          ③ 回来粘贴到上面输入框，点「连接」即可
-        </div>
-      </details>
-      <details style="margin-top:6px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
-        <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">📱 换手机 / 换电脑怎么接着玩？</summary>
-        <div style="margin-top:6px">
-          <b>① 旧设备：</b>连接成功后，记下状态栏里的「云端存档 ID」<br>
-          <b>② 新设备：</b>打开同一网址 → 粘贴<b>同一个密码</b> + 把存档 ID 填进第二行输入框<br>
-          <b>③</b> 点「连接」→ 自动拉回旧进度，无缝续玩 ✓<br>
-          <div style="background:rgba(0,0,0,0.05);border-radius:6px;padding:6px 8px;margin-top:6px">⚠ 不填存档 ID 直接连接会新建一份空档。换设备务必填旧设备的存档 ID。</div>
-        </div>
-      </details>
       <details style="margin-top:6px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
         <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">❓ 常见问题</summary>
         <div style="margin-top:6px">
-          <b>密码是什么？</b>就是 jsonbin.io 的 API Key（X-Master-Key），相当于你云存档的钥匙<br>
-          <b>存档 ID 在哪看？</b>连接成功后，状态栏会显示完整 ID，随时可抄<br>
-          <b>存档 ID 丢了？</b>回旧设备打开云端区就能看到；两个都丢只能手动导出了<br>
-          <b>连接失败？</b>检查密码是否完整复制（别带空格）、网络是否可用<br>
-          <b>不想同步了？</b>清空两个输入框即可断开，本地进度不受影响
+          <b>存档存在哪？</b>自动存在本机浏览器里，同一手机同一浏览器打开就还在<br>
+          <b>为什么要导出？</b>换手机、换浏览器、清理浏览器数据都会让本机存档丢失，导出文件就是保险<br>
+          <b>建议频率？</b>每周导出一次，文件名自带日期，留最新那份即可<br>
+          <b>导入会覆盖新设备进度？</b>会以导入的文件为准，所以旧设备导出的才是最新进度<br>
+          <b>导出的文件丢了？</b>没导入过的旧设备还能重新导一次；导入过就再导一次新的
         </div>
       </details>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <button class="btn btn-outline" style="flex:1" onclick="cloudPush(true)">☁️ 手动上传</button>
-        <button class="btn btn-outline" style="flex:1" onclick="cloudPull(true)">☁️ 手动拉取</button>
-      </div>
+      <div style="background:rgba(212,175,55,.08);border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:var(--text-secondary);line-height:1.7">💡 建议每周点一次「⬇️ 导出存档」做备份，文件名自带日期，永不丢进度。</div>
     </div>
   </div>
   <div class="chapter-list">
@@ -1368,155 +1341,14 @@ function saveState() {
       streak: state.streak, bookmarks: [...state.bookmarks], wrongWords: state.wrongWords,
     }));
   } catch(e) {}
-  scheduleCloudPush(); // 已连接云端时自动防抖上传
 }
 function wordStatus(word) {
   if (state.mastered.has(word)) return 'mastered';
   if (state.learned.has(word)) return 'learning';
   return 'new';
 }
-/* ============================================================ 云端同步（JSONBin 免费 JSON 存储）
-   配置存 localStorage（xt12_cloud）：{ apiKey, binId, lastSync }
-   - 首次「连接」自动创建 bin；之后每次保存自动防抖上传；启动时自动检测云端更新
-   - 冲突策略：最后写入者胜，云端比本机新时自动同步不覆盖，手动操作会弹窗确认 */
-const CLOUD_CFG_KEY = 'xt12_cloud';
-let _cloudTimer = null, _cloudBusy = false;
-function getCloudCfg() { try { return JSON.parse(localStorage.getItem(CLOUD_CFG_KEY) || '{}') || {}; } catch(e) { return {}; } }
-function setCloudCfg(c) { try { localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(c)); } catch(e) {} }
-function buildCloudPayload() {
-  return { v: 3, app: 'xt12', updatedAt: Date.now(),
-    state: localStorage.getItem('xt12_state_v2'),
-    leaderboard: localStorage.getItem('xt12_leaderboard') };
-}
-async function jsonbinReq(path, method, body) {
-  const cfg = getCloudCfg();
-  const res = await fetch('https://api.jsonbin.io/v3/b' + path, {
-    method: method, body: body ? JSON.stringify(body) : undefined,
-    headers: { 'X-Master-Key': cfg.apiKey, 'Content-Type': 'application/json' },
-  });
-  if (!res.ok) { const e = new Error('HTTP ' + res.status); e.status = res.status; throw e; }
-  return res.json();
-}
-async function cloudConnect() {
-  if (_cloudBusy) return;
-  trackUsage('cloud');
-  const keyEl = document.getElementById('cloud-key');
-  const binEl = document.getElementById('cloud-bin');
-  const apiKey = ((keyEl && keyEl.value.trim()) || getCloudCfg().apiKey || '').trim();
-  const binInput = (binEl && binEl.value.trim()) || '';
-  if (!apiKey) { showToast('请先填入 JSONBin API Key'); return; }
-  _cloudBusy = true;
-  const cfg = getCloudCfg(); cfg.apiKey = apiKey; setCloudCfg(cfg); // 先落盘，jsonbinReq 才能读到 key
-  try {
-    if (binInput) {
-      /* 换设备接管：用填写的存档 ID 连接旧档 */
-      cfg.binId = binInput; setCloudCfg(cfg);
-      const data = await jsonbinReq('/' + cfg.binId + '/latest', 'GET'); // 校验 bin 有效
-      const r = (data && data.record) || {};
-      if (!r.state) throw Object.assign(new Error('no-state'), { status: 404 });
-      localStorage.setItem('xt12_state_v2', r.state);
-      if (r.leaderboard) localStorage.setItem('xt12_leaderboard', r.leaderboard);
-      loadState();
-      const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇';
-      let ri = 0; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (state.learned.size >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri;
-      renderAll();
-      cfg.lastSync = r.updatedAt || Date.now(); setCloudCfg(cfg);
-      showToast('☁️ 已接管云端存档，进度恢复 ✓');
-    } else if (!cfg.binId) {
-      saveState(); // 确保有初始存档再创建云端
-      const data = await jsonbinReq('', 'POST', buildCloudPayload());
-      cfg.binId = data.metadata && data.metadata.id;
-      if (!cfg.binId) throw new Error('no-bin');
-      cfg.lastSync = Date.now();
-      setCloudCfg(cfg);
-      showToast('☁️ 云端已连接，存档已上传 ✓');
-    } else {
-      await jsonbinReq('/' + cfg.binId + '/latest', 'GET'); // 校验 bin 有效
-      cfg.lastSync = Date.now(); setCloudCfg(cfg);
-      showToast('☁️ 云端已连接 ✓');
-    }
-    if (binEl) binEl.value = cfg.binId || '';
-    updateCloudStatus();
-  } catch (e) {
-    showToast(e.status === 401 ? 'API Key 无效，请检查' : (e.status === 404 ? '存档 ID 不存在，请检查（或删除后重新连接）' : '连接失败：' + e.message));
-  }
-  _cloudBusy = false;
-}
-function updateCloudStatus() {
-  const cfg = getCloudCfg();
-  const keyEl = document.getElementById('cloud-key');
-  const binEl = document.getElementById('cloud-bin');
-  const el = document.getElementById('cloud-status');
-  if (keyEl && cfg.apiKey && !keyEl.value) keyEl.value = cfg.apiKey;
-  if (binEl && cfg.binId && !binEl.value) binEl.value = cfg.binId;
-  if (!el) return;
-  if (cfg.apiKey && cfg.binId) {
-    const t = new Date(cfg.lastSync || Date.now());
-    const pad = n => String(n).padStart(2, '0');
-    el.textContent = '已连接 ✓ 存档 ID：' + cfg.binId + ' · 上次同步 ' + pad(t.getMonth() + 1) + '/' + pad(t.getDate()) + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes());
-    el.style.color = '#3a8a5f';
-  } else if (cfg.apiKey) {
-    el.textContent = '已填 Key · 尚未连接，点「🔗 连接」创建云端存档';
-    el.style.color = 'var(--text-light)';
-  } else {
-    el.textContent = '未连接 · 填入 API Key 后点「连接」，首次会自动创建云端存档';
-    el.style.color = 'var(--text-light)';
-  }
-}
-async function cloudPush(manual) {
-  let cfg = getCloudCfg();
-  if (!cfg.apiKey || !cfg.binId) {
-    if (!manual) return;
-    showToast('请先连接云端（填 API Key 点连接）'); return;
-  }
-  try {
-    const remote = await jsonbinReq('/' + cfg.binId + '/latest', 'GET');
-    const r = remote.record || {};
-    if (r.updatedAt && cfg.lastSync && r.updatedAt > cfg.lastSync + 60000) {
-      if (manual) {
-        if (!confirm('⚠️ 云端进度比本机新（' + new Date(r.updatedAt).toLocaleString() + '），上传会覆盖云端，确定继续？')) return;
-      } else { return; } // 自动同步遇云端更新则跳过，交由用户手动决定
-    }
-    await jsonbinReq('/' + cfg.binId, 'PUT', buildCloudPayload());
-    cfg = getCloudCfg(); cfg.lastSync = Date.now(); setCloudCfg(cfg);
-    updateCloudStatus();
-    if (manual) showToast('☁️ 已上传到云端 ✓');
-  } catch (e) {
-    if (manual) showToast('上传失败：' + (e.status === 401 ? 'API Key 无效' : '网络异常'));
-  }
-}
-async function cloudPull(manual) {
-  const cfg = getCloudCfg();
-  if (!cfg.apiKey || !cfg.binId) { if (manual) showToast('请先连接云端（填 API Key 点连接）'); return; }
-  try {
-    const data = await jsonbinReq('/' + cfg.binId + '/latest', 'GET');
-    const r = data.record || {};
-    if (!r.state) { if (manual) showToast('云端暂无存档，先点「☁️ 上传进度」'); return; }
-    if (manual) {
-      if (!confirm('拉取云端进度会覆盖本机当前进度，确定？')) return;
-    } else if (!(r.updatedAt > (cfg.lastSync || 0))) {
-      return; // 自动检测：云端不新则跳过
-    }
-    localStorage.setItem('xt12_state_v2', r.state);
-    if (r.leaderboard) localStorage.setItem('xt12_leaderboard', r.leaderboard);
-    loadState();
-    const b = document.getElementById('sound-btn'); if (b) b.textContent = sfxOn ? '🔊' : '🔇';
-    let ri = 0; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (state.learned.size >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri;
-    renderAll();
-    const c2 = getCloudCfg(); c2.lastSync = r.updatedAt || Date.now(); setCloudCfg(c2);
-    updateCloudStatus();
-    showToast(manual ? '☁️ 已从云端拉取 ✓' : '☁️ 检测到云端更新，已同步 ✓');
-  } catch (e) {
-    if (manual) showToast('拉取失败：' + (e.status === 401 ? 'API Key 无效' : '网络异常'));
-  }
-}
-// 防抖自动上传：游戏内每处保存进度后调用（3.5 秒内合并为一次上传）
-function scheduleCloudPush() {
-  const cfg = getCloudCfg();
-  if (!cfg.apiKey || !cfg.binId) return;
-  clearTimeout(_cloudTimer);
-  _cloudTimer = setTimeout(() => { cloudPush(false); }, 3500);
-}
+/* 云端同步（jsonbin）已按 V6.20 决策移除：正式版仅保留本机自动保存 + 导出/导入存档。
+   若未来迁移 Cloudflare/Supabase 后端，可在此处重新接入。 */
 /* 存档导出：把本机 localStorage 打包成 JSON 文件，便于跨设备续缘 */
 function exportSave() {
   try {
@@ -3621,7 +3453,7 @@ const USAGE_ITEMS = [
   ['read', '📖', '剧情悟词'], ['trial', '⚔️', '章节试炼'], ['mystery', '🌌', '秘境探索'],
   ['ling', '🔮', '词灵阁'], ['review', '🔄', '温养复习'], ['bookmark', '⭐', '生词本'],
   ['wrong', '❌', '错题本'], ['share', '🃏', '战绩分享'], ['challenge', '⚔️', '论道台'],
-  ['cloud', '☁️', '云同步'], ['rank', '🏆', '仙途榜']
+  ['rank', '🏆', '仙途榜']
 ];
 function getUsageStats() {
   try { return JSON.parse(localStorage.getItem(USAGE_KEY) || '{}') || {}; } catch (e) { return {}; }
@@ -3729,7 +3561,9 @@ function openTutorial() {
       <div class="tg-head">—— 切磋与数据 ——</div>
       <div class="tg-row"><b>论道台</b>生成挑战码与战绩卡，与道友同关比词力</div>
       <div class="tg-row"><b>挑战码</b>如 XT-C5-90-128-15-A23，胜负比正确率→用时→连击</div>
-      <div class="tg-row"><b>云同步</b>记一个密码，换设备续进度</div>
+      <div class="tg-row"><b>自动存档</b>进度自动存本机浏览器，无需注册账号</div>
+      <div class="tg-row"><b>导出存档</b>首页「存档续缘」→⬇️导出，进度存成带日期的 json 文件，建议每周备份一次</div>
+      <div class="tg-row"><b>导入存档</b>换设备时：旧设备导出→微信/网盘传文件→新设备点⬆️导入，进度即刻恢复</div>
       <div class="tg-row"><b>仙途榜</b>提交战绩冲排行</div>
       <div class="tg-row"><b>修行手记</b>藏录页统计你用过哪些功能</div>
     </div>
@@ -3778,8 +3612,6 @@ function openTutorial() {
 // 初始化境界索引：避免读档用户加载时误触「突破」特效
 (function () { let ri = 0; const learned = state.learned.size; for (let i = 0; i < RANK_THRESHOLDS.length; i++) if (learned >= RANK_THRESHOLDS[i]) ri = i; _lastRankIdx = ri; })();
 renderAll();
-// 云端续缘：恢复配置显示 + 自动检测云端更新（已连接时）
-(function () { updateCloudStatus(); const c = getCloudCfg(); if (c.apiKey && c.binId) setTimeout(() => cloudPull(false), 1200); })();
 // 论道台：URL 挑战直达 + 来访统计
 handleChallengeUrl();
 initBusuanzi();
