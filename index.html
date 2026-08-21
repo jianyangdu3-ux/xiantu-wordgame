@@ -640,7 +640,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
   <div class="save-sync">
     <div class="section-header" style="margin-bottom:8px"><h2>存档续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备续玩</span></div>
-    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度<b>自动保存在本机</b>，无需注册任何账号。换手机/换电脑/换浏览器时，导出存档文件到新设备导入即可延续进度。</p>
+    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度<b>自动保存在本机</b>，无需注册账号，也<b>不需要手动备份</b>——同一台设备接着玩就行。只有要<b>换手机/换电脑/换浏览器</b>时，才需要导出存档文件带到新设备。</p>
     <div style="background:rgba(220,120,50,.10);border:1px solid rgba(220,120,50,.35);border-radius:8px;padding:7px 10px;margin-bottom:10px;font-size:11px;color:#A8541A;line-height:1.7">⚠️ 若你是从<b>微信里点开的链接</b>：请先点右上角「⋯」→ 选「在浏览器打开」再用。微信内直接使用时，导出/导入存档可能失败。</div>
     <div style="display:flex;gap:10px;margin-bottom:10px">
       <button class="btn btn-outline" style="flex:1" onclick="exportSave()">⬇️ 导出存档</button>
@@ -656,14 +656,14 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
       <details style="margin-top:6px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
         <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">❓ 常见问题</summary>
         <div style="margin-top:6px">
-          <b>存档存在哪？</b>自动存在本机浏览器里，同一手机同一浏览器打开就还在<br>
-          <b>为什么要导出？</b>换手机、换浏览器、清理浏览器数据都会让本机存档丢失，导出文件就是保险<br>
-          <b>建议频率？</b>每周导出一次，文件名自带日期，留最新那份即可<br>
+          <b>存档存在哪？</b>自动存在本机浏览器里，同一手机同一浏览器打开就还在，<b>什么都不用做</b><br>
+          <b>什么时候才需要导出？</b>只有换手机、换浏览器、或要清浏览器数据<b>之前</b>才需要——导出个文件带走即可<br>
+          <b>不导出会怎样？</b>不换设备就完全没影响；只有清了浏览器数据/卖了旧机才找不回，所以换设备前导一次就够<br>
           <b>导入会覆盖新设备进度？</b>会以导入的文件为准，所以旧设备导出的才是最新进度<br>
           <b>导出的文件丢了？</b>没导入过的旧设备还能重新导一次；导入过就再导一次新的
         </div>
       </details>
-      <div style="background:rgba(212,175,55,.08);border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:var(--text-secondary);line-height:1.7">💡 建议每周点一次「⬇️ 导出存档」做备份，文件名自带日期，永不丢进度。</div>
+      <div style="background:rgba(212,175,55,.08);border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:var(--text-secondary);line-height:1.7">💡 平时不用管存档。只有准备<b>换设备</b>时，先来这里点一次「⬇️ 导出存档」把文件带走即可。</div>
     </div>
   </div>
   <div class="chapter-list">
@@ -3564,7 +3564,7 @@ function openTutorial() {
       <div class="tg-row"><b>论道台</b>生成挑战码与战绩卡，与道友同关比词力</div>
       <div class="tg-row"><b>挑战码</b>如 XT-C5-90-128-15-A23，胜负比正确率→用时→连击</div>
       <div class="tg-row"><b>自动存档</b>进度自动存本机浏览器，无需注册账号</div>
-      <div class="tg-row"><b>导出存档</b>首页「存档续缘」→⬇️导出，进度存成带日期的 json 文件，建议每周备份一次</div>
+      <div class="tg-row"><b>导出存档</b>首页「存档续缘」→⬇️导出，进度存成带日期的 json 文件；不换设备无需导出</div>
       <div class="tg-row"><b>导入存档</b>换设备时：旧设备导出→微信/网盘传文件→新设备点⬆️导入，进度即刻恢复</div>
       <div class="tg-row"><b>仙途榜</b>提交战绩冲排行</div>
       <div class="tg-row"><b>修行手记</b>藏录页统计你用过哪些功能</div>
@@ -3633,7 +3633,7 @@ function maybeRemindBackup() {
     const lastRemind = +(localStorage.getItem('xt12_backup_remind_ts') || 0);
     if (now - lastBackup < WEEK || now - lastRemind < WEEK) return;
     localStorage.setItem('xt12_backup_remind_ts', String(now));
-    showToast('📅 建议点一次「⬇️ 导出存档」备份进度（首页→存档续缘），防换机丢失');
+    showToast('💡 小提示：日后换手机/电脑前，记得先到「存档续缘」点一次「⬇️ 导出存档」带走进度；不换设备无需理会');
   } catch (e) {}
 }
 setTimeout(maybeWarnWeChat, 900);
