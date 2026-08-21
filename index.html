@@ -641,6 +641,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   <div class="save-sync">
     <div class="section-header" style="margin-bottom:8px"><h2>存档续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备续玩</span></div>
     <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度<b>自动保存在本机</b>，无需注册任何账号。换手机/换电脑/换浏览器时，导出存档文件到新设备导入即可延续进度。</p>
+    <div style="background:rgba(220,120,50,.10);border:1px solid rgba(220,120,50,.35);border-radius:8px;padding:7px 10px;margin-bottom:10px;font-size:11px;color:#A8541A;line-height:1.7">⚠️ 若你是从<b>微信里点开的链接</b>：请先点右上角「⋯」→ 选「在浏览器打开」再用。微信内直接使用时，导出/导入存档可能失败。</div>
     <div style="display:flex;gap:10px;margin-bottom:10px">
       <button class="btn btn-outline" style="flex:1" onclick="exportSave()">⬇️ 导出存档</button>
       <button class="btn btn-outline" style="flex:1" onclick="document.getElementById('save-file').click()">⬆️ 导入存档</button>
@@ -1361,6 +1362,7 @@ function exportSave() {
     a.download = '仙途十二阶存档_' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '.json';
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
+    try { localStorage.setItem('xt12_backup_ts', String(Date.now())); } catch (e2) {} // 记录本次备份时间，供每周备份提醒计时
     showToast('已导出存档 ✓ 换设备时导入即可');
   } catch (e) { showToast('导出失败：' + e.message); }
 }
@@ -3615,6 +3617,27 @@ renderAll();
 // 论道台：URL 挑战直达 + 来访统计
 handleChallengeUrl();
 initBusuanzi();
+// 微信内置浏览器提醒：导出/导入存档在微信内易失败，引导用系统浏览器打开
+function maybeWarnWeChat() {
+  try {
+    if (!/MicroMessenger/i.test(navigator.userAgent)) return;
+    showToast('⚠️ 微信内可能无法导出/导入存档：点右上角「⋯」→ 在浏览器打开');
+  } catch (e) {}
+}
+// 每周备份提醒：距上次导出超过 7 天且已学 10 词以上时，启动后温和提醒一次（7 天内不重复）
+function maybeRemindBackup() {
+  try {
+    const WEEK = 7 * 24 * 3600 * 1000, now = Date.now();
+    if (!state || state.learned.size < 10) return;
+    const lastBackup = +(localStorage.getItem('xt12_backup_ts') || 0);
+    const lastRemind = +(localStorage.getItem('xt12_backup_remind_ts') || 0);
+    if (now - lastBackup < WEEK || now - lastRemind < WEEK) return;
+    localStorage.setItem('xt12_backup_remind_ts', String(now));
+    showToast('📅 建议点一次「⬇️ 导出存档」备份进度（首页→存档续缘），防换机丢失');
+  } catch (e) {}
+}
+setTimeout(maybeWarnWeChat, 900);
+setTimeout(maybeRemindBackup, 3200);
 </script>
 </body>
 </html>

@@ -17,10 +17,10 @@ function ok(cond, name) {
   if (cond) { pass++; console.log('✅ ' + name); }
   else { fail++; console.log('❌ ' + name); }
 }
-const NET_ERR = /Could not load|busuanzi|favicon|net::ERR|HTMLMediaElement|not implemented/i;
+const NET_ERR = /Could not load|busuanzi|favicon|net::ERR|HTMLMediaElement|not implemented|navigation to another Document/i;
 function cleanErrors() { return jsErrors.filter(e => !NET_ERR.test(String(e))); }
 
-function makeDom(url, allowTutorial) {
+function makeDom(url, allowTutorial, preStore) {
   const vc = new VirtualConsole();
   vc.on('jsdomError', e => jsErrors.push('jsdomError: ' + String(e.message || e).slice(0, 200)));
   return new JSDOM(html, {
@@ -32,6 +32,7 @@ function makeDom(url, allowTutorial) {
         setItem(k, v) { this._store[k] = String(v); }, removeItem(k) { delete this._store[k]; }
       };
       if (!allowTutorial) window.localStorage.setItem('xt12_tutorial_seen_2', '1');
+      if (preStore) preStore(window);
       window.fetch = () => Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({}) });
       window.confirm = () => true;
       window.scrollTo = () => {};
@@ -273,6 +274,50 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   const badDom = makeDom('http://localhost/?chall=not-a-code');
   await wait(1200);
   ok(true, '非法挑战链接静默降级（不崩）');
+
+  /* ========== 11. 微信警告 + 每周备份提醒（V6.21） ========== */
+  console.log('== 11. 微信警告与备份提醒 ==');
+  ok(document.body.textContent.includes('微信里点开的链接'), '首页存档续缘含微信浏览器警告');
+  ok(typeof window.maybeWarnWeChat === 'function' && typeof window.maybeRemindBackup === 'function', '提醒函数已定义');
+  // 老玩家（12 个已学词、从未备份）→ 启动后应触发备份提醒
+  const words12 = ['the','envy','absorb','vanish','bold','calm','eager','faint','grave','harsh','idle','joint'];
+  const dom4 = makeDom('http://localhost/?v=621', false, w => {
+    w.localStorage.setItem('xt12_state_v2', JSON.stringify({
+      v: 2, app: 'xt12', learned: words12, mastered: [], bookmarks: [], wrongWords: {},
+      madeChoices: {}, choiceTrial: {}, reviewSchedule: {}, lingRewarded: {},
+      dailyGoal: 20, learnedDates: { '2026-08-01': 12 }, streak: { lastDate: '2026-08-01', count: 3 }, sfxOn: true
+    }));
+  });
+  await wait(4000); // 提醒定时器 3200ms 后触发
+  const w4 = dom4.window, d4 = w4.document;
+  const toast4 = d4.getElementById('toast');
+  ok(toast4 && toast4.classList.contains('show') && toast4.textContent.includes('导出存档'), '老玩家启动后收到备份提醒 Toast');
+  ok(w4.localStorage.getItem('xt12_backup_remind_ts') !== null, '提醒时间戳已记录（7 天内不重复）');
+  // 导出存档 → 记录备份时间戳
+  const cleanErrB4 = cleanErrors().length;
+  w4.exportSave();
+  const backupTs = +(w4.localStorage.getItem('xt12_backup_ts') || 0);
+  ok(backupTs > 0 && Date.now() - backupTs < 60000, '导出存档后记录 xt12_backup_ts');
+  // 刚备份过 → 再触发提醒应跳过（提醒时间戳不更新）
+  const remindBefore = w4.localStorage.getItem('xt12_backup_remind_ts');
+  w4.maybeRemindBackup();
+  ok(w4.localStorage.getItem('xt12_backup_remind_ts') === remindBefore, '刚备份 7 日内不再提醒');
+  // 新手（学词不足 10）→ 不提醒
+  const dom5 = makeDom('http://localhost/?fresh=1', false);
+  await wait(3600);
+  ok(dom5.window.localStorage.getItem('xt12_backup_remind_ts') === null, '新手（<10 词）不打扰');
+  // 微信 UA → 弹警告
+  let uaOk = true;
+  try { Object.defineProperty(dom5.window.navigator, 'userAgent', { value: 'Mozilla/5.0 MicroMessenger/8.0.20', configurable: true }); }
+  catch (e) { uaOk = false; }
+  if (uaOk) {
+    dom5.window.maybeWarnWeChat();
+    const t5 = dom5.window.document.getElementById('toast');
+    ok(t5 && t5.textContent.includes('在浏览器打开'), '微信 UA 检测后弹「在浏览器打开」提示');
+  } else {
+    ok(html.includes('MicroMessenger'), '微信 UA 检测逻辑存在（jsdom 无法覆盖 UA，退化为静态断言）');
+  }
+  ok(cleanErrors().length === cleanErrB4, '提醒/导出流程无新增 JS 错误');
 
   console.log(`\n===== 论道台专项验证: ${pass} 通过 / ${fail} 失败 =====`);
   process.exit(fail ? 1 : 0);
