@@ -1584,6 +1584,7 @@ let state = {
   bookmarks: new Set(),    // ⭐ 生词本
   wrongWords: {},          // 错题本 { word: 答错次数 }
   unlockedChapter: 1,      // 已解锁到的最高章节 id（1-based），只增不减，兼容老玩家进度
+  trialWords: {},          // { 'sec0': 'word' } 当前章节道之试炼的缓存词，防止 renderStoryContent 重新随机导致跳变
 };
 function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -1659,6 +1660,7 @@ function loadState() {
       state.streak = p.streak || { lastDate: '', count: 0 };
       state.bookmarks = new Set(p.bookmarks || []);
       state.wrongWords = p.wrongWords || {};
+      state.trialWords = p.trialWords || {};
       if (typeof p.sfxOn === 'boolean') sfxOn = p.sfxOn;
       if (typeof p.unlockedChapter === 'number') state.unlockedChapter = p.unlockedChapter;
       else needMigrate = true; // 老存档无此字段 → 需迁移
@@ -1677,7 +1679,7 @@ function saveState() {
       dailyGoal: state.dailyGoal, goalStreak: state.goalStreak, goalRewardDates: state.goalRewardDates,
       learnedDates: state.learnedDates,
       streak: state.streak, bookmarks: [...state.bookmarks], wrongWords: state.wrongWords,
-      unlockedChapter: state.unlockedChapter,
+      unlockedChapter: state.unlockedChapter, trialWords: state.trialWords,
     }));
   } catch(e) {}
 }
@@ -3044,7 +3046,9 @@ function renderStoryContent() {
     const trialDone = !!state.choiceTrial[choiceKey];
     if (!chosen && !trialDone) {
       // 道之试炼：先证明你认得本章一词，才显分支选项（杜绝白送抉择）
-      const qWord = pickTrialWord(sIdx);
+      const secKey = 'sec' + sIdx;
+      let qWord = state.trialWords[secKey];
+      if (!qWord) { qWord = pickTrialWord(sIdx); state.trialWords[secKey] = qWord; }
       const info = getWordInfo(qWord);
       const correctRaw = info.contextMeaning || (info.def || '').split('；')[0];
       const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
@@ -3170,6 +3174,7 @@ function speakWord(word) {
   const w = (word || '').trim();
   if (!w) return;
   if (_curAudio) { try { _curAudio.pause(); } catch (e) {} }
+  if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
   let fellBack = false;
   const fallback = () => {
     if (fellBack) return; fellBack = true;
@@ -3485,8 +3490,10 @@ function pickTrialWord(sIdx) {
   return shuffleArray(arr)[0];
 }
 function handleChoiceTrial(sIdx, word, selected, correct) {
+  const secKey = 'sec' + sIdx;
   if (selected === correct) {
-    state.choiceTrial['sec' + sIdx] = true;
+    state.choiceTrial[secKey] = true;
+    delete state.trialWords[secKey];
     saveState(); sfx('correct'); showToast('✦ 道心已稳，抉择开启');
     renderStoryContent();
   } else {
