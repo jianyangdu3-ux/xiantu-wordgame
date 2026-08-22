@@ -492,6 +492,32 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(wBad.eval('state.unlockedChapter') === 1 && wBad.eval('state.learned.size') === 0, '损坏存档 → 安全回退初始状态不崩溃');
   ok(wBad.document.body.innerHTML.length > 1000, '损坏存档页面正常渲染不白屏');
 
+  /* ---------- 12.6 道之试炼防回归（2026-08-22 V6.35 专项） ---------- */
+  // 源码锁：speakWord 必须先 cancel 浏览器 TTS（否则网络 fallback 后双声音重叠）
+  ok(/speechSynthesis\.cancel\(\)/.test(html) && /speechSynthesis\.cancel/.test((html.match(/function speakWord\(word\) \{[\s\S]*?\n\}/) || [''])[0]), '源码锁：speakWord 内 speechSynthesis.cancel 打断旧 TTS');
+  // 源码锁：renderStoryContent 复用 trialWords 缓存（否则打开词卡后试炼词随机跳变）
+  ok(/state\.trialWords\[secKey\]/.test(html), '源码锁：renderStoryContent 复用 trialWords 缓存');
+  // 运行时：旧存档（无 trialWords 字段）加载兼容 + 试炼词稳定 + 答对清除
+  const domT = makeDom('http://localhost/?trial=1', false, w => {
+    w.localStorage.setItem('xt12_state_v2', JSON.stringify({
+      learned: ['poverty'], mastered: [], bookmarks: [], wrongWords: {}, madeChoices: {},
+      choiceTrial: {}, reviewSchedule: {}, lingRewarded: {}, dailyGoal: 30,
+      learnedDates: {}, streak: { lastDate: '', count: 0 }, unlockedChapter: 1
+    }));
+    w.speechSynthesis = { _c: 0, cancel() { this._c++; }, speak() {} };
+  });
+  await wait(400);
+  const wT = domT.window;
+  ok(wT.eval('state.trialWords && typeof state.trialWords === "object"'), '旧存档无 trialWords → 自动初始化不报错');
+  wT.eval('state.currentSection = 0; renderStoryContent();');
+  const tw1 = wT.eval('state.trialWords["sec0"]');
+  wT.eval('renderStoryContent(); renderStoryContent();');
+  ok(!!tw1 && wT.eval('state.trialWords["sec0"]') === tw1, '连续 3 次渲染试炼词稳定不跳变');
+  wT.eval("speakWord('apple'); speakWord('banana');");
+  ok(wT.speechSynthesis._c >= 2, `连续朗读旧 TTS 均被打断（cancel ${wT.speechSynthesis._c} 次）`);
+  wT.eval('window.__w = state.trialWords["sec0"]; window.__c = humanizePOS((getWordInfo(window.__w).def||"").split("；")[0]); handleChoiceTrial(0, window.__w, window.__c, window.__c);');
+  ok(wT.eval('state.choiceTrial["sec0"]') === true && wT.eval('state.trialWords["sec0"]') === undefined, '答对后 choiceTrial 记录 + 缓存清除');
+
   /* ========== 每日目标达成奖励（V6.31） ========== */
   console.log('\n== 每日目标达成奖励 ==');
   const domGoal = makeDom('http://localhost/?goal=1', false);
