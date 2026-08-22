@@ -443,6 +443,55 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < ch1Need; i++) domNew.window.eval(`markLearned('${ch1Words[i]}')`);
   ok(domNew.window.eval('isChapterUnlocked(2)'), `新玩家学完第 1 章 ${ch1Need}/${ch1Words.length} 词 → 第 2 章解锁`);
 
+  /* ---------- 12.5 老玩家兼容增量（2026-08-22 V6.34 专项） ---------- */
+  // 通关老玩家：unlockedChapter=13 全章开，加载后不回退、可继续学新插叙词
+  const allLearned = [];
+  for (let ch = 1; ch <= 12; ch++) allLearned.push(...SW.filter(w => w.chapter === ch).map(w => w.word).slice(0, 30));
+  const domDone = makeDom('http://localhost/?done=1', false, w => {
+    w.localStorage.setItem('xt12_state_v2', JSON.stringify({
+      learned: allLearned, mastered: allLearned.slice(0, 100), bookmarks: [], wrongWords: {},
+      madeChoices: {}, choiceTrial: {}, reviewSchedule: {}, lingRewarded: {},
+      dailyGoal: 50, learnedDates: {}, streak: { lastDate: '', count: 0 }, sfxOn: true, unlockedChapter: 13
+    }));
+  });
+  await wait(400);
+  const wDone = domDone.window;
+  ok(wDone.eval('state.unlockedChapter') === 13, '通关老玩家 unlockedChapter 保持 13（不回退）');
+  ok(wDone.eval('isChapterUnlocked(12)'), '通关老玩家第 12 章仍可进入');
+  ok(wDone.eval('state.learned.size') === allLearned.length, `通关老玩家已学词完整保留 ${wDone.eval('state.learned.size')}/${allLearned.length}`);
+  ok(wDone.eval('chapterWords(12).filter(x=>!state.learned.has(x)).length') > 0, '通关老玩家第 12 章仍有新插叙词可继续学（扩容词正常融入）');
+
+  // V6.31 老玩家（unlockedChapter=8）：补学第 8 章满 35 词（封顶门槛）→ 推进第 9 章
+  const b7Learned = [];
+  for (let ch = 1; ch <= 7; ch++) b7Learned.push(...SW.filter(w => w.chapter === ch).map(w => w.word).slice(0, 5));
+  const domB = makeDom('http://localhost/?b31=1', false, w => {
+    w.localStorage.setItem('xt12_state_v2', JSON.stringify({
+      learned: b7Learned, mastered: b7Learned.slice(0, 10), bookmarks: ['barren'], wrongWords: {},
+      madeChoices: {}, choiceTrial: {}, reviewSchedule: {}, lingRewarded: {}, dailyGoal: 30,
+      goalStreak: { lastDate: '2026-08-21', count: 3 }, goalRewardDates: { '2026-08-21': true },
+      learnedDates: {}, streak: { lastDate: '2026-08-21', count: 5 }, sfxOn: true, unlockedChapter: 8
+    }));
+  });
+  await wait(400);
+  const wB = domB.window;
+  ok(wB.eval('state.unlockedChapter') === 8, 'V6.31 老玩家 unlockedChapter 保持 8（不被锁回）');
+  ok(wB.eval('isChapterUnlocked(8)') && !wB.eval('isChapterUnlocked(9)'), '第 8 章可进、第 9 章仍锁（进度连续）');
+  ok(wB.eval('state.goalStreak.count') === 3, '连击达成计数保留');
+  ok(wB.eval('state.dailyGoal') === 30, '每日目标设置保留');
+  ok(wB.eval('state.bookmarks.has("barren")'), '生词本收藏保留');
+  const ch8New = wB.eval('chapterWords(8).filter(x=>!state.learned.has(x)).slice(0,35)');
+  for (const word of ch8New) wB.eval(`markLearned(${JSON.stringify(word)})`);
+  ok(wB.eval('state.unlockedChapter') >= 9, `补学第 8 章满 35 词 → 解锁推进到第 ${wB.eval('state.unlockedChapter')} 章（门槛封顶 35 生效）`);
+
+  // 损坏存档 → 安全回退初始状态
+  const domBad = makeDom('http://localhost/?bad=1', false, w => {
+    w.localStorage.setItem('xt12_state_v2', '{broken json');
+  });
+  await wait(400);
+  const wBad = domBad.window;
+  ok(wBad.eval('state.unlockedChapter') === 1 && wBad.eval('state.learned.size') === 0, '损坏存档 → 安全回退初始状态不崩溃');
+  ok(wBad.document.body.innerHTML.length > 1000, '损坏存档页面正常渲染不白屏');
+
   /* ========== 每日目标达成奖励（V6.31） ========== */
   console.log('\n== 每日目标达成奖励 ==');
   const domGoal = makeDom('http://localhost/?goal=1', false);
