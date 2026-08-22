@@ -347,6 +347,57 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   }
   ok(cleanErrors().length === cleanErrB4, '提醒/导出流程无新增 JS 错误');
 
+  /* ========== 12. 老玩家章节解锁迁移（V6.24 核心） ========== */
+  console.log('== 12. 老玩家章节解锁迁移 ==');
+  // 取前 5 章各 3 个剧情词（模拟旧版 5 词/章、60%=3 阈值下达标的老玩家）
+  const SW = window.eval('STORY_WORDS');
+  const oldLearned = [];
+  for (let ch = 1; ch <= 5; ch++) {
+    const chWords = SW.filter(w => w.chapter === ch).map(w => w.word).slice(0, 3);
+    oldLearned.push(...chWords);
+  }
+  // 老存档：有 learned 但无 unlockedChapter 字段
+  const domOld = makeDom('http://localhost/?old=1', false, w => {
+    w.localStorage.setItem('xt12_state_v2', JSON.stringify({
+      learned: oldLearned, mastered: [], bookmarks: [], wrongWords: {},
+      madeChoices: {}, choiceTrial: {}, reviewSchedule: {}, lingRewarded: {},
+      dailyGoal: 50, learnedDates: {}, streak: { lastDate: '', count: 0 }, sfxOn: true
+      // 故意不带 unlockedChapter 字段
+    }));
+  });
+  await wait(500);
+  const wOld = domOld.window;
+  const stOld = wOld.eval('state');
+  ok(typeof stOld.unlockedChapter === 'number', `老存档迁移后 unlockedChapter 已设置（值=${stOld.unlockedChapter}）`);
+  ok(stOld.unlockedChapter >= 6, `老玩家学完前 5 章各 3 词 → 迁移后解锁至第 6 章（实际 unlockedChapter=${stOld.unlockedChapter}）`);
+  ok(wOld.eval('isChapterUnlocked(6)'), '迁移后第 6 章 isChapterUnlocked 返回 true');
+  ok(wOld.eval('isChapterUnlocked(1)'), '第 1 章始终解锁');
+  // 迁移后存档已持久化 unlockedChapter
+  const savedOld = JSON.parse(wOld.localStorage.getItem('xt12_state_v2') || '{}');
+  ok(typeof savedOld.unlockedChapter === 'number', '迁移后存档已写入 unlockedChapter 字段');
+  // 旧版仅学 3 词/章 → 新门槛需 18 词/章（30×0.6）→ 若无迁移则被锁
+  // 验证迁移阈值确实是宽松的（≤3），而非新门槛（18）
+  ok(stOld.unlockedChapter >= 6, '迁移用宽松阈值（≤3）而非新门槛（18），老玩家未被锁回');
+
+  // 只增不减：迁移后再学几个词，unlockedChapter 不应降低
+  const beforeRe = stOld.unlockedChapter;
+  wOld.eval(`state.learned.add('${SW.find(w => w.chapter === 6).word}')`);
+  wOld.eval('advanceUnlock()');
+  const afterRe = wOld.eval('state.unlockedChapter');
+  ok(afterRe >= beforeRe, `只增不减：迁移后 unlockedChapter 不降低（${beforeRe}→${afterRe}）`);
+
+  // 新玩家（无存档）：unlockedChapter 初始为 1
+  const domNew = makeDom('http://localhost/?new=1', false);
+  await wait(300);
+  const stNew = domNew.window.eval('state');
+  ok(stNew.unlockedChapter === 1, `新玩家 unlockedChapter 初始为 1（实际=${stNew.unlockedChapter}）`);
+  ok(!domNew.window.eval('isChapterUnlocked(2)'), '新玩家第 2 章未解锁（需先学第 1 章词）');
+  // 新玩家学完第 1 章 60% → 解锁第 2 章
+  const ch1Words = SW.filter(w => w.chapter === 1).map(w => w.word);
+  const ch1Need = Math.ceil(ch1Words.length * 0.6);
+  for (let i = 0; i < ch1Need; i++) domNew.window.eval(`markLearned('${ch1Words[i]}')`);
+  ok(domNew.window.eval('isChapterUnlocked(2)'), `新玩家学完第 1 章 ${ch1Need}/${ch1Words.length} 词 → 第 2 章解锁`);
+
   console.log(`\n===== 论道台专项验证: ${pass} 通过 / ${fail} 失败 =====`);
   process.exit(fail ? 1 : 0);
 })();

@@ -587,7 +587,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 
 <div class="top-bar">
   <button class="menu-btn" onclick="showToast('藏经阁开发中')">☰</button>
-  <div style="text-align:center"><h1>仙途十二阶</h1><div class="subtitle">凡女逆袭 · 5491词修仙录</div></div>
+  <div style="text-align:center"><h1>仙途十二阶</h1><div class="subtitle">凡女逆袭 · 5498词修仙录</div></div>
   <button class="menu-btn sound-btn" id="sound-btn" onclick="toggleSfx()" title="音效开关">🔊</button>
   <button class="menu-btn" id="guide-btn" onclick="openTutorial()" title="修行指北 · 新手必读" style="font-size:16px">❓</button>
 </div>
@@ -784,7 +784,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
   </div>
 </div>
 
-<div class="page-version">仙途十二阶 v28 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
+<div class="page-version">仙途十二阶 v29 · 若页面异常请长按链接在浏览器打开<span id="xt-visit" style="display:none"> · ☯ 道友来访 <span id="busuanzi_value_site_uv"></span> 人</span></div>
 
 <div class="tab-bar">
   <button class="tab-item active" data-tab="home" onclick="switchTab('home')"><span class="tab-icon">🏔️</span><span class="tab-label">宗</span></button>
@@ -1569,6 +1569,7 @@ let state = {
   streak: { lastDate: '', count: 0 }, // 连续打卡（count 含今日）
   bookmarks: new Set(),    // ⭐ 生词本
   wrongWords: {},          // 错题本 { word: 答错次数 }
+  unlockedChapter: 1,      // 已解锁到的最高章节 id（1-based），只增不减，兼容老玩家进度
 };
 function todayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -1583,6 +1584,7 @@ function markLearned(word) {
       state.streak.lastDate = t;
     }
   }
+  advanceUnlock(); // 学完词后同步提升章节解锁进度（只增不减）
 }
 // 答错记录（错题本）+ 保证进入温养
 function recordWrong(word) {
@@ -1597,6 +1599,7 @@ function toggleBookmark(word) {
   saveState(); updateStats();
 }
 function loadState() {
+  let needMigrate = false;
   try {
     const saved = localStorage.getItem('xt12_state_v2');
     if (saved) {
@@ -1614,8 +1617,12 @@ function loadState() {
       state.bookmarks = new Set(p.bookmarks || []);
       state.wrongWords = p.wrongWords || {};
       if (typeof p.sfxOn === 'boolean') sfxOn = p.sfxOn;
+      if (typeof p.unlockedChapter === 'number') state.unlockedChapter = p.unlockedChapter;
+      else needMigrate = true; // 老存档无此字段 → 需迁移
     }
   } catch(e) {}
+  // 老玩家（存档存在但无 unlockedChapter 字段）首次启动：用宽松阈值还原旧版已解锁章节，避免扩词抬高门槛把老买家锁在已通关章节之前
+  if (needMigrate) migrateUnlockedChapter();
 }
 function saveState() {
   try {
@@ -1626,6 +1633,7 @@ function saveState() {
       reviewSchedule: state.reviewSchedule, sfxOn: sfxOn, lingRewarded: state.lingRewarded,
       dailyGoal: state.dailyGoal, learnedDates: state.learnedDates,
       streak: state.streak, bookmarks: [...state.bookmarks], wrongWords: state.wrongWords,
+      unlockedChapter: state.unlockedChapter,
     }));
   } catch(e) {}
 }
@@ -2727,7 +2735,7 @@ function appendChoiceNextStep(sIdx) {
   const pct = Math.round((learnedInCh / totalCh) * 100);
   const chIdx = CHAPTERS.findIndex(c => c.id === chId);
   const hasNext = chIdx >= 0 && chIdx < CHAPTERS.length - 1;
-  const nextLocked = hasNext && learnedInCh < Math.ceil(totalCh * 0.6);
+  const nextLocked = hasNext && !isChapterUnlocked(CHAPTERS[chIdx+1].id);
   
   // Find the choice-block and append after it
   const choiceBlocks = document.querySelectorAll('.choice-block');
@@ -3036,12 +3044,39 @@ function showQuizResult() {
 
 // ============================================================ 词关锁剧情 & 抉择考词 辅助
 function chapterWords(chId) { return STORY_WORDS.filter(w => w.chapter === chId).map(w => w.word); }
+// 章节解锁：持久化进度（state.unlockedChapter，只增不减）为主，新玩家按新门槛动态提升至持久化；老玩家首次启动由 migrateUnlockedChapter 还原旧版进度
 function isChapterUnlocked(chId) {
   if (chId <= 1) return true;
+  if (typeof state.unlockedChapter === 'number' && chId <= state.unlockedChapter) return true;
   const prev = chapterWords(chId - 1);
   if (!prev.length) return true;
   const learned = prev.filter(w => state.learned.has(w)).length;
   return learned >= Math.ceil(prev.length * 0.6);
+}
+// 动态提升：某章达标则持久化解锁下一章（只增不减）
+function advanceUnlock() {
+  let changed = false;
+  for (let i = 1; i <= CHAPTERS.length; i++) {
+    const w = chapterWords(i);
+    const learned = w.filter(x => state.learned.has(x)).length;
+    if (w.length && learned >= Math.ceil(w.length * 0.6)) {
+      if (state.unlockedChapter < i + 1) { state.unlockedChapter = i + 1; changed = true; }
+    }
+  }
+  if (changed) saveState();
+}
+// 老玩家迁移：根据历史已学词，用极宽松阈值还原其旧版应解锁到的连续章节。
+// 旧版每章仅 5 词、门槛 3 词；迁移阈值上限 3，确保任何版本达标的老玩家都不被重新锁住。
+function migrateUnlockedChapter() {
+  let maxU = 1;
+  for (let i = 1; i <= CHAPTERS.length; i++) {
+    const w = chapterWords(i);
+    const learned = w.filter(x => state.learned.has(x)).length;
+    const threshold = Math.min(Math.ceil(w.length * 0.6), 3);
+    if (w.length === 0 || learned >= threshold) maxU = i + 1; else break;
+  }
+  state.unlockedChapter = maxU;
+  saveState();
 }
 function openChapter(chId) {
   if (!isChapterUnlocked(chId)) { const p = chapterWords(chId - 1); showToast(`🔒 上一章封印未解，需先习得 ${p.filter(w => state.learned.has(w)).length}/${p.length} 词`); return; }
@@ -3270,8 +3305,9 @@ function renderMap() {
     return { ch, learnedInCh, total: chWords.length };
   });
   for (let i = 0; i < statuses.length; i++) {
-    statuses[i].unlocked = (i === 0) || (statuses[i-1].learnedInCh >= Math.ceil(statuses[i-1].total * 0.6));
+    statuses[i].unlocked = isChapterUnlocked(statuses[i].ch.id);
   }
+  advanceUnlock(); // 打开地图时同步提升持久化解锁进度
   let currentIdx = 0;
   for (let i = 0; i < statuses.length; i++) if (statuses[i].unlocked) currentIdx = i;
   let html = '<div class="xt-map-path"></div>';
