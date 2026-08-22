@@ -3094,7 +3094,13 @@ function renderStoryContent() {
   const trialWordEl = container.querySelector('.trial-word');
   if (trialWordEl) {
     const tw = trialWordEl.textContent.replace('🔊', '').trim();
-    if (tw) speakWord(tw);
+    const secKey = 'sec' + sIdx;
+    // 每个试炼词只在首次渲染时自动朗读一次——此前每次 renderStoryContent 都重读，
+    // 与词卡自动朗读叠加造成"一次点击、两个声音"（网页端网络慢时尤为明显）
+    if (tw && !_trialSpoken[secKey]) {
+      _trialSpoken[secKey] = true;
+      if (!_suppressTrialSpeak) speakWord(tw);
+    }
   }
   const learnedInStory = STORY_WORDS.filter(w => state.learned.has(w.word)).length;
   document.getElementById('reader-progress').textContent = `${learnedInStory}/${STORY_WORDS.length}`;
@@ -3170,14 +3176,27 @@ let _enVoice = null;
   } catch (e) {}
 })();
 let _curAudio = null;
+const _trialSpoken = {};   // 各小节试炼词是否已自动朗读过（仅运行时，不持久化）
+let _suppressTrialSpeak = false; // 词卡自动朗读期间抑制试炼词自动朗读，避免双声叠加
+let _speakSeq = 0; // 朗读代际：只有最新一次 speakWord 的兜底回调才允许出声
+function _killAudio(a) {
+  if (!a) return;
+  try { a.onerror = null; a.pause(); } catch (e) {}
+  try { a.currentTime = 0; } catch (e) {}
+  // 关键：仅 pause() 掐不死"仍在加载、play() 尚未 resolve"的音频（网页端网络慢时，
+  // 数据到达后旧声音照播不误）；必须清 src 并 load() 才能真正中断请求并复位播放器
+  try { a.src = ''; a.load(); } catch (e) {}
+}
 function speakWord(word) {
   const w = (word || '').trim();
   if (!w) return;
-  if (_curAudio) { try { _curAudio.pause(); } catch (e) {} }
+  const seq = ++_speakSeq;
+  if (_curAudio) { _killAudio(_curAudio); _curAudio = null; }
   if ('speechSynthesis' in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
   let fellBack = false;
   const fallback = () => {
-    if (fellBack) return; fellBack = true;
+    // 迟到的失败回调（上一轮朗读的 onerror/play.catch 稍后才到）直接丢弃，防止新旧声音叠加
+    if (fellBack || seq !== _speakSeq) return; fellBack = true;
     try {
       if ('speechSynthesis' in window) {
         const u = new SpeechSynthesisUtterance(w);
@@ -3200,8 +3219,11 @@ function openWordModal(word) {
   const info = getWordInfo(word);
   if (!info.def) { showToast('该词暂无释义'); return; }
   // 点开词卡不直接算「学会」——须答对「试此一道」才计入已学（防止刷进度）
-  // 若当前在剧情页，刷新高亮
-  if (document.getElementById('page-read').classList.contains('active')) renderStoryContent();
+  // 若当前在剧情页，刷新高亮（抑制试炼词自动朗读——词卡稍后会自动朗读点开的词，避免双声叠加）
+  if (document.getElementById('page-read').classList.contains('active')) {
+    _suppressTrialSpeak = true;
+    try { renderStoryContent(); } finally { _suppressTrialSpeak = false; }
+  }
   const isMastered = state.mastered.has(word);
   const isBookmarked = state.bookmarks.has(word);
   const hasCollection = !!info.collectionType;

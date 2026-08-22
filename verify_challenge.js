@@ -518,6 +518,50 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   wT.eval('window.__w = state.trialWords["sec0"]; window.__c = humanizePOS((getWordInfo(window.__w).def||"").split("；")[0]); handleChoiceTrial(0, window.__w, window.__c, window.__c);');
   ok(wT.eval('state.choiceTrial["sec0"]') === true && wT.eval('state.trialWords["sec0"]') === undefined, '答对后 choiceTrial 记录 + 缓存清除');
 
+  /* ---------- 12.7 网页端重复朗读防回归（2026-08-22 V6.36 专项） ---------- */
+  // 源码锁 1：旧音频必须 src='' + load() 彻底中断（仅 pause() 掐不死加载中的音频——网页端网络慢时旧声音照播）
+  {
+    const fnSrc = (html.match(/function _killAudio\(a\) \{[\s\S]*?\n\}/) || [''])[0];
+    ok(/a\.src = ''/.test(fnSrc) && /a\.load\(\)/.test(fnSrc), '源码锁：_killAudio 彻底中断旧音频（src 清空 + load()）');
+    ok(/_killAudio\(_curAudio\)/.test(html), '源码锁：speakWord 调用 _killAudio 掐断上一段音频');
+  }
+  // 源码锁 2：试炼词只自动朗读一次（此前每次 renderStoryContent 都重读，与词卡自动朗读叠加成双声）
+  ok(/_trialSpoken\[secKey\]/.test(html), '源码锁：试炼词经 _trialSpoken 去重，只首次渲染自动朗读');
+  ok(/_suppressTrialSpeak = true/.test(html) && /_suppressTrialSpeak = false/.test(html), '源码锁：openWordModal 期间抑制试炼词自动朗读');
+  // 源码锁 3：迟到 fallback 被代际 token 丢弃（旧音频的 onerror 稍后才到，不能叠加 TTS）
+  ok(/seq !== _speakSeq\) return/.test(html), '源码锁：代际 token 丢弃迟到的朗读回调');
+  // 运行时：模拟网页端慢网络（Audio play 永不 resolve）——试炼只读一次 + 点词卡只读一个词 + 旧音频被彻底掐断
+  const domS = makeDom('http://localhost/?speak=1', false, w => {
+    w.__audios = [];
+    w.Audio = class {
+      constructor(src) { this.src = src; this.loaded = false; w.__audios.push(this); }
+      play() { return new Promise(() => {}); } // 永不 resolve：模拟音频一直加载中
+      pause() { this.paused = true; }
+      load() { this.loaded = true; }
+    };
+    w.__ttsSpoken = [];
+    w.speechSynthesis = { cancel() {}, speak(u) { w.__ttsSpoken.push(u.text); } };
+  });
+  await wait(400);
+  const wS = domS.window;
+  wS.eval('window.__count = 0; window.__orig = speakWord; speakWord = function(word){ window.__count++; window.__orig(word); };');
+  wS.eval('state.currentSection = 0; state.choiceTrial = {}; state.trialWords = {}; for (const k in _trialSpoken) delete _trialSpoken[k]; renderStoryContent();');
+  ok(wS.eval('window.__count') === 1, '试炼词首次渲染自动朗读 1 次');
+  wS.eval('renderStoryContent(); renderStoryContent(); renderStoryContent();');
+  ok(wS.eval('window.__count') === 1, '连续 4 次渲染不重复朗读');
+  wS.eval('document.getElementById("page-read").classList.add("active");');
+  const someWord = wS.eval('Object.keys(VOCAB_MAP)[0]');
+  wS.eval(`openWordModal(${JSON.stringify(someWord)});`);
+  ok(wS.eval('window.__count') === 2, '点开词卡仅新增 1 次朗读（试炼词被抑制）');
+  wS.eval('speakWord = window.__orig;');
+  wS.__audios.length = 0;
+  wS.eval('speakWord("apple"); speakWord("banana");');
+  const killedA = wS.__audios[0];
+  ok(killedA.src === '' && killedA.loaded === true, '旧音频被彻底中断（src 清空 + load 调用）');
+  wS.__ttsSpoken.length = 0;
+  killedA.onerror && killedA.onerror();
+  ok(wS.__ttsSpoken.length === 0, '旧音频迟到的 onerror 被丢弃，不叠加 TTS');
+
   /* ========== 每日目标达成奖励（V6.31） ========== */
   console.log('\n== 每日目标达成奖励 ==');
   const domGoal = makeDom('http://localhost/?goal=1', false);
