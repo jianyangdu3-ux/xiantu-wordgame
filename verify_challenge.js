@@ -305,6 +305,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   /* ========== 11. 微信警告 + 每周备份提醒（V6.21） ========== */
   console.log('== 11. 微信警告与备份提醒 ==');
   ok(document.body.textContent.includes('微信里打开') || document.body.textContent.includes('浏览器打开'), '首页存档续缘含微信浏览器警告');
+  ok(document.body.textContent.includes('添加到主屏幕') && document.body.textContent.includes('安装应用'), '首页存档续缘含「加到手机桌面」说明（iOS/安卓）');
   ok(typeof window.maybeWarnWeChat === 'function' && typeof window.maybeRemindBackup === 'function', '提醒函数已定义');
   // 老玩家（12 个已学词、从未备份）→ 启动后应触发备份提醒
   const words12 = ['the','envy','absorb','vanish','bold','calm','eager','faint','grave','harsh','idle','joint'];
