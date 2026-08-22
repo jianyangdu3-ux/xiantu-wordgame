@@ -218,6 +218,9 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .rank-step-desc { font-size: 9px; color: rgba(234,240,241,0.4); margin-top: 2px; }
 .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--bg-dark); color: #fff; padding: 10px 24px; border-radius: 20px; font-size: 14px; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; max-width: 90%; text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.wechat-banner { background:linear-gradient(135deg,#ff6b35,#f7931e); color:#fff; padding:10px 14px; font-size:13px; line-height:1.6; border-radius:0; margin-bottom:0; display:flex;align-items:flex-start;gap:8px; position:relative; }
+.wechat-banner .wb-close { position:absolute;right:8px;top:6px;background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;padding:2px 6px;line-height:1; }
+.wechat-banner b { color:#fff; }
 .palace-pattern { position: relative; }
 .palace-pattern::before { content: '✦'; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); color: var(--gold); font-size: 12px; }
 ::-webkit-scrollbar { width: 4px; } ::webkit-scrollbar-track { background: transparent; } ::webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
@@ -444,8 +447,8 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .trial-opt { margin-bottom: 8px; }
 
 /* 章节封印 */
-.ch-lock-note { margin-top: 8px; font-size: 12px; color: #ffb4a0; background: rgba(120,30,20,.25); border: 1px dashed rgba(255,120,90,.4); border-radius: 10px; padding: 8px 10px; line-height: 1.6; }
-.ch-lock-note b { color: #ffd0b0; }
+.ch-lock-note { margin-top: 8px; font-size: 13px; color: #c0392b; background: rgba(253,235,230,.85); border: 1px solid rgba(192,57,43,.35); border-radius: 10px; padding: 10px 12px; line-height: 1.6; font-weight:500; }
+.ch-lock-note b { color: #a93226; }
 
 /* 境界突破全屏特效 */
 .breakthrough { position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 45%, rgba(30,18,55,.5), rgba(0,0,0,.94)); opacity: 0; transition: opacity .4s ease; pointer-events: none; overflow: hidden; }
@@ -639,31 +642,33 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <span class="le-arrow">›</span>
   </div>
   <div class="save-sync">
-    <div class="section-header" style="margin-bottom:8px"><h2>存档续缘</h2><span class="view-all" onclick="showToast('换手机/电脑时，导出存档再导入即可延续进度')">跨设备续玩</span></div>
-    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:10px">进度<b>自动保存在本机</b>，无需注册账号，也<b>不需要手动备份</b>——同一台设备接着玩就行。只有要<b>换手机/换电脑/换浏览器</b>时，才需要导出存档文件带到新设备。</p>
-    <div style="background:rgba(220,120,50,.10);border:1px solid rgba(220,120,50,.35);border-radius:8px;padding:7px 10px;margin-bottom:10px;font-size:11px;color:#A8541A;line-height:1.7">⚠️ 若你是从<b>微信里点开的链接</b>：请先点右上角「⋯」→ 选「在浏览器打开」再用。微信内直接使用时，导出/导入存档可能失败。</div>
-    <div style="display:flex;gap:10px;margin-bottom:10px">
+    <div class="section-header" style="margin-bottom:6px"><h2>存档续缘</h2><span class="view-all" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'">📖 使用说明</span></div>
+    <p style="font-size:12px;color:var(--text-light);line-height:1.7;margin-bottom:8px">进度自动保存在本机，<b>不换设备完全不用管</b>。换手机/电脑时，先导出再导入即可延续。</p>
+    <div style="display:flex;gap:10px;margin-bottom:8px">
       <button class="btn btn-outline" style="flex:1" onclick="exportSave()">⬇️ 导出存档</button>
       <button class="btn btn-outline" style="flex:1" onclick="document.getElementById('save-file').click()">⬆️ 导入存档</button>
     </div>
     <input type="file" id="save-file" accept="application/json,.json" style="display:none" onchange="importSave(this)">
-    <div class="cloud-box">
-      <div style="font-size:13px;font-weight:600;margin-bottom:6px">📱 换手机 / 换电脑怎么接着玩？</div>
-      <p style="font-size:11px;color:var(--text-light);line-height:1.8;margin-bottom:8px">
-        <b>① 旧设备：</b>点上方「⬇️ 导出存档」→ 浏览器会下载一个<b>带日期的存档文件</b>（如 仙途十二阶存档_20260821.json），用微信/QQ 发给自己、或存到网盘均可<br>
-        <b>② 新设备：</b>打开同一网址 → 点「⬆️ 导入存档」→ 选中那个文件 → 进度即刻恢复 ✓
-      </p>
-      <details style="margin-top:6px;border-radius:10px;background:rgba(0,0,0,0.04);padding:8px 10px;font-size:11px;color:var(--text-light);line-height:1.8">
-        <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">❓ 常见问题</summary>
-        <div style="margin-top:6px">
-          <b>存档存在哪？</b>自动存在本机浏览器里，同一手机同一浏览器打开就还在，<b>什么都不用做</b><br>
-          <b>什么时候才需要导出？</b>只有换手机、换浏览器、或要清浏览器数据<b>之前</b>才需要——导出个文件带走即可<br>
-          <b>不导出会怎样？</b>不换设备就完全没影响；只有清了浏览器数据/卖了旧机才找不回，所以换设备前导一次就够<br>
-          <b>导入会覆盖新设备进度？</b>会以导入的文件为准，所以旧设备导出的才是最新进度<br>
-          <b>导出的文件丢了？</b>没导入过的旧设备还能重新导一次；导入过就再导一次新的
+    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.6">💡 微信里打开的链接请先用浏览器打开再玩，导出/导入更稳定。</div>
+    <!-- 详细说明：默认隐藏，点「📖 使用说明」展开 -->
+    <div id="save-detail" style="display:none">
+      <details open style="border-radius:10px;background:var(--bg-card);padding:10px 12px;font-size:11px;color:var(--text-light);line-height:1.9;border:1px solid rgba(0,0,0,.06)">
+        <summary style="cursor:pointer;list-style:none;font-weight:600;color:var(--text-secondary);margin-bottom:6px">📱 换设备怎么接着玩？</summary>
+        <div style="margin-top:4px">
+          <b>① 旧设备：</b>点上方「⬇️ 导出存档」→ 浏览器会下载一个带日期的 json 文件（如 仙途十二阶存档_20260821.json），用微信/QQ 发给自己或存网盘均可<br><br>
+          <b>② 新设备：</b>打开同一网址 → 点「⬆️ 导入存档」→ 选中那个文件 → 进度即刻恢复 ✓<br><br>
+          <b>③ 不换设备？</b>什么都不用做，进度一直在本机浏览器里。
         </div>
       </details>
-      <div style="background:rgba(212,175,55,.08);border-radius:8px;padding:7px 10px;margin-top:8px;font-size:11px;color:var(--text-secondary);line-height:1.7">💡 平时不用管存档。只有准备<b>换设备</b>时，先来这里点一次「⬇️ 导出存档」把文件带走即可。</div>
+      <details style="margin-top:8px;border-radius:10px;background:var(--bg-card);padding:10px 12px;font-size:11px;color:var(--text-light);line-height:1.9;border:1px solid rgba(0,0,0,.06)">
+        <summary style="cursor:pointer;list-style:none;font-weight:500;color:var(--text-secondary)">❓ 常见问题</summary>
+        <div style="margin-top:4px">
+          <b>存档在哪？</b>自动存在本机浏览器里，同一设备打开就还在，什么都不用做<br><br>
+          <b>什么时候才需要导出？</b>只有换手机、换浏览器、或清浏览器数据之前才需要<br><br>
+          <b>不导出会怎样？</b>不换设备就完全没影响；清了数据或卖了旧机才找不回<br><br>
+          <b>导入会覆盖新设备进度？</b>会以导入的文件为准，所以旧设备导出的才是最新进度
+        </div>
+      </details>
     </div>
   </div>
   <div class="chapter-list">
@@ -806,8 +811,9 @@ const RANKS = [
   { name:'渡劫', icon:'⚡', desc:'历经天劫，九死一生' },
   { name:'飞升', icon:'🌌', desc:'羽化登仙，超脱凡尘' },
 ];
-// 十二境界：按「已学词数」累计晋级（覆盖 5491 全词库）
-const RANK_THRESHOLDS = [0, 40, 120, 250, 450, 700, 1000, 1500, 2200, 3000, 4000, 5491];
+// 十二境界：按「已学词数」累计晋级，满级阈值要求学完全部词库。末位随词库大小自动跟随，避免硬编码漂移导致境界错位
+const VOCAB_SIZE = (window.VOCAB && window.VOCAB.length) || 5498;
+const RANK_THRESHOLDS = [0, 40, 120, 250, 450, 700, 1000, 1500, 2200, 3000, 4000, VOCAB_SIZE];
 
 const CHAPTERS = [
   { id:1, title:'杂役入宗', desc:'测灵石上，她被判定最劣等的杂灵根。当众受辱那刻，一枚古玉坠入掌心……' },
@@ -826,7 +832,8 @@ const CHAPTERS = [
 // 章节试炼通关后解锁的藏录卡
 const CHAPTER_QUIZ_CARD = { 1:10, 2:16, 3:11, 4:12, 5:17, 6:18, 7:19, 8:20, 9:21, 10:22, 11:23, 12:24 };
 
-// 剧情词（60 个）—— 提供「仙途语境义 / 例句 / 收藏卡归属」；真实音标释义优先取自 vocab.js
+// 剧情词（覆盖全 12 章，每章恰好 30 词，共 360）—— 提供「仙途语境义 / 例句 / 收藏卡归属」；真实音标释义优先取自 vocab.js。
+// 双轨取词（见 contextualPool / broadPool）：章节试炼等主线走剧情词强关联；秘境 / 天降机缘 / 自由测验经 broadPool 从全 5498 词抽未学词套仙途壳，逐步覆盖全词库——绝不允许任何学习板块退化为"只循环几百词"（产品诚信底线：对外宣称 5000+ 词，就必须全库可达）。
 const STORY_WORDS = [
   { word:'timid', phonetic:'/ˈtɪmɪd/', meaning:'胆小的；羞怯的', contextMeaning:'胆怯', difficulty:2, example:'The timid disciple lowered her eyes.', exampleTrans:'胆怯的弟子垂下了眼。', storyContext:'苏渺性子 timid，受辱时只敢低头。', chapter:1, collectionType:'character', collectionName:'苏渺' },
   { word:'quiet', phonetic:'/ˈkwaɪət/', meaning:'安静的；平静的', contextMeaning:'安静', difficulty:1, example:'The quiet of the night.', exampleTrans:'夜的安静。', storyContext:'她只愿在 quiet 的柴房里默念心法。', chapter:1 },
@@ -841,6 +848,21 @@ const STORY_WORDS = [
   { word:'courtyard', phonetic:'/ˈkɔːrtjɑːrd/', meaning:'庭院；院子', contextMeaning:'庭院', difficulty:2, example:'The training courtyard.', exampleTrans:'演武庭院。', storyContext:'晨课在青云宗的 central courtyard 举行。', chapter:1, collectionType:'location', collectionName:'青云宗' },
   { word:'chamber', phonetic:'/ˈtʃeɪmbər/', meaning:'室；密室', contextMeaning:'密室', difficulty:2, example:'A hidden chamber.', exampleTrans:'一处隐秘密室。', storyContext:'采药时她误入一处 hidden chamber。', chapter:1, collectionType:'location', collectionName:'残魂密室' },
   { word:'wretched', phonetic:'/ˈretʃɪd/', meaning:'可怜的；悲惨的', contextMeaning:'可怜', difficulty:4, example:'A wretched menial.', exampleTrans:'可怜的杂役。', storyContext:'曾几何时，她过着 wretched 的杂役生涯。', chapter:1 },
+  { word:'weary', phonetic:'/ˈwɪəri/', meaning:'疲倦的；厌倦的', contextMeaning:'疲惫', difficulty:2, example:'A weary servant.', exampleTrans:'疲惫的杂役。', storyContext:'她 weary 地扛着柴薪，却不敢有半分懈怠。', chapter:1, collectionType:'character', collectionName:'苏渺' },
+  { word:'harsh', phonetic:'/hɑːʃ/', meaning:'苛刻的；严酷的', contextMeaning:'严苛', difficulty:3, example:'A harsh reproach.', exampleTrans:'严苛的训斥。', storyContext:'长老的 harsh 训斥，日日悬在杂役头顶。', chapter:1 },
+  { word:'modest', phonetic:'/ˈmɒdɪst/', meaning:'谦虚的；有节制的', contextMeaning:'谦卑', difficulty:2, example:'Stay modest.', exampleTrans:'保持谦卑。', storyContext:'她 modest 其志，只把锋芒藏进柴房。', chapter:1 },
+  { word:'glimpse', phonetic:'/ɡlɪmps/', meaning:'一瞥；瞥见', contextMeaning:'惊鸿一瞥', difficulty:3, example:'A glimpse of light.', exampleTrans:'一缕微光。', storyContext:'她于石缝中 glimpse 一缕微光，命运的齿轮开始转动。', chapter:1, collectionType:'item', collectionName:'古玉佩' },
+  { word:'pierce', phonetic:'/pɪəs/', meaning:'刺穿；刺破', contextMeaning:'刺骨', difficulty:3, example:'The wind pierced.', exampleTrans:'寒风刺骨。', storyContext:'寒风 pierce 骨，却刺不穿她心底的火。', chapter:1 },
+  { word:'dim', phonetic:'/dɪm/', meaning:'暗淡的；模糊的', contextMeaning:'昏暗', difficulty:2, example:'A dim cave.', exampleTrans:'昏暗的洞窟。', storyContext:'洞中 dim 无光，她却以心为灯。', chapter:1 },
+  { word:'remote', phonetic:'/rɪˈməʊt/', meaning:'遥远的；偏僻的', contextMeaning:'偏僻', difficulty:3, example:'A remote hill.', exampleTrans:'偏僻的山坳。', storyContext:'remote 的后山，是她唯一的喘息之地。', chapter:1 },
+  { word:'scarce', phonetic:'/skeəs/', meaning:'缺乏的；稀少的', contextMeaning:'稀少', difficulty:3, example:'Food was scarce.', exampleTrans:'粮米稀少。', storyContext:'宗门粮米 scarce，杂役常挨饿。', chapter:1 },
+  { word:'faint', phonetic:'/feɪnt/', meaning:'微弱的；不明显的', contextMeaning:'微弱', difficulty:2, example:'A faint pulse.', exampleTrans:'微弱的脉动。', storyContext:'玉佩传来 faint 的脉动，似有古魂将醒。', chapter:1 },
+  { word:'patience', phonetic:'/ˈpeɪʃns/', meaning:'耐心；忍耐', contextMeaning:'隐忍', difficulty:3, example:'Years of patience.', exampleTrans:'多年的隐忍。', storyContext:'她以 patience 熬过三年冷眼。', chapter:1 },
+  { word:'wander', phonetic:'/ˈwɒndə/', meaning:'漫步；徘徊；迷失', contextMeaning:'徘徊', difficulty:2, example:'Wander the path.', exampleTrans:'山道徘徊。', storyContext:'夜半 wander 山道，她撞见了不该见的秘辛。', chapter:1 },
+  { word:'neglect', phonetic:'/nɪˈɡlekt/', meaning:'忽视；疏忽', contextMeaning:'被忽视', difficulty:3, example:'Long neglected.', exampleTrans:'久被忽视。', storyContext:'曾被世人 neglect 的废柴，终将惊艳众人。', chapter:1 },
+  { word:'servant', phonetic:'/ˈsɜːvənt/', meaning:'仆人', contextMeaning:'杂役', difficulty:2, example:'A lowly servant.', exampleTrans:'低等的杂役。', storyContext:'身为最低等的 servant，她却守着不卑的脊梁。', chapter:1, collectionType:'character', collectionName:'苏渺' },
+  { word:'poverty', phonetic:'/ˈpɒvəti/', meaning:'贫穷；贫困', contextMeaning:'清贫', difficulty:3, example:'Born in poverty.', exampleTrans:'生于清贫。', storyContext:'poverty 不曾折她傲骨，反淬其剑心。', chapter:1, collectionType:'character', collectionName:'苏渺' },
+  { word:'whisper', phonetic:'/ˈwɪspə/', meaning:'耳语；低语', contextMeaning:'低语', difficulty:2, example:'A faint whisper.', exampleTrans:'一缕低语。', storyContext:'风里似有 whisper，残魂在唤她的名。', chapter:1, collectionType:'character', collectionName:'残魂' },
   { word:'meticulous', phonetic:'/məˈtɪkjələs/', meaning:'一丝不苟的；细致的', contextMeaning:'细致', difficulty:4, example:'Meticulous in herb care.', exampleTrans:'照料灵草一丝不苟。', storyContext:'她浇灌灵草极为 meticulous，暗藏玄机。', chapter:2, collectionType:'item', collectionName:'清灵草' },
   { word:'stern', phonetic:'/stɜːrn/', meaning:'严厉的；严峻的', contextMeaning:'严厉', difficulty:3, example:'The stern elder.', exampleTrans:'严厉的长老。', storyContext:'玄清子长老目光 stern，令人生畏。', chapter:2, collectionType:'character', collectionName:'玄清子' },
   { word:'subtle', phonetic:'/ˈsʌtl/', meaning:'微妙的；精细的', contextMeaning:'微妙', difficulty:3, example:'A subtle qi shift.', exampleTrans:'灵气的微妙异动。', storyContext:'她察觉灵气中 subtle 的异动。', chapter:2 },
@@ -850,6 +872,22 @@ const STORY_WORDS = [
   { word:'adequate', phonetic:'/ˈædɪkwət/', meaning:'足够的；胜任的', contextMeaning:'足够', difficulty:3, example:'Adequate foundation.', exampleTrans:'足够的基础。', storyContext:'她根基尚不 adequate，需勤补。', chapter:2 },
   { word:'admire', phonetic:'/ədˈmaɪər/', meaning:'钦佩；欣赏', contextMeaning:'钦佩', difficulty:2, example:'I admire her grit.', exampleTrans:'我钦佩她的韧劲。', storyContext:'连柳如烟也暗自 admire 她的坚韧。', chapter:2 },
   { word:'ambitious', phonetic:'/æmˈbɪʃəs/', meaning:'有雄心的', contextMeaning:'野心', difficulty:3, example:'An ambitious goal.', exampleTrans:'宏大的目标。', storyContext:'她 ambitious 之志，直指飞升。', chapter:2 },
+  { word:'perceive', phonetic:'/pəˈsiːv/', meaning:'察觉；感知；理解', contextMeaning:'心领', difficulty:3, example:'She perceived the change.', exampleTrans:'她察觉到了异变。', storyContext:'她 perceive 到灵脉深处异样，却不动声色。', chapter:2, collectionType:'location', collectionName:'青云宗' },
+  { word:'reveal', phonetic:'/rɪˈviːl/', meaning:'展现；揭示；泄露', contextMeaning:'点破', difficulty:3, example:'Reveal the secret.', exampleTrans:'点破玄机。', storyContext:'残魂 reveal 她身负混沌灵根之秘。', chapter:2, collectionType:'character', collectionName:'残魂' },
+  { word:'conceal', phonetic:'/kənˈsiːl/', meaning:'隐藏；隐瞒', contextMeaning:'藏匿', difficulty:3, example:'Conceal the truth.', exampleTrans:'藏匿真相。', storyContext:'柳家 conceal 的阴谋，终被一线灵光撕开。', chapter:2 },
+  { word:'potential', phonetic:'/pəˈtenʃl/', meaning:'潜在的；潜能', contextMeaning:'潜质', difficulty:3, example:'Hidden potential.', exampleTrans:'蛰伏的潜质。', storyContext:'那被封印的 potential，正是她逆天改命的根。', chapter:2 },
+  { word:'vigorous', phonetic:'/ˈvɪɡərəs/', meaning:'精力旺盛的；朝气蓬勃的', contextMeaning:'勃发', difficulty:3, example:'A vigorous spirit.', exampleTrans:'勃发的心志。', storyContext:'引动灵气后，她 vigorous 如新生。', chapter:2 },
+  { word:'instruct', phonetic:'/ɪnˈstrʌkt/', meaning:'教导；教授', contextMeaning:'授艺', difficulty:3, example:'The soul instructed her.', exampleTrans:'残魂授她心法。', storyContext:'残魂 instruct 她《清灵诀》口诀，字字珠玑。', chapter:2, collectionType:'character', collectionName:'残魂' },
+  { word:'diligent', phonetic:'/ˈdɪlɪdʒənt/', meaning:'勤奋的；用功的', contextMeaning:'勤苦', difficulty:3, example:'A diligent disciple.', exampleTrans:'勤苦的弟子。', storyContext:'她 diligent 苦修，不让一日虚度。', chapter:2 },
+  { word:'rigorous', phonetic:'/ˈrɪɡərəs/', meaning:'严格的；严谨的', contextMeaning:'严苛', difficulty:4, example:'Rigorous rules.', exampleTrans:'严苛的规矩。', storyContext:'测灵大会的规矩 rigorous，容不得半点作假。', chapter:2 },
+  { word:'latent', phonetic:'/ˈleɪtnt/', meaning:'潜在的；潜伏的', contextMeaning:'蛰伏', difficulty:4, example:'Latent power.', exampleTrans:'蛰伏之力。', storyContext:'latent 的混沌之力，一旦苏醒便惊天动地。', chapter:2 },
+  { word:'ignite', phonetic:'/ɪɡˈnaɪt/', meaning:'点火；引燃', contextMeaning:'点燃', difficulty:3, example:'Ignite the meridian.', exampleTrans:'点燃经脉。', storyContext:'玉佩之力 ignite 她沉寂的经脉。', chapter:2 },
+  { word:'clarity', phonetic:'/ˈklærəti/', meaning:'清晰；明晰', contextMeaning:'清明', difficulty:3, example:'Mental clarity.', exampleTrans:'灵台清明。', storyContext:'灵台 clarity，让她在乱局中看清前路。', chapter:2 },
+  { word:'thrive', phonetic:'/θraɪv/', meaning:'兴旺；繁荣', contextMeaning:'茁长', difficulty:3, example:'Thrive in adversity.', exampleTrans:'于逆境茁长。', storyContext:'于绝境之中，她反倒 thrive 得愈发坚韧。', chapter:2 },
+  { word:'nurture', phonetic:'/ˈnɜːtʃə/', meaning:'养育；教养', contextMeaning:'润养', difficulty:3, example:'Nurture the root.', exampleTrans:'润养灵根。', storyContext:'残魂以古法 nurture 她的灵根，渐有起色。', chapter:2, collectionType:'item', collectionName:'清灵草' },
+  { word:'discern', phonetic:'/dɪˈsɜːn/', meaning:'认出；辨别', contextMeaning:'明辨', difficulty:4, example:'Discern the flaw.', exampleTrans:'明辨破绽。', storyContext:'她 discern 出柳家眼线的破绽。', chapter:2 },
+  { word:'resolve', phonetic:'/rɪˈzɒlv/', meaning:'决心；解决', contextMeaning:'决意', difficulty:3, example:'A firm resolve.', exampleTrans:'坚毅的决意。', storyContext:'一念 resolve，她誓要踏碎这命定的卑微。', chapter:2 },
+  { word:'arouse', phonetic:'/əˈraʊz/', meaning:'唤醒；唤起', contextMeaning:'唤起', difficulty:3, example:'Arouse suspicion.', exampleTrans:'唤起疑窦。', storyContext:'测灵石的光芒 arouse 满座惊疑。', chapter:2 },
   { word:'intrigue', phonetic:'/ɪnˈtriːɡ/', meaning:'阴谋；诡计', contextMeaning:'阴谋', difficulty:4, example:'Court intrigue.', exampleTrans:'宗门阴谋。', storyContext:'大比之前，各峰 intrigue 四起。', chapter:3 },
   { word:'conspire', phonetic:'/kənˈspaɪər/', meaning:'密谋；共谋', contextMeaning:'密谋', difficulty:4, example:'They conspired against her.', exampleTrans:'他们密谋对付她。', storyContext:'柳如烟 conspire 下毒，欲废她修为。', chapter:3 },
   { word:'manipulate', phonetic:'/məˈnɪpjuleɪt/', meaning:'操纵；控制', contextMeaning:'操纵', difficulty:4, example:'Manipulate the array.', exampleTrans:'操纵阵法。', storyContext:'有人试图 manipulate 试炼阵法。', chapter:3 },
@@ -861,6 +899,21 @@ const STORY_WORDS = [
   { word:'arbitrary', phonetic:'/ˈɑːrbɪtreri/', meaning:'任意的；武断的', contextMeaning:'武断', difficulty:4, example:'An arbitrary ruling.', exampleTrans:'武断的裁决。', storyContext:'裁判 arbitrary 判罚，暗藏偏袒。', chapter:3 },
   { word:'ambiguous', phonetic:'/æmˈbɪɡjuəs/', meaning:'模棱两可的；含糊的', contextMeaning:'含糊', difficulty:4, example:'An ambiguous verse.', exampleTrans:'含糊的偈语。', storyContext:'古籍中 ambiguous 的偈语，暗藏天机。', chapter:3 },
   { word:'eloquent', phonetic:'/ˈeləkwənt/', meaning:'雄辩的；有说服力的', contextMeaning:'雄辩', difficulty:4, example:'An eloquent defense.', exampleTrans:'一番雄辩的辩护。', storyContext:'她 eloquent 陈词，当众揭穿阴谋。', chapter:3 },
+  { word:'confront', phonetic:'/kənˈfrʌnt/', meaning:'面对；对抗', contextMeaning:'直面', difficulty:3, example:'Confront the scheme.', exampleTrans:'直面阴谋。', storyContext:'擂台之上，她 confront 柳如烟的阴毒算计。', chapter:3 },
+  { word:'justify', phonetic:'/ˈdʒʌstɪfaɪ/', meaning:'证明正当；辩护', contextMeaning:'自辩', difficulty:4, example:'Justify the deed.', exampleTrans:'为行径自辩。', storyContext:'柳家欲 justify 下毒之举，满口歪理。', chapter:3 },
+  { word:'deceive', phonetic:'/dɪˈsiːv/', meaning:'欺骗；蒙蔽', contextMeaning:'蒙骗', difficulty:3, example:'Deceive the naive.', exampleTrans:'蒙骗轻信之人。', storyContext:'可有人 deceive 她，佯作同门实为暗箭。', chapter:3 },
+  { word:'spite', phonetic:'/spaɪt/', meaning:'恶意；怨恨', contextMeaning:'怨毒', difficulty:3, example:'Out of sheer spite.', exampleTrans:'纯出于怨毒。', storyContext:'柳如烟出于 spite，处处设陷相坑。', chapter:3, collectionType:'character', collectionName:'柳如烟' },
+  { word:'accuse', phonetic:'/əˈkjuːz/', meaning:'控告；指责', contextMeaning:'指证', difficulty:3, example:'Accuse the guilty.', exampleTrans:'指证罪人。', storyContext:'她 accuse 柳如烟下毒，满场哗然。', chapter:3, collectionType:'character', collectionName:'苏渺' },
+  { word:'verdict', phonetic:'/ˈvɜːdɪkt/', meaning:'裁决；定论', contextMeaning:'裁断', difficulty:4, example:'A biased verdict.', exampleTrans:'偏袒的裁断。', storyContext:'长老迟迟不下的 verdict，藏着偏袒。', chapter:3 },
+  { word:'oppose', phonetic:'/əˈpəʊz/', meaning:'反对；对抗', contextMeaning:'抗衡', difficulty:3, example:'Oppose the injustice.', exampleTrans:'抗衡不公。', storyContext:'她 oppose 不公的裁决，挺身为己正名。', chapter:3 },
+  { word:'provoke', phonetic:'/prəˈvəʊk/', meaning:'挑动；招惹', contextMeaning:'激怒', difficulty:3, example:'Provoke a fight.', exampleTrans:'激起争斗。', storyContext:'柳如烟刻意 provoke，逼她先露破绽。', chapter:3 },
+  { word:'spectacle', phonetic:'/ˈspektəkl/', meaning:'场面；奇观', contextMeaning:'闹剧', difficulty:4, example:'A public spectacle.', exampleTrans:'一场众目闹剧。', storyContext:'这场比试成了宗门 spectacle，人人围观。', chapter:3 },
+  { word:'reclaim', phonetic:'/rɪˈkleɪm/', meaning:'收回；要求归还', contextMeaning:'讨还', difficulty:4, example:'Reclaim one\'s honor.', exampleTrans:'讨还尊严。', storyContext:'她要 reclaim 被夺走的尊严与清白。', chapter:3 },
+  { word:'upright', phonetic:'/ˈʌpraɪt/', meaning:'正直的；诚实的', contextMeaning:'刚正', difficulty:3, example:'An upright heart.', exampleTrans:'刚正之心。', storyContext:'纵处泥沼，她仍守 upright 之心。', chapter:3 },
+  { word:'denounce', phonetic:'/dɪˈnaʊns/', meaning:'公开指责；谴责', contextMeaning:'当众揭批', difficulty:4, example:'Denounce the plot.', exampleTrans:'当众揭批阴谋。', storyContext:'她当众 denounce 柳家的卑劣。', chapter:3, collectionType:'event', collectionName:'大比雪耻' },
+  { word:'prevail', phonetic:'/prɪˈveɪl/', meaning:'取胜；占优势', contextMeaning:'胜出', difficulty:4, example:'Truth will prevail.', exampleTrans:'真理终将胜出。', storyContext:'乱局之中，真理终将 prevail。', chapter:3 },
+  { word:'disgrace', phonetic:'/dɪsˈɡreɪs/', meaning:'耻辱；使蒙羞', contextMeaning:'蒙羞', difficulty:4, example:'End in disgrace.', exampleTrans:'以蒙羞收场。', storyContext:'柳如烟的算计，反令自己 disgrace 收场。', chapter:3, collectionType:'character', collectionName:'柳如烟' },
+  { word:'stain', phonetic:'/steɪn/', meaning:'污点；玷污', contextMeaning:'玷污', difficulty:4, example:'Stain her name.', exampleTrans:'玷污名节。', storyContext:'柳家欲 stain 她的名节，却自取其辱。', chapter:3 },
   { word:'dignity', phonetic:'/ˈdɪɡnəti/', meaning:'尊严；高贵', contextMeaning:'尊严', difficulty:3, example:'She kept her dignity.', exampleTrans:'她守住了尊严。', storyContext:'纵为杂役，亦不失 dignity。', chapter:4 },
   { word:'cunning', phonetic:'/ˈkʌnɪŋ/', meaning:'狡猾的；机巧的', contextMeaning:'机巧', difficulty:3, example:'A cunning trap.', exampleTrans:'机巧的陷阱。', storyContext:'她以 cunning 之计破上古阵。', chapter:4 },
   { word:'prosper', phonetic:'/ˈprɒspər/', meaning:'繁荣；兴旺', contextMeaning:'兴旺', difficulty:3, example:'May the sect prosper.', exampleTrans:'愿宗门兴旺。', storyContext:'愿青云宗 prosper 万年。', chapter:4 },
@@ -870,6 +923,22 @@ const STORY_WORDS = [
   { word:'hesitate', phonetic:'/ˈhezɪteɪt/', meaning:'犹豫；踌躇', contextMeaning:'犹豫', difficulty:2, example:'Do not hesitate.', exampleTrans:'勿犹豫。', storyContext:'机缘面前，她不再 hesitate。', chapter:4 },
   { word:'endure', phonetic:'/ɪnˈdjʊr/', meaning:'忍受；承受', contextMeaning:'忍受', difficulty:3, example:'Endure the trial.', exampleTrans:'承受试炼。', storyContext:'她须 endure 秘境中的万重险。', chapter:4 },
   { word:'solitude', phonetic:'/ˈsɒlɪtuːd/', meaning:'孤独；孤境', contextMeaning:'孤境', difficulty:3, example:'Cultivate in solitude.', exampleTrans:'于孤境清修。', storyContext:'她偏爱 solitude 中的清修。', chapter:4 },
+  { word:'treasure', phonetic:'/ˈtreʒə/', meaning:'珍宝；珍爱', contextMeaning:'镇魂之宝', difficulty:3, example:'The sect treasure.', exampleTrans:'宗门镇魂之宝。', storyContext:'幻月深处镇着宗门 treasure——镇魂之珠。', chapter:4, collectionType:'item', collectionName:'镇魂珠' },
+  { word:'penetrate', phonetic:'/ˈpenɪtreɪt/', meaning:'穿过；看穿', contextMeaning:'洞穿', difficulty:4, example:'Penetrate the core.', exampleTrans:'洞穿阵核。', storyContext:'她以巧劲 penetrate 上古阵法的核心。', chapter:4 },
+  { word:'barrier', phonetic:'/ˈbæriə/', meaning:'屏障；障碍', contextMeaning:'障壁', difficulty:3, example:'A sealing barrier.', exampleTrans:'封印的障壁。', storyContext:'洞口 barrier 骤起，将她困于绝境。', chapter:4 },
+  { word:'patrol', phonetic:'/pəˈtrəʊl/', meaning:'巡逻；巡逻队', contextMeaning:'巡守', difficulty:3, example:'The patrolling golem.', exampleTrans:'巡守的傀儡。', storyContext:'阵中 patrol 的傀儡，寸步不离守宝。', chapter:4 },
+  { word:'hatch', phonetic:'/hætʃ/', meaning:'孵；孵出', contextMeaning:'破壳', difficulty:3, example:'The egg will hatch.', exampleTrans:'灵兽蛋将破壳。', storyContext:'灵兽蛋 hatch 裂响，雪团初啼破寂。', chapter:4, collectionType:'character', collectionName:'雪团' },
+  { word:'linger', phonetic:'/ˈlɪŋɡə/', meaning:'逗留；留恋', contextMeaning:'萦绕', difficulty:3, example:'A voice lingered.', exampleTrans:'余音萦绕。', storyContext:'残魂的余音 linger 在洞壁，指引她破阵。', chapter:4 },
+  { word:'refuge', phonetic:'/ˈrefjuːdʒ/', meaning:'避难处；藏身处', contextMeaning:'栖身', difficulty:3, example:'A quiet refuge.', exampleTrans:'静谧的栖身。', storyContext:'幽暗洞窟成了她暂得的 refuge。', chapter:4 },
+  { word:'hazard', phonetic:'/ˈhæzəd/', meaning:'危险；冒险', contextMeaning:'凶险', difficulty:3, example:'Every step a hazard.', exampleTrans:'步步凶险。', storyContext:'每一道阵纹皆藏 hazard，触之即殒。', chapter:4 },
+  { word:'uncover', phonetic:'/ʌnˈkʌvə/', meaning:'揭开；揭露', contextMeaning:'揭开', difficulty:4, example:'Uncover the eye.', exampleTrans:'揭开阵眼。', storyContext:'她 uncover 阵眼真相，反将设局者困住。', chapter:4 },
+  { word:'revive', phonetic:'/rɪˈvaɪv/', meaning:'复苏；恢复', contextMeaning:'复苏', difficulty:4, example:'Revive the vein.', exampleTrans:'复苏灵脉。', storyContext:'镇魂珠之力 revive 她几近枯竭的灵脉。', chapter:4 },
+  { word:'beast', phonetic:'/biːst/', meaning:'兽；牲畜', contextMeaning:'灵兽', difficulty:2, example:'A spirit beast.', exampleTrans:'一头灵兽。', storyContext:'那伴生 beast 雪团，自此与她性命相连。', chapter:4, collectionType:'character', collectionName:'雪团' },
+  { word:'formation', phonetic:'/fɔːˈmeɪʃn/', meaning:'形成；构造', contextMeaning:'阵法', difficulty:4, example:'An ancient formation.', exampleTrans:'上古阵法。', storyContext:'上古 formation 环环相扣，一步错满盘皆输。', chapter:4 },
+  { word:'commit', phonetic:'/kəˈmɪt/', meaning:'交托；托付', contextMeaning:'托付', difficulty:3, example:'Commit her life.', exampleTrans:'将性命托付。', storyContext:'她将性命 commit 于这一搏，破阵而出。', chapter:4 },
+  { word:'emerge', phonetic:'/ɪˈmɜːdʒ/', meaning:'显现；浮现', contextMeaning:'现世', difficulty:3, example:'Emerge from light.', exampleTrans:'自光芒中现世。', storyContext:'洞开一刻，雪团 emerge 于光芒之中。', chapter:4 },
+  { word:'doze', phonetic:'/dəʊz/', meaning:'瞌睡；假寐', contextMeaning:'假寐', difficulty:2, example:'A dozing egg.', exampleTrans:'假寐的灵兽蛋。', storyContext:'一枚 doze 的灵兽蛋，静候破壳之期。', chapter:4 },
+  { word:'cradle', phonetic:'/ˈkreɪdl/', meaning:'摇篮；发源地', contextMeaning:'孕育', difficulty:3, example:'The cradle of life.', exampleTrans:'生命之摇篮。', storyContext:'幻月洞天乃雪团诞生之 cradle。', chapter:4, collectionType:'location', collectionName:'幻月洞天' },
   { word:'affection', phonetic:'/əˈfekʃn/', meaning:'喜爱；情愫', contextMeaning:'情愫', difficulty:2, example:'Affection for her beast.', exampleTrans:'对灵兽的喜爱。', storyContext:'她对雪团渐生 affection。', chapter:5, collectionType:'character', collectionName:'雪团' },
   { word:'benevolent', phonetic:'/bəˈnevələnt/', meaning:'仁慈的；仁厚的', contextMeaning:'仁厚', difficulty:4, example:'A benevolent immortal.', exampleTrans:'仁厚的仙人。', storyContext:'上界使者看似 benevolent，却另有图谋。', chapter:5 },
   { word:'vigilant', phonetic:'/ˈvɪdʒɪlənt/', meaning:'警惕的；警醒的', contextMeaning:'警惕', difficulty:3, example:'Remain vigilant.', exampleTrans:'保持警惕。', storyContext:'渡劫时须 vigilant 防心魔。', chapter:5 },
@@ -951,6 +1020,183 @@ const STORY_WORDS = [
   { word:'forge', phonetic:'/fɔ:dʒ/', meaning:'v.锻造,伪造 n.锻工车间;锻炉', contextMeaning:'开创', difficulty:3, example:'Forge a new order.', exampleTrans:'开创新规。', storyContext:'她 forge 属于自己的秩序。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
   { word:'perpetual', phonetic:'/pə\'petʃuəl/', meaning:'a.永久的,永恒的,长期的', contextMeaning:'长存', difficulty:3, example:'Perpetual peace.', exampleTrans:'长久的安宁。', storyContext:'她许众生 perpetual 之安。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
   { word:'master', phonetic:'/\'mɑ:stə/', meaning:'n.男主人;师傅;硕士 v.精通,控制 a.主要的', contextMeaning:'执掌', difficulty:3, example:'Master one\'s fate.', exampleTrans:'执掌自身命运。', storyContext:'凡女亦可 master 自己的命数。', chapter:12, collectionType:'event', collectionName:'天棋破局' },
+
+
+  { word:'inferior', phonetic:'/in\'fiəriə/', meaning:'a.下等的,下级的;劣等的,差的 n.下级,晚辈', contextMeaning:'劣等的', difficulty:2, example:'An inferior root marks her fate.', exampleTrans:'劣等的灵根注定她的命运。', storyContext:'测灵石判她 inferior 灵根，众人哄笑。', chapter:1 },
+  { word:'humiliate', phonetic:'/hju:\'milieit/', meaning:'v.使羞辱，使丢脸[同]disgrace', contextMeaning:'羞辱', difficulty:2, example:'They humiliate her before the crowd.', exampleTrans:'他们在众人前羞辱她。', storyContext:'执法长老一番话，将她当众 humiliate。', chapter:1 },
+  { word:'cultivate', phonetic:'/\'kʌltiveit/', meaning:'v.耕作,栽培,养殖;培养,教养,磨炼', contextMeaning:'修炼', difficulty:2, example:'She must cultivate the hidden root.', exampleTrans:'她须修炼这被封印的灵根。', storyContext:'残魂教她 cultivate 混沌灵根。', chapter:2 },
+  { word:'refine', phonetic:'/ri\'fain/', meaning:'v.精炼,精制,提纯;使文雅,使高尚', contextMeaning:'精炼', difficulty:2, example:'Refine the spiritual energy within.', exampleTrans:'精炼体内的灵气。', storyContext:'她于丹田 refine 一丝灵气。', chapter:2 },
+  { word:'unfold', phonetic:'/ˌʌn\'fəuld/', meaning:'vt.打开;显露;展示 vi.呈现;显示;展示', contextMeaning:'显露', difficulty:2, example:'A secret unfolds in the chamber.', exampleTrans:'密室中一段秘辛显露。', storyContext:'玉佩之中，往事缓缓 unfold。', chapter:2 },
+  { word:'tutor', phonetic:'/\'tju:tə/', meaning:'n.导师;家教 v.辅导;当导师;当家庭教师', contextMeaning:'导师', difficulty:2, example:'The ancient sword soul is her tutor.', exampleTrans:'上古剑仙是她的导师。', storyContext:'残魂甘为 tutor，授她心法。', chapter:2 },
+  { word:'wake', phonetic:'/weɪk/', meaning:'v.醒来,唤醒;使觉醒,激发,引起', contextMeaning:'觉醒', difficulty:2, example:'Her true power begins to wake.', exampleTrans:'她真正的力量开始觉醒。', storyContext:'混沌灵根一朝 wake，石破天惊。', chapter:2 },
+  { word:'arrogant', phonetic:'/\'ærəgənt/', meaning:'a.傲慢的，自大的', contextMeaning:'傲慢的', difficulty:2, example:'The arrogant prodigy sneers at her.', exampleTrans:'傲慢的天骄对她冷笑。', storyContext:'柳如烟 arrogant 相向，满口轻蔑。', chapter:3 },
+  { word:'defeat', phonetic:'/di\'fi:t/', meaning:'n.击败,战胜,失败 v.击败,战胜;使失败', contextMeaning:'击败', difficulty:2, example:'She will defeat her rival.', exampleTrans:'她要击败对手。', storyContext:'擂台之上，她一招 defeat 柳如烟。', chapter:3 },
+  { word:'challenge', phonetic:'/\'tʃælɪndʒ/', meaning:'n.挑战(书);艰巨任务,难题 v.向…挑战', contextMeaning:'挑战', difficulty:2, example:'He issues a public challenge.', exampleTrans:'他发出当众挑战。', storyContext:'柳家师兄递来 challenge，杀机毕露。', chapter:3 },
+  { word:'victory', phonetic:'/\'viktəri/', meaning:'n.胜利', contextMeaning:'胜利', difficulty:2, example:'This victory costs her dearly.', exampleTrans:'这场胜利代价惨重。', storyContext:'雪耻 victory 之后，杀机已至。', chapter:3 },
+  { word:'seal', phonetic:'/si:l/', meaning:'n.封铅,封条;印,图章;海豹 v.封,密封', contextMeaning:'封印', difficulty:3, example:'An ancient seal locks the cave.', exampleTrans:'古老的封印锁住洞府。', storyContext:'洞口被人以 seal 悄然封死。', chapter:4 },
+  { word:'menace', phonetic:'/\'menəs/', meaning:'vt./n.有危险性的人(或物)；威胁，威吓', contextMeaning:'威胁', difficulty:3, example:'A silent menace fills the dark.', exampleTrans:'无声的威胁弥漫洞中。', storyContext:'镇魂珠旁，潜藏致命 menace。', chapter:4 },
+  { word:'shield', phonetic:'/ʃi:ld/', meaning:'n.防护物,护罩;盾,盾状物 v.保护,防护', contextMeaning:'护盾', difficulty:3, example:'Her qi forms a thin shield.', exampleTrans:'她的灵气凝成薄盾。', storyContext:'危急时，灵气化 shield 护身。', chapter:4 },
+  { word:'guard', phonetic:'/gɑ:d/', meaning:'v./n.保卫，守卫，提防 n.哨兵，警卫，看守', contextMeaning:'守卫', difficulty:3, example:'Puppets guard the treasure.', exampleTrans:'傀儡守卫着宝物。', storyContext:'上古阵法 guard 着镇魂之宝。', chapter:4 },
+  { word:'shelter', phonetic:'/\'ʃeltə/', meaning:'n.掩蔽处;掩蔽,保护 v.掩蔽,躲避,庇护', contextMeaning:'庇护', difficulty:3, example:'The beast offers her shelter.', exampleTrans:'灵兽给她庇护。', storyContext:'雪团依偎，予她片刻 shelter。', chapter:4 },
+  { word:'perish', phonetic:'/\'periʃ/', meaning:'v.丧生;凋谢;毁灭,消亡', contextMeaning:'消亡', difficulty:3, example:'Many perish in the catastrophe.', exampleTrans:'浩劫中无数人消亡。', storyContext:'宗门获罪，同门纷纷 perish。', chapter:5 },
+  { word:'desperate', phonetic:'/\'despərət/', meaning:'a.不顾一切的，铤而走险的；绝望的，危急的', contextMeaning:'绝境的', difficulty:3, example:'A desperate fight for life.', exampleTrans:'为活命的绝境死战。', storyContext:'她陷 desperate 之境，背水一战。', chapter:5 },
+  { word:'critical', phonetic:'/\'kritikəl/', meaning:'a.批评的,评论的;危急,紧要的;临界的', contextMeaning:'危急的', difficulty:3, example:'The elder lies in critical state.', exampleTrans:'长老陷入危急之境。', storyContext:'长老重伤，命悬 critical 一线。', chapter:5 },
+  { word:'overcome', phonetic:'/ˌəuvə\'kʌm/', meaning:'v.战胜,克服', contextMeaning:'克服', difficulty:3, example:'She overcomes the tribulation.', exampleTrans:'她克服这场劫难。', storyContext:'生死道上，她终 overcome 桎梏。', chapter:5 },
+  { word:'cripple', phonetic:'/\'kripl/', meaning:'n.跛子,残疾人 v.使跛,使残疾', contextMeaning:'重创', difficulty:3, example:'The blast cripples the sect.', exampleTrans:'爆炸重创宗门。', storyContext:'雷火 cripple 青云宗根基。', chapter:5 },
+  { word:'agony', phonetic:'/\'ægəni/', meaning:'n.(精神或肉体的)极大痛苦，创伤', contextMeaning:'剧痛', difficulty:3, example:'He screams in agony.', exampleTrans:'他在剧痛中嘶吼。', storyContext:'长老重伤，陷于 agony 之中。', chapter:5 },
+  { word:'breach', phonetic:'/bri:tʃ/', meaning:'n.违反，不履行；破裂 vt.冲破，攻破', contextMeaning:'突破', difficulty:3, example:'A breach in the formation.', exampleTrans:'阵法出现突破。', storyContext:'灵气倒灌，于桎梏处 breach。', chapter:5 },
+  { word:'fatal', phonetic:'/\'feitl/', meaning:'a.致命的,毁灭性的', contextMeaning:'致命的', difficulty:3, example:'A fatal wound to the core.', exampleTrans:'命门的致命伤。', storyContext:'灵脉受 fatal 之创，危在旦夕。', chapter:5 },
+  { word:'severe', phonetic:'/si\'viə/', meaning:'a.严厉的;剧烈的,严重的,严峻的,艰难的', contextMeaning:'严重的', difficulty:3, example:'She bears a severe injury.', exampleTrans:'她身负重伤。', storyContext:'为护宗门，她受 severe 之伤。', chapter:5 },
+  { word:'struggle', phonetic:'/\'strʌgl/', meaning:'n./v.斗争,奋斗,努力', contextMeaning:'挣扎', difficulty:3, example:'A struggle against death.', exampleTrans:'与死亡的挣扎。', storyContext:'绝境中，她拼命 struggle 求生。', chapter:5 },
+  { word:'threshold', phonetic:'/\'θreʃhəuld/', meaning:'n.门槛;入门,开端', contextMeaning:'临界', difficulty:3, example:'At the threshold of life.', exampleTrans:'生死的临界。', storyContext:'她立 threshold 之上，悟生死道。', chapter:5 },
+  { word:'plunge', phonetic:'/plʌndʒ/', meaning:'v.(into)(使)投入,(使)插进,陷入;猛冲', contextMeaning:'坠入', difficulty:3, example:'She plunges into the abyss.', exampleTrans:'她坠入深渊。', storyContext:'为护长老，她纵身 plunge 险地。', chapter:5 },
+  { word:'twist', phonetic:'/twist/', meaning:'v.捻;拧;扭曲;蜿蜒曲折而行 n.拧;歪曲;曲折', contextMeaning:'转折', difficulty:3, example:'A cruel twist of fate.', exampleTrans:'命运的残酷转折。', storyContext:'岂料天命 twist，祸事陡生。', chapter:5 },
+  { word:'anguish', phonetic:'/\'æŋgwiʃ/', meaning:'n.(尤指心灵上的)极度痛苦，烦恼', contextMeaning:'痛苦', difficulty:3, example:'Her heart breaks in anguish.', exampleTrans:'她心碎于无尽痛苦。', storyContext:'宗门倾覆，她满心 anguish。', chapter:5 },
+  { word:'despair', phonetic:'/di\'spεə/', meaning:'n.绝望;失望;令人失望的人(事物)v.绝望', contextMeaning:'绝望', difficulty:3, example:'Despair claws at her soul.', exampleTrans:'绝望攫住她的神魂。', storyContext:'至暗时刻，despair 几将她吞没。', chapter:5 },
+  { word:'torment', phonetic:'/tɔ:\'ment/', meaning:'n.折磨；令人痛苦的东西(人)vt.折磨；纠缠', contextMeaning:'折磨', difficulty:3, example:'The poison torments her.', exampleTrans:'毒火折磨着她。', storyContext:'阴毒入体，日夜 torment 不休。', chapter:5 },
+  { word:'wound', phonetic:'/waund/', meaning:'n.创伤,伤口 v.伤,伤害', contextMeaning:'创伤', difficulty:3, example:'The old wound reopens.', exampleTrans:'旧创再度崩裂。', storyContext:'为救同门，旧 wound 又裂。', chapter:5 },
+  { word:'misery', phonetic:'/\'mizəri/', meaning:'n.痛苦,悲惨,不幸', contextMeaning:'悲惨', difficulty:3, example:'Misery shrouds the fallen sect.', exampleTrans:'惨状笼罩倾覆的宗门。', storyContext:'青云宗蒙受 misery，满目疮痍。', chapter:5 },
+  { word:'suffer', phonetic:'/\'sʌfə/', meaning:'v.(from)受痛苦,患病;受损失;遭受;忍受', contextMeaning:'受苦', difficulty:3, example:'They suffer for her crime.', exampleTrans:'他们因她获罪受苦。', storyContext:'宗门因她 suffer，长老重伤。', chapter:5 },
+  { word:'peak', phonetic:'/pi:k/', meaning:'n.山顶,最高点;峰,山峰 a.高峰的,最高的', contextMeaning:'巅峰', difficulty:3, example:'She stands at the peak.', exampleTrans:'她立于巅峰。', storyContext:'她扶摇直上，抵修行 peak。', chapter:6 },
+  { word:'rise', phonetic:'/raiz/', meaning:'v.升起;起立;上涨;起义 n.上涨,增高;起源', contextMeaning:'崛起', difficulty:3, example:'Her power begins to rise.', exampleTrans:'她的力量开始崛起。', storyContext:'弑神血脉苏醒，修为 rise。', chapter:6 },
+  { word:'glorious', phonetic:'/\'glɔ:riəs/', meaning:'a.壮丽的,辉煌的;光荣的', contextMeaning:'辉煌的', difficulty:3, example:'A glorious ascension.', exampleTrans:'辉煌的飞升。', storyContext:'九重雷劫后，glorious 加身。', chapter:6 },
+  { word:'storm', phonetic:'/stɔ:m/', meaning:'n.暴风雨,暴风雪;激动,爆发 v.猛攻,直捣', contextMeaning:'风暴', difficulty:3, example:'A storm of lightning.', exampleTrans:'雷劫的风暴。', storyContext:'九重雷劫如 storm 加身。', chapter:6 },
+  { word:'blaze', phonetic:'/bleiz/', meaning:'n.火焰;火光;闪光,光辉  v.燃烧,冒火焰', contextMeaning:'烈焰', difficulty:3, example:'The blaze purifies her.', exampleTrans:'烈焰淬炼她。', storyContext:'雷火 blaze 之中，她破而后立。', chapter:6 },
+  { word:'overwhelm', phonetic:'/ˌəuvə\'welm/', meaning:'v.淹没,覆没,压倒,制服,使不知所措', contextMeaning:'淹没', difficulty:3, example:'Power overwhelms her body.', exampleTrans:'力量淹没她的躯体。', storyContext:'血脉之力 overwhelm 周身经脉。', chapter:6 },
+  { word:'feat', phonetic:'/fi:t/', meaning:'n.功绩，伟业，技艺', contextMeaning:'伟业', difficulty:3, example:'An impossible feat.', exampleTrans:'不可能的伟业。', storyContext:'她成就飞升 feat，惊动上界。', chapter:6 },
+  { word:'majesty', phonetic:'/\'mædʒisti/', meaning:'n.雄伟,壮丽,庄严,威严;最高权威,王权', contextMeaning:'威严', difficulty:3, example:'The majesty of the heavens.', exampleTrans:'上界的威严。', storyContext:'雷劫之 majesty，令众生俯首。', chapter:6 },
+  { word:'roar', phonetic:'/rɔ:/', meaning:'n./v.吼叫,怒号;轰鸣,咆哮', contextMeaning:'咆哮', difficulty:3, example:'Thunder roars above.', exampleTrans:'雷霆在头顶咆哮。', storyContext:'九霄 roar，雷劫轰然落下。', chapter:6 },
+  { word:'elevate', phonetic:'/\'eliveit/', meaning:'vt.举起,提拔,振奋,提升...的职位', contextMeaning:'提升', difficulty:3, example:'The lightning elevates her.', exampleTrans:'雷劫提升她的境界。', storyContext:'雷火加身，elevate 她至新境。', chapter:6 },
+  { word:'climb', phonetic:'/klaim/', meaning:'v./n.攀登,爬', contextMeaning:'攀登', difficulty:3, example:'She climbs toward the sky.', exampleTrans:'她向天攀登。', storyContext:'她顺雷劫 climb，直上云霄。', chapter:6 },
+  { word:'mount', phonetic:'/maunt/', meaning:'v.登上;安装n.支架,底板;(用于山名前)山峰', contextMeaning:'登上', difficulty:3, example:'Mount the path of ascension.', exampleTrans:'踏上飞升之路。', storyContext:'她 mount 九重天，去意已决。', chapter:6 },
+  { word:'escalate', phonetic:'/\'eskəleit/', meaning:'v.(使)逐步增长(或发展)，(使)逐步升级', contextMeaning:'升级', difficulty:3, example:'The tribulation escalates.', exampleTrans:'劫难层层升级。', storyContext:'雷劫 escalate，一重猛过一重。', chapter:6 },
+  { word:'supreme', phonetic:'/sju\'pri:m/', meaning:'a.极度的,最重要的;至高的,最高的', contextMeaning:'至高的', difficulty:3, example:'Supreme power awakens.', exampleTrans:'至高的力量觉醒。', storyContext:'弑神血脉，乃 supreme 之力。', chapter:6 },
+  { word:'oath', phonetic:'/əuθ/', meaning:'n.誓言,誓约,诅咒', contextMeaning:'誓言', difficulty:3, example:'She swears a solemn oath.', exampleTrans:'她立下庄严誓言。', storyContext:'飞升前，她发下 oath 复仇。', chapter:6 },
+  { word:'fortune', phonetic:'/\'fɔ:tʃən/', meaning:'n.运气;命运;财产;财富', contextMeaning:'命运', difficulty:3, example:'Fortune favors the bold.', exampleTrans:'命运眷顾勇者。', storyContext:'她改写自身 fortune，逆天改命。', chapter:6 },
+  { word:'splendid', phonetic:'/\'splendid/', meaning:'a.壮丽的,辉煌的;极好的', contextMeaning:'壮丽的', difficulty:3, example:'A splendid vision.', exampleTrans:'壮丽的景象。', storyContext:'飞升之光，splendid 夺目。', chapter:6 },
+  { word:'steep', phonetic:'/sti:p/', meaning:'a.陡峭，险峻的；急剧升降的vt.浸泡,沉浸', contextMeaning:'陡峭的', difficulty:3, example:'A steep path to heaven.', exampleTrans:'通往天界的陡径。', storyContext:'飞升之路 steep，步步惊心。', chapter:6 },
+  { word:'heighten', phonetic:'/\'haitən/', meaning:'v.提高,升高', contextMeaning:'增强', difficulty:3, example:'Her senses heighten.', exampleTrans:'她的感知增强。', storyContext:'雷劫之中，灵觉 heighten 数倍。', chapter:6 },
+  { word:'promote', phonetic:'/prəu\'məut/', meaning:'v.促进,发扬;提升,提拔;增进,助长', contextMeaning:'擢升', difficulty:3, example:'The heavens promote her.', exampleTrans:'上界擢升她。', storyContext:'她因飞升 promote 为新尊。', chapter:6 },
+  { word:'zoom', phonetic:'/zu:m/', meaning:'vi.(飞机)陡升 n.陡升；嗡嗡声', contextMeaning:'疾升', difficulty:3, example:'Her soul zooms upward.', exampleTrans:'她的神魂疾升。', storyContext:'神魂 zoom 而起，直破天门。', chapter:6 },
+  { word:'exile', phonetic:'/\'egzail/', meaning:'n.流放；被流放者 vt.流放，放逐，把…充军', contextMeaning:'流放', difficulty:4, example:'They exile the traitor.', exampleTrans:'他们流放叛徒。', storyContext:'上界将她视作可 exile 之囚。', chapter:7 },
+  { word:'condemn', phonetic:'/kən\'dem/', meaning:'v.谴责,指责;判刑,宣告有罪', contextMeaning:'谴责', difficulty:4, example:'The decree condemns her.', exampleTrans:'敕令谴责她。', storyContext:'一道敕令 condemn 其弑神之罪。', chapter:7 },
+  { word:'reign', phonetic:'/rein/', meaning:'n./v.统治,支配,盛行 n.统治时期 v.占优势', contextMeaning:'统治', difficulty:4, example:'His reign is absolute.', exampleTrans:'他的统治绝对。', storyContext:'上界之主 reign 万界。', chapter:7 },
+  { word:'vessel', phonetic:'/\'vesəl/', meaning:'n.容器,器皿;船,舰;管,血管', contextMeaning:'容器', difficulty:4, example:'Her body is a vessel.', exampleTrans:'她的肉身是容器。', storyContext:'弑神者之魂，寻一 vessel 重归。', chapter:7 },
+  { word:'subject', phonetic:'/\'sʌbdʒikt/', meaning:'n.主题;学科 a.隶属的;易遭..的 v.使隶属', contextMeaning:'臣民', difficulty:4, example:'She is a lowly subject.', exampleTrans:'她是高高在上的臣民? 不，她是被俯视的 subject。', storyContext:'于上界，她不过一介 subject。', chapter:7 },
+  { word:'sovereign', phonetic:'/\'sɔvərin/', meaning:'a.独立的，有主权的 n.君主，国王，统治者', contextMeaning:'君主', difficulty:4, example:'The sovereign speaks.', exampleTrans:'君主开口。', storyContext:'上界 sovereign 点破她身份。', chapter:7 },
+  { word:'monarch', phonetic:'/\'mɔnək/', meaning:'n.帝王，君主，最高统治者', contextMeaning:'帝王', difficulty:4, example:'The ancient monarch.', exampleTrans:'上古的帝王。', storyContext:'上界 monarch 垂眸，威压如山。', chapter:7 },
+  { word:'dominate', phonetic:'/\'dɔmineit/', meaning:'v.支配,统治,控制;占优势', contextMeaning:'支配', difficulty:4, example:'Power dominates all.', exampleTrans:'力量支配一切。', storyContext:'上界以强 dominate 万灵。', chapter:7 },
+  { word:'govern', phonetic:'/\'gʌvən/', meaning:'v.统治,管理;决定,支配', contextMeaning:'统辖', difficulty:4, example:'Laws govern the realm.', exampleTrans:'律法统辖此界。', storyContext:'天条 govern 上界众生。', chapter:7 },
+  { word:'holy', phonetic:'/\'həuli/', meaning:'a.神圣的,圣洁的', contextMeaning:'神圣的', difficulty:4, example:'A holy decree.', exampleTrans:'神圣的敕令。', storyContext:'使者持 holy 之令而来。', chapter:7 },
+  { word:'sacred', phonetic:'/\'seikrid/', meaning:'a.神圣的;宗教的;庄严的', contextMeaning:'圣洁的', difficulty:4, example:'The sacred mountain.', exampleTrans:'圣洁的神山。', storyContext:'上界 sacred 之地，凡人禁入。', chapter:7 },
+  { word:'heaven', phonetic:'/\'hevən/', meaning:'n.天,天空,天堂;(Heaven)上帝,神', contextMeaning:'天界', difficulty:4, example:'Heaven is no paradise.', exampleTrans:'天界并非乐土。', storyContext:'她方知 heaven 亦藏杀机。', chapter:7 },
+  { word:'god', phonetic:'/gɔd/', meaning:'n.上帝(小写god泛指所有的“神，神像”)', contextMeaning:'神', difficulty:4, example:'A fallen god.', exampleTrans:'坠落的神。', storyContext:'弑神者，曾是与 god 比肩者。', chapter:7 },
+  { word:'ruler', phonetic:'/\'ru:lə/', meaning:'n.统治者,支配者;尺,直尺', contextMeaning:'统治者', difficulty:4, example:'The ruler of skies.', exampleTrans:'天界的统治者。', storyContext:'上界 ruler 俯瞰众生。', chapter:7 },
+  { word:'hierarchy', phonetic:'/\'haiəˌrɑ:ki/', meaning:'n.等级制度；统治集团，领导层', contextMeaning:'等级', difficulty:4, example:'A rigid hierarchy.', exampleTrans:'森严的等级。', storyContext:'上界 hierarchy 分明，位卑者如尘。', chapter:7 },
+  { word:'status', phonetic:'/\'steɪtəs/', meaning:'n.地位,身份;情形,状况', contextMeaning:'身份', difficulty:4, example:'Her status is exposed.', exampleTrans:'她的身份被揭。', storyContext:'敕令一道，点破她 status。', chapter:7 },
+  { word:'temple', phonetic:'/\'templ/', meaning:'n.庙宇,神殿,寺;太阳穴', contextMeaning:'神殿', difficulty:4, example:'The temple of judgment.', exampleTrans:'审判的神殿。', storyContext:'她被押入 heaven temple 受审。', chapter:7 },
+  { word:'spirit', phonetic:'/\'spirit/', meaning:'n.精神;志气;(pl.)情绪,心情;(pl.)酒精', contextMeaning:'灵', difficulty:4, example:'A bound spirit.', exampleTrans:'被缚的灵。', storyContext:'弑神之 spirit 在她体内苏醒。', chapter:7 },
+  { word:'ally', phonetic:'/\'ælaɪ/', meaning:'n.同盟者，同盟国，vt.使结盟；与…有关联', contextMeaning:'盟友', difficulty:4, example:'An ally arrives in time.', exampleTrans:'盟友及时赶到。', storyContext:'危难时，旧友成 ally。', chapter:8 },
+  { word:'rally', phonetic:'/\'ræli/', meaning:'v.重整,恢复,振作 n.聚集,集会,拉力赛', contextMeaning:'集结', difficulty:4, example:'Disciples rally to defend.', exampleTrans:'弟子集结防守。', storyContext:'幸存者 rally，共御外敌。', chapter:8 },
+  { word:'siege', phonetic:'/si:dʒ/', meaning:'n.包围，围攻，围困', contextMeaning:'围攻', difficulty:4, example:'A siege surrounds the sect.', exampleTrans:'围攻击宗门。', storyContext:'柳家引兵，siege 青云宗。', chapter:8 },
+  { word:'overthrow', phonetic:'/ˌəuvə\'θrəu/', meaning:'v./n.推翻,颠覆', contextMeaning:'颠覆', difficulty:4, example:'They plot to overthrow.', exampleTrans:'他们图谋颠覆。', storyContext:'柳家欲 overthrow 青云宗。', chapter:8 },
+  { word:'bleak', phonetic:'/bli:k/', meaning:'a.荒凉的;冷酷的;没有希望的', contextMeaning:'荒凉的', difficulty:4, example:'A bleak future.', exampleTrans:'荒凉的前途。', storyContext:'宗门将倾，前景 bleak。', chapter:8 },
+  { word:'remnant', phonetic:'/\'remnənt/', meaning:'n.剩余(物),零料,遗迹[风] a.剩余的,残留的', contextMeaning:'残部', difficulty:4, example:'The remnant holds on.', exampleTrans:'残部死守。', storyContext:'青云宗 remnant 退守后山。', chapter:8 },
+  { word:'kin', phonetic:'/kin/', meaning:'n.家族,亲属,血缘关系 a.亲属关系的,同类的', contextMeaning:'亲族', difficulty:4, example:'Her kin are in danger.', exampleTrans:'她的亲族危殆。', storyContext:'同门如 kin，休戚与共。', chapter:8 },
+  { word:'withstand', phonetic:'/wið\'stænd/', meaning:'vt.抵抗,经受住', contextMeaning:'抵挡', difficulty:4, example:'They withstand the assault.', exampleTrans:'他们抵挡攻势。', storyContext:'众弟子 withstand 雷火轰击。', chapter:8 },
+  { word:'salvation', phonetic:'/sæl\'veiʃən/', meaning:'n.拯救,救助;救济(者,品),救助工具;救世主', contextMeaning:'救赎', difficulty:4, example:'She is their salvation.', exampleTrans:'她是他们的救赎。', storyContext:'千里驰援，她成宗门 salvation。', chapter:8 },
+  { word:'save', phonetic:'/seɪv/', meaning:'v.救,拯救;储蓄,贮存;节省', contextMeaning:'拯救', difficulty:4, example:'Go save the sect.', exampleTrans:'去拯救宗门。', storyContext:'她转身 save 倾覆之青云。', chapter:8 },
+  { word:'resist', phonetic:'/ri\'zist/', meaning:'v.抵抗,反抗;抗,忍得住,抵制', contextMeaning:'抵抗', difficulty:4, example:'Resist the invaders.', exampleTrans:'抵抗来犯者。', storyContext:'弟子 resist，血染山门。', chapter:8 },
+  { word:'resistance', phonetic:'/ri\'zistəns/', meaning:'n.(to)抵抗,反抗;抵抗力,阻力;电阻', contextMeaning:'抵抗', difficulty:4, example:'The last resistance.', exampleTrans:'最后的抵抗。', storyContext:'后山残部，作最后 resistance。', chapter:8 },
+  { word:'solidarity', phonetic:'/ˌsɔli\'dæriti/', meaning:'n.团结；休戚相关', contextMeaning:'团结', difficulty:4, example:'Solidarity binds them.', exampleTrans:'团结将他们凝聚。', storyContext:'同门 solidarity，共赴死生。', chapter:8 },
+  { word:'unity', phonetic:'/\'ju:niti/', meaning:'n.团结;统一,一致,整体', contextMeaning:'一体', difficulty:4, example:'Unity is their strength.', exampleTrans:'一体是他们的力量。', storyContext:'宗门 unity，方敌外侮。', chapter:8 },
+  { word:'survival', phonetic:'/sə\'vaivəl/', meaning:'n.幸存,生存;幸存者,残存物', contextMeaning:'幸存', difficulty:4, example:'Survival is uncertain.', exampleTrans:'幸存未卜。', storyContext:'浩劫之后，survival 成奢望。', chapter:8 },
+  { word:'desolate', phonetic:'/\'desələt/', meaning:'a.荒凉的;孤独的 v.使荒芜', contextMeaning:'荒废的', difficulty:4, example:'A desolate hall.', exampleTrans:'荒废的大殿。', storyContext:'宗门 desolate，满目断壁。', chapter:8 },
+  { word:'ruthless', phonetic:'/\'ru:θlis/', meaning:'a.残酷的,无情的', contextMeaning:'无情的', difficulty:4, example:'A ruthless enemy.', exampleTrans:'无情的敌人。', storyContext:'柳家 ruthless，赶尽杀绝。', chapter:8 },
+  { word:'savage', phonetic:'/\'sævɪdʒ/', meaning:'a.野蛮的;凶恶,残暴的 n.野人,未开化的人', contextMeaning:'凶猛的', difficulty:4, example:'A savage beast.', exampleTrans:'凶猛的妖兽。', storyContext:'守护兽 savage 扑向来敌。', chapter:8 },
+  { word:'massacre', phonetic:'/\'mæsəkə/', meaning:'vt.残杀,集体屠杀 n.残杀,大屠杀', contextMeaning:'屠杀', difficulty:4, example:'They massacre the weak.', exampleTrans:'他们屠杀弱小。', storyContext:'来敌 massacre 山下凡民。', chapter:8 },
+  { word:'fierce', phonetic:'/fiəs/', meaning:'a.凶猛的,残忍的;狂热的,强烈的', contextMeaning:'猛烈的', difficulty:4, example:'A fierce battle.', exampleTrans:'猛烈的战事。', storyContext:'山门前，fierce 厮杀彻夜。', chapter:8 },
+  { word:'submit', phonetic:'/səb\'mɪt/', meaning:'v.(to)使服从,屈服;(to)呈送,提交', contextMeaning:'臣服', difficulty:4, example:'He submits to her.', exampleTrans:'他向她臣服。', storyContext:'上尊 submit 于她脚下。', chapter:9 },
+  { word:'concede', phonetic:'/kən\'si:d/', meaning:'vt.承认；容许；(比赛结束前)认输；退让', contextMeaning:'让步', difficulty:4, example:'The envoy concedes.', exampleTrans:'使者让步。', storyContext:'使者无奈 concede，跪地求饶。', chapter:9 },
+  { word:'subordinate', phonetic:'/sə\'bɔ:dinət/', meaning:'a.(to)次要的,从属的;下级的', contextMeaning:'下属', difficulty:4, example:'Once a subordinate.', exampleTrans:'曾是下属。', storyContext:'昔日 subordinate，今朝反主。', chapter:9 },
+  { word:'excel', phonetic:'/ik\'sel/', meaning:'vi.胜过其他;擅长 vt.胜过，优于', contextMeaning:'胜过', difficulty:4, example:'She excels them all.', exampleTrans:'她胜过众人。', storyContext:'弑神者之姿，excel 上界同辈。', chapter:9 },
+  { word:'adore', phonetic:'/ə\'dɔ:/', meaning:'vt.崇拜,敬慕,爱慕；非常喜欢', contextMeaning:'崇拜', difficulty:4, example:'They adore her power.', exampleTrans:'他们崇拜她的力量。', storyContext:'上界众生 adore 其威。', chapter:9 },
+  { word:'worship', phonetic:'/\'wə:ʃip/', meaning:'n.礼拜,礼拜仪式;崇拜 v.崇拜,敬仰;做礼拜', contextMeaning:'膜拜', difficulty:4, example:'Cults worship her.', exampleTrans:'教派膜拜她。', storyContext:'万灵 worship，奉她为新尊。', chapter:9 },
+  { word:'eminent', phonetic:'/\'eminənt/', meaning:'a.显赫的;杰出的;有名的;优良的', contextMeaning:'杰出的', difficulty:4, example:'An eminent being.', exampleTrans:'杰出的存在。', storyContext:'她已是 eminent 之上尊。', chapter:9 },
+  { word:'outstanding', phonetic:'/ˌaut\'stændiŋ/', meaning:'a.突出的,显著的,杰出的', contextMeaning:'卓越的', difficulty:4, example:'Outstanding talent.', exampleTrans:'卓越的天赋。', storyContext:'其资 outstanding，惊动上界。', chapter:9 },
+  { word:'excellent', phonetic:'/\'eksələnt/', meaning:'a.卓越的,极好的', contextMeaning:'极佳的', difficulty:4, example:'Excellent comprehension.', exampleTrans:'极佳的悟性。', storyContext:'她 excellent 的资质，世所罕见。', chapter:9 },
+  { word:'brilliant', phonetic:'/\'brɪliənt/', meaning:'a.光辉的,灿烂的;卓越的,有才华的', contextMeaning:'卓越的', difficulty:4, example:'A brilliant mind.', exampleTrans:'卓越的心智。', storyContext:'她 brilliant 的谋略，反客为主。', chapter:9 },
+  { word:'distinguish', phonetic:'/dis\'tiŋgwiʃ/', meaning:'v.(from)区别,辨别;辨认出;使杰出', contextMeaning:'杰出', difficulty:4, example:'Distinguish yourself.', exampleTrans:'崭露头角。', storyContext:'她以战功 distinguish 于众。', chapter:9 },
+  { word:'surpass', phonetic:'/sə\'pɑ:s/', meaning:'vt.超过,胜过', contextMeaning:'超越', difficulty:4, example:'Surpass the masters.', exampleTrans:'超越众尊。', storyContext:'她修为 surpass 昔日师长。', chapter:9 },
+  { word:'exceed', phonetic:'/ik\'si:d/', meaning:'v.超过,胜过;越出', contextMeaning:'超过', difficulty:4, example:'Exceed all limits.', exampleTrans:'超过一切极限。', storyContext:'她之强，exceed 上界预计。', chapter:9 },
+  { word:'persevere', phonetic:'/ˌpə:si\'viə/', meaning:'v.坚持,坚忍,不屈不挠', contextMeaning:'坚持', difficulty:4, example:'Persevere through trials.', exampleTrans:'坚持度过试炼。', storyContext:'她 persevere，终成大道。', chapter:9 },
+  { word:'persuasion', phonetic:'/pə\'sweiʒən/', meaning:'n.说服,说服力', contextMeaning:'说服', difficulty:4, example:'By persuasion alone.', exampleTrans:'仅凭说服。', storyContext:'她以 persuasion 收服上尊。', chapter:9 },
+  { word:'gift', phonetic:'/gift/', meaning:'n.礼品,赠品;天赋,才能', contextMeaning:'天赋', difficulty:4, example:'A rare gift.', exampleTrans:'罕见的天赋。', storyContext:'混沌灵根，乃天赐 gift。', chapter:9 },
+  { word:'asset', phonetic:'/\'æset/', meaning:'n.(pl.)资产,财产；有价值的物品；天赋', contextMeaning:'财富', difficulty:4, example:'Her greatest asset.', exampleTrans:'她最大的财富。', storyContext:'这具肉身，是弑神者 asset。', chapter:9 },
+  { word:'singular', phonetic:'/\'siŋgjulə/', meaning:'a.非凡的,卓越的;单数的', contextMeaning:'非凡的', difficulty:4, example:'A singular fate.', exampleTrans:'非凡的命运。', storyContext:'她有 singular 之命，逆天改命。', chapter:9 },
+  { word:'natural', phonetic:'/\'nætʃərəl/', meaning:'a.正常的;自然界的,天然的,天赋的,固有的', contextMeaning:'天生的', difficulty:4, example:'Natural aptitude.', exampleTrans:'天生的资质。', storyContext:'她 natural 的悟性，惊为天人。', chapter:9 },
+  { word:'prominent', phonetic:'/\'prɔminənt/', meaning:'a.突起的,凸出的;突出的,杰出的', contextMeaning:'显赫的', difficulty:4, example:'A prominent clan.', exampleTrans:'显赫的宗族。', storyContext:'柳家曾 prominent，今已倾颓。', chapter:9 },
+  { word:'void', phonetic:'/vɔid/', meaning:'a.空虚的;没有的;无效的', contextMeaning:'虚空', difficulty:5, example:'She enters the void.', exampleTrans:'她进入虚空。', storyContext:'参道至深处，入 void 之境。', chapter:10 },
+  { word:'revelation', phonetic:'/ˌrevə\'leiʃən/', meaning:'n.揭示,揭露,显示,启示,新发现,被揭露的事', contextMeaning:'启示', difficulty:5, example:'A sudden revelation.', exampleTrans:'突来的启示。', storyContext:'生死边缘，得 revelation。', chapter:10 },
+  { word:'inner', phonetic:'/\'inə/', meaning:'a.内部的,里面的;内心的', contextMeaning:'内在的', difficulty:5, example:'Her inner world.', exampleTrans:'她的内在之境。', storyContext:'她观 inner 虚空，明心见性。', chapter:10 },
+  { word:'meditation', phonetic:'/ˌmedɪ\'teɪʃn/', meaning:'n.熟虑;(尤指宗教的)默想,沉思;(pl.)冥想录', contextMeaning:'冥想', difficulty:5, example:'Deep meditation.', exampleTrans:'深度冥想。', storyContext:'她于 meditation 中证道。', chapter:10 },
+  { word:'silence', phonetic:'/\'sailəns/', meaning:'n.寂静,沉默 v.使沉默,使安静', contextMeaning:'寂静', difficulty:5, example:'Perfect silence.', exampleTrans:'至纯寂静。', storyContext:'试炼之境，silence 中闻道。', chapter:10 },
+  { word:'peaceful', phonetic:'/\'pi:sful/', meaning:'a.和平的,平静的,安宁的,爱好和平的', contextMeaning:'宁静的', difficulty:5, example:'A peaceful realm.', exampleTrans:'宁静之境。', storyContext:'她心 peaceful，乱而不惊。', chapter:10 },
+  { word:'still', phonetic:'/stil/', meaning:'a.静止的，寂静的 ad.仍然；更；安静地', contextMeaning:'静止', difficulty:5, example:'The still mind.', exampleTrans:'静止的心。', storyContext:'心 still 如水，方见大道。', chapter:10 },
+  { word:'empty', phonetic:'/\'empti/', meaning:'a.空的;空洞的 v.倒空,使成为空的', contextMeaning:'空的', difficulty:5, example:'An empty vessel.', exampleTrans:'空之容器。', storyContext:'灵台 empty，方能纳道。', chapter:10 },
+  { word:'blank', phonetic:'/blæŋk/', meaning:'a.空白的,空着的;失色的 n.空白;表格', contextMeaning:'空白', difficulty:5, example:'A blank slate.', exampleTrans:'空白之境。', storyContext:'神识 blank，杂念尽消。', chapter:10 },
+  { word:'ideal', phonetic:'/ai\'diəl/', meaning:'a.理想的;空想的;理想主义的;唯心的 n.理想', contextMeaning:'理想的', difficulty:5, example:'The ideal state.', exampleTrans:'理想的境界。', storyContext:'她抵 ideal 之境，超然物外。', chapter:10 },
+  { word:'imagination', phonetic:'/iˌmædʒi\'neiʃən/', meaning:'n.想象(力)；空想，幻觉；想象出来的事物', contextMeaning:'想象', difficulty:5, example:'Beyond imagination.', exampleTrans:'超乎想象。', storyContext:'其道 imagination 所不能及。', chapter:10 },
+  { word:'inward', phonetic:'/\'inwəd/', meaning:'ad.向内,在内 a.向内的,在内的,里面的', contextMeaning:'向内的', difficulty:5, example:'Turn inward.', exampleTrans:'转向内省。', storyContext:'她 inward 观照，参透生死。', chapter:10 },
+  { word:'internal', phonetic:'/in\'tə:nəl/', meaning:'a.内部的,内的;国内的,内政的', contextMeaning:'内在的', difficulty:5, example:'Internal vision.', exampleTrans:'内在之见。', storyContext:'她启 internal 之眼，洞悉万物。', chapter:10 },
+  { word:'within', phonetic:'/wi\'ðin/', meaning:'prep.在…里面,在…以内 ad.在内', contextMeaning:'在内', difficulty:5, example:'The truth within.', exampleTrans:'内在之真理。', storyContext:'大道 within，不假外求。', chapter:10 },
+  { word:'sober', phonetic:'/\'səubə(r)/', meaning:'a.清醒的;认真的,冷静的,适度的', contextMeaning:'清醒的', difficulty:5, example:'A sober clarity.', exampleTrans:'清醒的明澈。', storyContext:'她 sober 以对，不为幻惑。', chapter:10 },
+  { word:'comprehension', phonetic:'/ˌkɔmpri\'henʃən/', meaning:'a.理解(力),领悟；包含，包含力', contextMeaning:'领悟', difficulty:5, example:'Full comprehension.', exampleTrans:'全然领悟。', storyContext:'一试炼毕，comprehension 顿开。', chapter:10 },
+  { word:'attend', phonetic:'/ə\'tend/', meaning:'vt.出席，参加；照顾，护理 vi.注意；侍奉', contextMeaning:'专注', difficulty:5, example:'Attend to the breath.', exampleTrans:'专注于息。', storyContext:'她 attend 于灵息，入定忘我。', chapter:10 },
+  { word:'fantasy', phonetic:'/\'fæntəsi/', meaning:'n.幻想，空想；空想的产物，幻想作品', contextMeaning:'幻境', difficulty:5, example:'A tempting fantasy.', exampleTrans:'诱人之幻境。', storyContext:'试炼生 fantasy，扰她道心。', chapter:10 },
+  { word:'heart', phonetic:'/hɑ:t/', meaning:'n.心(脏)；内心，感情；热忱；中心，要点', contextMeaning:'本心', difficulty:5, example:'Follow the heart.', exampleTrans:'依循本心。', storyContext:'她守 heart 不乱，终证大道。', chapter:10 },
+  { word:'inherent', phonetic:'/in\'hiərənt/', meaning:'a.固有的,内在的,天生的', contextMeaning:'固有的', difficulty:5, example:'Inherent dao.', exampleTrans:'固有之道。', storyContext:'道为 inherent，本自具足。', chapter:10 },
+  { word:'doom', phonetic:'/du:m/', meaning:'n.厄运,劫数 v.注定,命定', contextMeaning:'厄运', difficulty:5, example:'Doom descends.', exampleTrans:'厄运降临。', storyContext:'九霄 doom 加身，避无可避。', chapter:11 },
+  { word:'bolt', phonetic:'/bəult/', meaning:'n.螺栓,(门,窗的)插销 v.闩(门),关窗,拴住', contextMeaning:'闪电', difficulty:5, example:'A bolt strikes.', exampleTrans:'一道闪电劈下。', storyContext:'天劫 bolt 落，山岳崩裂。', chapter:11 },
+  { word:'inevitable', phonetic:'/in\'evitəbl/', meaning:'a.不可避免的,必然发生的', contextMeaning:'不可避免的', difficulty:5, example:'The inevitable trial.', exampleTrans:'不可避免的考校。', storyContext:'上界天劫 inevitable，唯破之。', chapter:11 },
+  { word:'erupt', phonetic:'/i\'rʌpt/', meaning:'v.(尤指火山)爆发', contextMeaning:'爆发', difficulty:5, example:'Lightning erupts.', exampleTrans:'雷火爆发。', storyContext:'云中 erupt 千道雷光。', chapter:11 },
+  { word:'flame', phonetic:'/fleim/', meaning:'n.火焰,火苗;热情;光辉 v.发火焰,燃烧', contextMeaning:'火焰', difficulty:5, example:'Holy flame.', exampleTrans:'圣洁的火焰。', storyContext:'天火 flame 灼烧她的魂。', chapter:11 },
+  { word:'fire', phonetic:'/\'faiə/', meaning:'n.火；火灾，失火；炉火 vi.开火 vt.放(枪)', contextMeaning:'火', difficulty:5, example:'Purging fire.', exampleTrans:'淬炼之火。', storyContext:'她浴 fire 重生，更上层楼。', chapter:11 },
+  { word:'disastrous', phonetic:'/di\'zɑ:strəs/', meaning:'a.灾难性的', contextMeaning:'灾难性的', difficulty:5, example:'A disastrous omen.', exampleTrans:'灾难之兆。', storyContext:'雷劫 disastrous，宗门震恐。', chapter:11 },
+  { word:'tragedy', phonetic:'/\'trædʒidi/', meaning:'n.悲剧;惨事,灾难', contextMeaning:'悲剧', difficulty:5, example:'A celestial tragedy.', exampleTrans:'天界之悲剧。', storyContext:'弑神旧事，乃上界 tragedy。', chapter:11 },
+  { word:'punish', phonetic:'/\'pʌniʃ/', meaning:'v.惩罚,处罚', contextMeaning:'惩罚', difficulty:5, example:'Heaven punishes.', exampleTrans:'天界惩罚。', storyContext:'上界以雷劫 punish 逆者。', chapter:11 },
+  { word:'penalty', phonetic:'/\'penəlti/', meaning:'n.处罚,刑罚,惩罚,罚金', contextMeaning:'刑罚', difficulty:5, example:'The ultimate penalty.', exampleTrans:'终极刑罚。', storyContext:'天劫乃对逆者的 penalty。', chapter:11 },
+  { word:'judge', phonetic:'/dʒʌdʒ/', meaning:'n.法官;裁判员;鉴定人 vt.审判;评论,裁判', contextMeaning:'审判', difficulty:5, example:'The heavens judge.', exampleTrans:'天界审判。', storyContext:'上界 judge 她的弑神之罪。', chapter:11 },
+  { word:'judgement', phonetic:'/\'dʒʌdʒmənt/', meaning:'n.(judgment)审判,判决;判断(力);看法,意见', contextMeaning:'裁决', difficulty:5, example:'A final judgement.', exampleTrans:'最终的裁决。', storyContext:'雷劫即 judgement，定其去留。', chapter:11 },
+  { word:'justice', phonetic:'/\'dʒʌstis/', meaning:'n.公正,公平;审判,司法', contextMeaning:'天道', difficulty:5, example:'Rough justice.', exampleTrans:'粗略的天道。', storyContext:'上界 justice，强者为尊。', chapter:11 },
+  { word:'sanction', phonetic:'/\'sæŋˌkʃən/', meaning:'n./v.批准,同意,支持,认可 n.处罚,制裁', contextMeaning:'制裁', difficulty:5, example:'Divine sanction.', exampleTrans:'神之制裁。', storyContext:'天条 sanction，降于不驯者。', chapter:11 },
+  { word:'spark', phonetic:'/spɑ:k/', meaning:'n.火花,火星 v.发火花,发电花', contextMeaning:'火花', difficulty:5, example:'A single spark.', exampleTrans:'一星火花。', storyContext:'雷火 spark，点燃她血脉。', chapter:11 },
+  { word:'volcano', phonetic:'/vɔl\'keinəu/', meaning:'n.火山', contextMeaning:'火山', difficulty:5, example:'A sky volcano.', exampleTrans:'天火山。', storyContext:'云海如 volcano，喷薄雷浆。', chapter:11 },
+  { word:'torch', phonetic:'/tɔ:tʃ/', meaning:'n.手电筒;火炬,火把', contextMeaning:'火炬', difficulty:5, example:'A guiding torch.', exampleTrans:'指引的火炬。', storyContext:'她执道火 torch，照破长夜。', chapter:11 },
+  { word:'outbreak', phonetic:'/\'autbreik/', meaning:'n.(战争,愤怒,火灾等的)爆发,(疾病的)发作', contextMeaning:'爆发', difficulty:5, example:'The outbreak of thunder.', exampleTrans:'雷霆的爆发。', storyContext:'天劫 outbreak，举世皆惊。', chapter:11 },
+  { word:'instinct', phonetic:'/\'instiŋkt/', meaning:'n.本能,直觉,天性', contextMeaning:'本能', difficulty:5, example:'Survival instinct.', exampleTrans:'求生本能。', storyContext:'她凭 instinct，于雷火中穿梭。', chapter:11 },
+  { word:'nature', phonetic:'/\'neitʃə/', meaning:'n.自然界,大自然;性质,本性,天性', contextMeaning:'天道', difficulty:5, example:'The wrath of nature.', exampleTrans:'天道之怒。', storyContext:'上界 nature，不容悖逆。', chapter:11 },
+  { word:'misfortune', phonetic:'/mis\'fɔ:tʃən/', meaning:'n.不幸,灾祸,灾难', contextMeaning:'不幸', difficulty:5, example:'A stroke of misfortune.', exampleTrans:'一道不幸。', storyContext:'雷劫 misfortune，亦是机缘。', chapter:11 },
+  { word:'maneuver', phonetic:'/mə\'nu:və/', meaning:'n.(manoeuvre)机动;运用,操作; v.机动', contextMeaning:'运筹', difficulty:5, example:'A clever maneuver.', exampleTrans:'精妙的运筹。', storyContext:'她 maneuver 于棋局，步步为营。', chapter:12 },
+  { word:'plot', phonetic:'/plɔt/', meaning:'n.秘密计划;情节 v.标绘,绘制;密谋,策划', contextMeaning:'图谋', difficulty:5, example:'They plot against her.', exampleTrans:'他们图谋她。', storyContext:'上界 plot 将她制成棋子。', chapter:12 },
+  { word:'gamble', phonetic:'/\'gæmbl/', meaning:'n./v.投机,冒险;赌博', contextMeaning:'赌博', difficulty:5, example:'A desperate gamble.', exampleTrans:'孤注一掷的赌。', storyContext:'她以命 gamble，翻盘此局。', chapter:12 },
+  { word:'strategy', phonetic:'/\'strætidʒi/', meaning:'n.战略，策略；对策，政策', contextMeaning:'谋略', difficulty:5, example:'A grand strategy.', exampleTrans:'宏大的谋略。', storyContext:'她布 strategy，反制上界。', chapter:12 },
+  { word:'tactic', phonetic:'/\'tæktik/', meaning:'n.(tactics)策略,战术', contextMeaning:'战术', difficulty:5, example:'A hidden tactic.', exampleTrans:'隐秘的战术。', storyContext:'她藏 tactic，于终局亮出。', chapter:12 },
+  { word:'chess', phonetic:'/tʃes/', meaning:'n.棋，国际象棋', contextMeaning:'棋', difficulty:5, example:'A game of chess.', exampleTrans:'一局棋。', storyContext:'众生如 chess，任人摆布。', chapter:12 },
+  { word:'castle', phonetic:'/\'kɑ:sl/', meaning:'n.城堡；(国际象棋中的)车', contextMeaning:'城垒', difficulty:5, example:'The heavenly castle.', exampleTrans:'天界城垒。', storyContext:'云上 castle，锁尽棋子。', chapter:12 },
+  { word:'deceit', phonetic:'/di\'si:t/', meaning:'n.欺骗,欺骗行为', contextMeaning:'欺诈', difficulty:5, example:'Veiled deceit.', exampleTrans:'掩饰的欺诈。', storyContext:'上界以 deceit 控她命运。', chapter:12 },
+  { word:'fraud', phonetic:'/frɔ:d/', meaning:'n.欺诈，诈骗；欺骗(行为)；骗子；假货', contextMeaning:'骗局', difficulty:5, example:'A cosmic fraud.', exampleTrans:'宇宙骗局。', storyContext:'所谓天命，乃一场 fraud。', chapter:12 },
+  { word:'trick', phonetic:'/trik/', meaning:'n.诡计,骗局;恶作剧;窍门 vt.欺骗,哄骗', contextMeaning:'诡计', difficulty:5, example:'A cruel trick.', exampleTrans:'残忍的诡计。', storyContext:'上界 trick，将她玩弄股掌。', chapter:12 },
+  { word:'reverse', phonetic:'/ri\'və:s/', meaning:'n.相反;背面 a.相反的 v.颠倒,倒转', contextMeaning:'逆转', difficulty:5, example:'Reverse the game.', exampleTrans:'逆转棋局。', storyContext:'她要 reverse 这盘死局。', chapter:12 },
+  { word:'revolt', phonetic:'/ri\'vəult/', meaning:'v./n.反抗,起义', contextMeaning:'反叛', difficulty:5, example:'She will revolt.', exampleTrans:'她将反叛。', storyContext:'棋局终局，她 revolt 执棋。', chapter:12 },
+  { word:'reflect', phonetic:'/rɪ\'flekt/', meaning:'v.反射,反映,表现,反省,沉思', contextMeaning:'映照', difficulty:5, example:'Reflect the truth.', exampleTrans:'映照真相。', storyContext:'云镜 reflect 她被操控的命。', chapter:12 },
+  { word:'mirror', phonetic:'/\'mirə/', meaning:'n.镜子;反映,反射 v.反映,反射', contextMeaning:'镜', difficulty:5, example:'A sky mirror.', exampleTrans:'天镜。', storyContext:'天镜如 mirror，照见棋子真相。', chapter:12 },
+  { word:'paradox', phonetic:'/\'pærədɒks/', meaning:'n.似非而是的话,自相矛盾的话,反论', contextMeaning:'悖反', difficulty:5, example:'A cruel paradox.', exampleTrans:'残酷的悖反。', storyContext:'她既是棋又是棋手，paradox 难解。', chapter:12 },
+  { word:'contrary', phonetic:'/\'kɔntrəri/', meaning:'a.(to)相反的,矛盾的 n.反对,矛盾;相反', contextMeaning:'相反的', difficulty:5, example:'The contrary truth.', exampleTrans:'相反的真相。', storyContext:'contrary 之相：她本自由。', chapter:12 },
+  { word:'opponent', phonetic:'/ə\'pəunənt/', meaning:'n.对手,反对者,敌手 a.对立的,对抗的', contextMeaning:'对手', difficulty:5, example:'A worthy opponent.', exampleTrans:'可敬的对手。', storyContext:'上界为她唯一 opponent。', chapter:12 },
+  { word:'champion', phonetic:'/\'tʃæmpiən/', meaning:'n.冠军,得胜者;拥护者,斗士', contextMeaning:'胜者', difficulty:5, example:'The final champion.', exampleTrans:'终局胜者。', storyContext:'她要做棋局 champion。', chapter:12 },
+  { word:'manage', phonetic:'/\'mænɪdʒ/', meaning:'v.经营,管理,处理;设法,对付;操纵,运用', contextMeaning:'掌控', difficulty:5, example:'Manage the board.', exampleTrans:'掌控棋局。', storyContext:'她须 manage 全局，方破死局。', chapter:12 },
+  { word:'competent', phonetic:'/\'kɔmpitənt/', meaning:'a.有能力的，能胜任的；足够的', contextMeaning:'胜任的', difficulty:5, example:'A competent player.', exampleTrans:'胜任的棋手。', storyContext:'她已 competent，可执此棋。', chapter:12 },
 ];
 
 const STORY_SECTIONS = [
@@ -968,7 +1214,11 @@ const STORY_SECTIONS = [
 
 后山灵脉 gloomy，终年不见天日。深夜山风 cold 彻骨，她被发配到 damp 阴冷的柴房，每日走那条 narrow 的采药小径。同门的白眼让她承受巨大 pressure，她却只在 quiet 的夜里默念心法。
 
-那一夜，她在采药时失足跌入一处 hidden chamber。石缝中滚出一枚古朴玉佩，触手生温。曾几何时，她过着 wretched 的杂役生涯；如今这 feeble 的灵根，竟在玉佩旁微微发烫……`,
+那一夜，她在采药时失足跌入一处 hidden chamber。石缝中滚出一枚古朴玉佩，触手生温。曾几何时，她过着 wretched 的杂役生涯；如今这 feeble 的灵根，竟在玉佩旁微微发烫……
+
+杂役生涯 harsh 而漫长。她每日 servant 般汲水砍柴，remote 的后山是唯一的喘息。粮米 scarce，她常伴着 faint 的星光入眠。可她以 patience 隐忍，于 dim 的柴房中 glimpse 一线微光——那枚古玉，正于无人处 whisper 着古老的低语。纵处 poverty，她 modest 其志，不愿折了脊梁。
+
+测灵石既判她 inferior 灵根，柳家便处处 humiliate 于她：克扣灵米、指派最苦的活计，连外门弟子都敢对她颐指气使。她却把每一口冷饭、每一记鞭痕，都咽进了要强的骨血里。`,
   },
   {
     label:'第2篇', title:'残魂传道',
@@ -986,7 +1236,11 @@ const STORY_SECTIONS = [
 
 测灵大会当日，她故意引动一丝混沌之气。测灵石轰然亮起，异象 apparent！满座哗然。柳如烟脸色铁青，连她都暗自 admire 这"废柴"的坚韧。
 
-"根基尚不 adequate，需勤补。"长老沉吟。苏渺垂眸，ambitious 之志，早已直指飞升。`,
+"根基尚不 adequate，需勤补。"长老沉吟。苏渺垂眸，ambitious 之志，早已直指飞升。
+
+残魂 reveal 她身负的 latent 之秘，悉心 instruct 她吐纳之法。她 perceive 到灵脉深处蛰伏的 potential，ignite 沉寂的经脉，vigorous 如获新生。她 diligent 苦修，以 rigorous 心法 nurture 这被封印的灵根，于灵台 clarity 中 discern 前路。一念 resolve，她誓要 arouse 满座惊疑，将 conceal 多年的真相，从柳家手中悄悄夺回。
+
+残魂既为 tutor，便倾囊相授。她于月下 cultivate 混沌灵根，将一丝灵气温温 refine；玉佩之中，旧日真相缓缓 unfold。直到那一夜，沉寂的血脉终于 wake——她才知，自己从来不是废柴。`,
   },
   {
     label:'第3篇', title:'大比雪耻',
@@ -1002,7 +1256,11 @@ const STORY_SECTIONS = [
 
 "这场比试，有鬼。"苏渺 eloquent 陈词，当众揭穿柳如烟下毒之实。柳如烟面如死灰——那张 treacherous 的面具，终于碎了。
 
-可她不知道，这一胜，惊动了不该惊动的人。`,
+可她不知道，这一胜，惊动了不该惊动的人。
+
+柳如烟出于 spite，刻意 provoke 这场 spectacle，欲 stain 她的名节。苏渺挺身 oppose 不公，当众 accuse 其下毒之实，denounce 那卑劣的算计。长老迟迟不下的 verdict 藏着偏袒，她却 upright 而立，誓要 reclaim 被夺的清白。乱局之中，真理终将 prevail，而柳家终以 disgrace 收场。
+
+柳如烟素来 arrogant，料定这杂役翻不起浪。谁知擂台之上，苏渺一招便 defeat 了她，接下那记当众 challenge，赢得满堂 victory。台下死寂，台上的人，第一次低下了高傲的头。`,
   },
   {
     label:'第4篇', title:'幻月洞天',
@@ -1018,7 +1276,11 @@ const STORY_SECTIONS = [
 
 她在洞中 relentless 苦修，于 solitude 里参悟 obscure 的上古残卷，得 profound 之悟。机缘面前，她不再 hesitate，甘愿 endure 一切险阻。
 
-"愿青云宗 prosper 万年。"她握珠望向洞口，却忽觉灵气倒灌——有人 from outside 封死了出路。`,
+"愿青云宗 prosper 万年。"她握珠望向洞口，却忽觉灵气倒灌——有人 from outside 封死了出路。
+
+幻月深处镇着宗门 treasure，环环相扣的 formation 步步 hazard。守阵 patrol 的傀儡寸步不离，洞口 barrier 骤起将她困于 refuge。她以巧劲 penetrate 阵核，linger 在洞壁的残魂余音指引她 uncover 阵眼。镇魂珠之力 revive 几近枯竭的灵脉，那枚 doze 的灵兽蛋应声 hatch，伴生 beast 雪团自光芒中 emerge——幻月洞天，本就是雪团诞生之 cradle。她将性命 commit 于这一搏，破阵而出。
+
+破阵时她以灵气化 shield，挡下傀儡的偷袭；镇魂珠畔，一缕无形 menace 始终尾随。洞口被人以古阵 seal 死，守阵之物仍默默 guard 着宝物。雪团蜷来，予她片刻 shelter——幻月洞天，既是杀局，也是生门。`,
   },
   {
     label:'第5篇', title:'生死悟道',
@@ -1034,7 +1296,9 @@ const STORY_SECTIONS = [
 
 剑势 aggressive 而决绝，她于生死之间 accomplish 了突破。灵气如潮，冲破桎梏——可当她破封而出，只见宗门因她获罪，玄清子长老为护她重伤倒地。
 
-"这一局，我来改写。"她望向上界使者的方向，眼中再无 timid。`,
+"这一局，我来改写。"她望向上界使者的方向，眼中再无 timid。
+
+宗门因她获罪，同门纷纷 perish。长老重伤，命悬 critical 一线；为护宗门，她受 severe 之创，旧 wound 又裂。阴毒入体，日夜 torment 不休，她在 agony 与 anguish 中几陷 despair。可绝境之中，她偏要 struggle 求生——灵气于桎梏处 breach，她立 threshold 之上悟透生死，终 overcome 这致命 fatal 之劫。纵被 cripple、纵遭 twist 的命运，她也不肯 suffer 这无端 misery。她纵身 plunge 险地，于 desperate 之境，反将死局走成活路。`,
   },
   {
     label:'第6篇', title:'九重雷劫',
@@ -1050,7 +1314,9 @@ const STORY_SECTIONS = [
 
 "本真之道，岂在他人掌中。"她终悟 authentic 修行之本。
 
-雷劫散尽，她 ascend 飞升，化作流光直入上界。可云端之上，无数道目光正静静俯视——那里，才是一场更大棋局的开始。`,
+雷劫散尽，她 ascend 飞升，化作流光直入上界。可云端之上，无数道目光正静静俯视——那里，才是一场更大棋局的开始。
+
+九重雷劫如 storm 加身，在头顶 roar。她立于修行 peak，看修为节节 rise；雷火 blaze 之中，血脉之力 overwhelm 周身，却也将她 elevate 至新境。一重猛过一重，劫难层层 escalate，她顺雷劫 climb、直 mount 九重天。majesty 的天威之下，她发下 oath：必改自身 fortune。雷光 splendid 夺目，飞升之路 steep 而险，灵觉 heighten 数倍，修为被 promote 为新尊。神魂 zoom 而起，她成就这旷世 feat，以 supreme 之力，于 glorious 飞升中扶摇直上。`,
   },
 
   {
@@ -1069,7 +1335,9 @@ const STORY_SECTIONS = [
 
 使者大怒，rage 如潮压下。她却一剑 shatter 了敕令金印。那一刻，descent 觉醒——她是上古弑神者的最后血脉，forbid 之术加身，天庭亦不能辱。
 
-昔日受辱的杂役，今朝 glory 加身。她望向天庭方向：这一笔账，该算了。`,
+昔日受辱的杂役，今朝 glory 加身。她望向天庭方向：这一笔账，该算了。
+
+上界以 holy 敕令 condemn 她的弑神之罪，要将她 exile。可这里的 sovereign 与 monarch，不过仗势 dominate 万灵；ruler 们以天条 govern 众生，维持森严 hierarchy。于他们眼中，她不过一介 subject，status 卑贱如尘。她被押入 heaven 的 temple 受审，方知 god 亦有私心——那缚于她体内的 spirit，才是真正的威胁。她这具肉身，原是弑神者寻来的 vessel；sacred 之地不容凡人，却容得下阴谋。上位者开口点破她身份之时，她才看清：所谓 reign，不过是更强者的独占。`,
   },
   {
     label:'第8篇', title:'宗门浩劫',
@@ -1087,7 +1355,9 @@ const STORY_SECTIONS = [
 
 浩劫之后，唯她 survive，重整旗鼓。她以弑神之力 restore 护宗大阵，将青云宗，重新立回天地之间。
 
-这一日，苏渺不再是杂役，而是青云宗的脊梁。`,
+这一日，苏渺不再是杂役，而是青云宗的脊梁。
+
+柳家引兵 siege 青云宗，欲 overthrow 师门。来敌 ruthless，下山 massacre 凡民；守护兽 savage 扑迎，山门前 fierce 厮杀彻夜。宗门将倾，前景 bleak，大殿 desolate 断壁。可幸存的弟子 rally 一处，以 solidarity 与 unity 相系，视同门如 kin。他们 resist 来犯，作最后 resistance，withstand 雷火轰击。残部 remnant 退守后山，salvation 却在千里之外——她撕裂虚空归来，save 下倾覆之宗。浩劫之后，survival 成奢望，却也有人甘为 ally，共赴死生。`,
   },
   {
     label:'第9篇', title:'上尊拜师',
@@ -1105,7 +1375,9 @@ const STORY_SECTIONS = [
 
 她以言语 persuade 天庭退兵，免了下界一场兵燹。昔日的 rival 柳如烟，如今甘为她递剑的侍者，眼中再无嫉恨，只剩 grateful——她 grateful 苏渺当年留她一命，更 grateful 这份超越恩怨的格局。
 
-"柳如烟 deserve 一个了断，也 deserve 一片天地。"苏渺说。曾经的天之骄女，终于在她面前，弯下了从不肯弯的脊背——不是臣服，是信服。`,
+"柳如烟 deserve 一个了断，也 deserve 一片天地。"苏渺说。曾经的天之骄女，终于在她面前，弯下了从不肯弯的脊背——不是臣服，是信服。
+
+昔日 superior 的使者，今朝 submit 于她阶下，无奈 concede、跪地求饶。曾经的 subordinate，此刻反客为主。她之资 outstanding 而 excellent，brilliant 的谋略惊动上界；其 talent 如此 eminent，连诸方老怪也 adore、worship 其威。她修为 surpass 昔日师长，exceed 一切预计，以战功 distinguish 于众，更 excel 同辈天骄。然她 persevere，不以 persuasion 之外的手段压人。混沌灵根乃天赐 gift，亦是弑神者最大的 asset；她有 singular 之命、natural 的悟性，纵柳家曾 prominent，今亦倾颓——青云之主，唯她一人。`,
   },
   {
     label:'第10篇', title:'绝境顿悟',
@@ -1123,7 +1395,9 @@ const STORY_SECTIONS = [
 
 当她睁眼，试炼台已成废墟，而她的修为，暴涨三重。
 
-"原来所谓天劫，不过是用来 transcend 的阶梯。"她轻笑。天庭这才惊觉——他们养出的，是一头注定撕破苍穹的猛虎。`,
+"原来所谓天劫，不过是用来 transcend 的阶梯。"她轻笑。天庭这才惊觉——他们养出的，是一头注定撕破苍穹的猛虎。
+
+她于 meditation 中证道，入 void 之境。试炼之中，silence 里闻道，心 peaceful 不乱，still 如水。灵台 empty、神识 blank，方能纳道；她抵 ideal 之境，超然物外。fantasy 生而扰心，她却 sober 以对，不为所惑。她 inward 观照，启 internal 之眼，洞悉万物；大道 within，不假外求。一试炼毕，comprehension 顿开，得 revelation。她 attend 于灵息，守 heart 不乱，观 inner 虚空——原来道为 inherent，本自具足，非 imagination 所能限。`,
   },
   {
     label:'第11篇', title:'上界天劫',
@@ -1141,7 +1415,9 @@ thunder 自九霄滚落，lightning 如银蛇劈下，这是专门针对弑神�
 
 当最后一道雷光散尽，她 triumph 立于云巅。脚下，是跪伏的天庭；头顶，是再无桎梏的苍穹。
 
-这一战，她赢的不是一个境界，是万灵被压了万年的那口气。`,
+这一战，她赢的不是一个境界，是万灵被压了万年的那口气。
+
+九霄 doom 加身，避无可避；天劫 inevitable，唯破之。云中 erupt 千道雷光，bolt 落处山岳崩裂。天火 flame 灼魂，她浴 fire 重生。雷劫 disastrous，宗门震恐；弑神旧事，乃上界 tragedy。上界以雷劫 punish 逆者，降终极 penalty——雷劫即 judgement，定其去留。天庭 judge 她的弑神之罪，行粗略 justice，以天条 sanction 不驯。雷火 spark 点燃血脉，云海如 volcano 喷薄雷浆；她执道火 torch，照破长夜。雷霆 outbreak，举世皆惊，她凭 instinct 于雷火中穿梭。上界 nature 不容悖逆，这 misfortune，于她却是机缘。`,
   },
   {
     label:'第12篇', title:'云上棋局',
@@ -1160,6 +1436,8 @@ thunder 自九霄滚落，lightning 如银蛇劈下，这是专门针对弑神�
 从此，天地之间，再无注定。每个凡女，皆可 master 自己的命数。
 
 她转身，望向来路——那个曾在测灵石上低头的少女，早已不在。在的，是一个把天道踩在脚下、为众生重写规则的苏渺。
+
+上界以 deceit 控她命运，plot 将她制成棋子；所谓天命，不过一场 fraud。众生如 chess，任人摆布于云上 castle。她却看穿 trick，布下宏大的 strategy 与隐秘的 tactic，于棋局中 maneuver 步步为营。这是一场孤注一掷的 gamble——她以命 reverse 死局，终要 revolt 执棋。天镜如 mirror，reflect 她被操控的真相；contrary 之相里，她本自由。上界为她唯一 opponent，她要做终局 champion。待她 competent 掌控全局、manage 这盘棋，那残酷 paradox 便有了答案：执棋者，从来是她。
 
 【全文完】`,
   },
@@ -1452,7 +1730,7 @@ function renderFeatureGrid() {
   const items = [
     { icon:'📖', title:'剧情悟词', desc:'边读边记红词', act:"switchTab('read')" },
     { icon:'⚔️', title:'章节试炼', desc:'Boss 战中考词', act:`quizChapter(${state.currentChapter})` },
-    { icon:'🌌', title:'秘境探索', desc:'全词库随机奇遇', act:'openMystery()' },
+    { icon:'🌌', title:'秘境探索', desc:'仙途奇遇（本章词 + 全库仙缘）', act:`openMystery(${state.currentChapter})` },
     { icon:'🔮', title:'词灵阁', desc:'收服词灵领奖', act:'openLingHall()' },
     { icon:'🔄', title:'温养复习', desc: due > 0 ? `${due} 词待复习` : '按遗忘曲线', act:"switchTab('quiz')", badge: due > 0 ? due : 0 },
     { icon:'⭐', title:'生词本', desc:'收藏的生词', act:"goVocabFilter('bookmark')", badge: bookmarks > 0 ? bookmarks : 0 },
@@ -2169,10 +2447,17 @@ const EXPLORE_EVENTS = {
 };
 // 探索掉落奖励池（权重随机）
 const EXPLORE_REWARDS = [
-  { name:'天降机缘', flavor:'天道垂青，一缕灵光为你录入新的仙缘词汇。', apply() {
-    const un = window.VOCAB ? shuffleArray(window.VOCAB.filter(w => !state.learned.has(w.word))) : [];
-    const w = un[0];
-    if (w) { markLearned(w.word); return `新词收录：${w.word} ${w.phonetic||''}`; }
+  { name:'天降机缘', flavor:'天道垂青，一段仙途旧缘落入心海，为你录入新的词汇。', apply() {
+    let w;
+    // 约 40% 概率录入全库未学词（逐步覆盖 5000），其余录入章节剧情词
+    if (Math.random() < 0.4) {
+      w = broadPool(new Set(contextualPool().map(x => x.word)), 1)[0];
+    }
+    if (!w) {
+      const cand = contextualPool().filter(x => !state.learned.has(x.word));
+      w = cand[0] || contextualPool()[0];
+    }
+    if (w) { markLearned(w); const info = getWordInfo(w); return `新词收录：${w} ${info.phonetic||''}`; }
     return '仙缘已足，灵光散入金辉。';
   }},
   { name:'残卷馈赠', flavor:'尘封残卷中飞出一页藏录，落进你的袖中。', apply() {
@@ -2204,7 +2489,7 @@ function openExplore(sIdx) {
   if (!info) return;
   const correctRaw = info.contextMeaning || (info.def || '').split('；')[0];
   const correct = info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw;
-  const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== ev.word)).slice(0, 3).map(w => (w.def || '').split('；')[0]);
+  const distractors = shuffleArray(contextualPool().filter(w => w.word !== ev.word)).slice(0, 3).map(w => { const di = getWordInfo(w.word); return (di.def || '').split('；')[0]; });
   const options = shuffleArray([correct, ...distractors]);
   const labels = ['A','B','C','D'];
   const esc = s => String(s).replace(/'/g, "\\'");
@@ -2243,20 +2528,45 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
   }
 }
 
-// 随机秘境：全词库 × 场景模板，让每个词都可能成为一段剧情奇遇
-function openMystery() {
+// 语境词池（强关联主线：当前章节剧情词 + 已学待温养词；全库未学词由 broadPool 在奇遇/泛学里套仙途壳引入）
+function contextualPool(chapter) {
+  let pool = STORY_WORDS.filter(w => (!chapter || w.chapter === chapter) && !state.mastered.has(w.word));
+  if (!pool.length) pool = STORY_WORDS.filter(w => !state.mastered.has(w.word));
+  if (!pool.length) pool = STORY_WORDS.slice();
+  return pool;
+}
+// 全库泛学池：从 window.VOCAB 抽「完全未学」词（!learned && !mastered），套仙途壳引入，逐步覆盖全 5000 词
+function broadPool(exclude, n) {
+  const ex = (exclude instanceof Set) ? exclude : new Set(Array.isArray(exclude) ? exclude : (exclude ? [exclude] : []));
+  const V = window.VOCAB || [];
+  const fresh = V.filter(v => !state.learned.has(v.word) && !state.mastered.has(v.word) && !ex.has(v.word));
+  const src = fresh.length ? fresh : V.filter(v => !state.mastered.has(v.word) && !ex.has(v.word));
+  return shuffleArray(src).slice(0, n || 10).map(v => v.word);
+}
+// 随机秘境：当前章节剧情词 × 场景模板，并穿插全库未学词奇遇，让每个词都成为一段仙途机缘
+function openMystery(chapter) {
   trackUsage('mystery');
-  const pool = (window.VOCAB && window.VOCAB.length) ? window.VOCAB : STORY_WORDS;
-  const unmastered = pool.filter(v => !state.mastered.has(v.word));
-  const src = unmastered.length ? unmastered : pool;
-  const v = src[Math.floor(Math.random() * src.length)];
+  const pool = contextualPool(chapter);
+  let v;
+  // 约 35% 概率遇到全库未学词（套仙途场景模板），持续覆盖 5000 词；其余走章节剧情词强关联
+  if (Math.random() < 0.35) {
+    const bw = broadPool(new Set(pool.map(x => x.word)), 1)[0];
+    if (bw) v = { word: bw };
+  }
+  if (!v) {
+    const unmastered = pool.filter(x => !state.mastered.has(x.word));
+    const src = unmastered.length ? unmastered : pool;
+    v = src[Math.floor(Math.random() * src.length)];
+  }
   if (!v) return;
+  const info = getWordInfo(v.word);
   const sc = SCENE_TEMPLATES[Math.floor(Math.random() * SCENE_TEMPLATES.length)];
   const flavor = sc.pre.replace('{word}', v.word);
-  const correctRaw = (v.def || '').split('；')[0];
-  const posTag = extractPOS(v.def || '');
+  const correctRaw = (info.def || '').split('；')[0];
+  const posTag = info.pos;
   const correct = humanizePOS(posTag && !correctRaw.match(/^[a-zA-Z]+\./) ? `${posTag} ${correctRaw}` : correctRaw);
-  const distractors = shuffleArray(pool.filter(w => w.word !== v.word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
+  const distractorWords = pool.map(x => x.word).concat(broadPool(new Set([v.word]), 12)).filter(w => w !== v.word);
+  const distractors = shuffleArray(distractorWords).slice(0, 3).map(w => humanizePOS((getWordInfo(w).def || '').split('；')[0]));
   const options = shuffleArray([correct, ...distractors]);
   const labels = ['A', 'B', 'C', 'D'];
   const esc = s => String(s).replace(/'/g, "\\'");
@@ -2265,7 +2575,7 @@ function openMystery() {
   overlay.innerHTML = `<div class="em-card">
     <div class="em-flavor">🌌 ${flavor}</div>
     <div class="em-word">${v.word}</div>
-    ${v.phonetic ? `<div class="em-phonetic">${v.phonetic}</div>` : ''}
+    ${info.phonetic ? `<div class="em-phonetic">${info.phonetic}</div>` : ''}
     <div class="em-q">择其义，方得机缘：</div>
     <div class="em-opts">${options.map((o, i) => `<button onclick="handleMysteryAnswer(this,'${esc(o)}','${esc(correct)}','${esc(v.word)}')">${labels[i]}. ${o}</button>`).join('')}</div>
     <div class="em-reward"></div>
@@ -2336,7 +2646,7 @@ function renderStoryContent() {
       const info = getWordInfo(qWord);
       const correctRaw = info.contextMeaning || (info.def || '').split('；')[0];
       const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
-      const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== qWord)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
+      const distractors = shuffleArray(contextualPool(sIdx + 1).filter(w => w.word !== qWord)).slice(0, 3).map(w => { const di = getWordInfo(w.word); return humanizePOS((di.def || '').split('；')[0]); });
       const options = shuffleArray([correctMeaning, ...distractors]);
       const labels = ['A', 'B', 'C', 'D'];
       const esc = s => String(s).replace(/'/g, "\\'");
@@ -2362,7 +2672,7 @@ function renderStoryContent() {
   // 互动探索点：本章奇遇 + 随机秘境（全词库剧情化——每个词都可能成为机缘）
   const exploreBtns = [];
   if (EXPLORE_EVENTS[sIdx]) exploreBtns.push(`<button class="explore-btn" onclick="openExplore(${sIdx})">🔍 本章奇遇</button>`);
-  exploreBtns.push(`<button class="explore-btn" onclick="openMystery()">🌌 秘境探索</button>`);
+  exploreBtns.push(`<button class="explore-btn" onclick="openMystery(${section.chapter})">🌌 秘境探索</button>`);
   html += `<div style="text-align:center;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">${exploreBtns.join('')}</div>`;
   html += `</div>`;
   // 阅读页底部：本章学词进度条
@@ -2551,7 +2861,7 @@ function markRemembered(word) {
 document.getElementById('word-modal').addEventListener('click', function(e) { if (e.target === this) hideWordModal(); });
 (document.getElementById('char-modal') || {}).addEventListener && document.getElementById('char-modal').addEventListener('click', function(e) { if (e.target === this) closeCharModal(); });
 
-// ============================================================ QUIZ（覆盖全词库）
+// ============================================================ QUIZ（泛学覆盖全词库；章节测验走剧情词）
 let currentQuizWord = null;
 function showQuizMenu() {
   exitBattle();
@@ -2608,9 +2918,18 @@ function quickQuizWord(word, mode) {
   state.quizIsReview = false; state._chapterQuizCard = null;
   document.getElementById('quiz-total').textContent = '1'; showQuizQuestion();
 }
-function sampleQuizWords(n) {
-  const pool = (window.VOCAB && window.VOCAB.length) ? window.VOCAB : STORY_WORDS;
-  // 优先抽未掌握词，其次全部
+function sampleQuizWords(n, chapter) {
+  // 泛学模式（无 chapter，如「自由测验」）：覆盖全库未学词，逐步刷完 5000
+  if (!chapter) {
+    return broadPool(null, n);
+  }
+  let pool = contextualPool(chapter);
+  // 章节剧情词不足时，用「已学待温养词」补齐，保持语境关联
+  if (pool.length < n) {
+    const learned = [...state.learned].filter(w => !state.mastered.has(w)).map(w => ({ word: w }));
+    const extra = learned.filter(x => !pool.some(p => p.word === x.word));
+    pool = pool.concat(extra);
+  }
   const unmastered = pool.filter(v => !state.mastered.has(v.word));
   const src = unmastered.length >= n ? unmastered : pool;
   return shuffleArray(src).slice(0, n).map(v => v.word);
@@ -2638,7 +2957,10 @@ function showQuizQuestion() {
     const correctRaw = info.contextMeaning || info.def.split('；')[0];
     // 若剧情释义不含词性前缀，补上 info.pos 保持格式统一
     const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
-    const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
+    const dpoolWords = contextualPool(state.currentChapter).map(x => x.word)
+      .concat(broadPool(new Set([word]), 12))
+      .filter(w => w !== word);
+    const distractors = shuffleArray(dpoolWords).slice(0, 3).map(w => humanizePOS((getWordInfo(w).def || '').split('；')[0]));
     const options = shuffleArray([correctMeaning, ...distractors]);
     const labels = ['A','B','C','D'];
     area.innerHTML = `<div class="qq-type">试词 · 英择中义</div>${buildQuizContext(word)}<div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">选择正确的释义</div>`;
@@ -2759,7 +3081,7 @@ function startChapterBattle(chId) {
   let pool = chapterWords(chId).filter(w => { const i = getWordInfo(w); return i && i.def; });
   if (pool.length < 20) {
     const need = 20 - pool.length;
-    const extra = sampleQuizWords(need * 3).filter(w => !pool.includes(w));
+    const extra = sampleQuizWords(need * 3, chId).filter(w => !pool.includes(w));
     pool = pool.concat(extra.slice(0, need));
   }
   battlePool = shuffleArray(pool.slice(0, 20));
@@ -3234,7 +3556,7 @@ function startChallenge(chId, opp) {
   const pool = chapterWords(chId).filter(w => { const i = getWordInfo(w); return i && i.def; });
   if (pool.length < 10) {
     const need = 10 - pool.length;
-    const extra = sampleQuizWords(need * 3).filter(w => !pool.includes(w));
+    const extra = sampleQuizWords(need * 3, chId).filter(w => !pool.includes(w));
     pool.push(...extra.slice(0, need));
   }
   const questions = shuffleArray(pool).slice(0, 10);
@@ -3278,7 +3600,7 @@ function renderChallengeQuestion() {
   const optsArea = document.getElementById('quiz-options-area');
   const correctRaw = info.contextMeaning || info.def.split('；')[0];
   const correctMeaning = humanizePOS(info.pos && !correctRaw.match(/^[a-zA-Z]+\./) ? `${info.pos} ${correctRaw}` : correctRaw);
-  const distractors = shuffleArray(window.VOCAB.filter(w => w.word !== word)).slice(0, 3).map(w => humanizePOS((w.def || '').split('；')[0]));
+  const distractors = shuffleArray(contextualPool(challenge.chId).filter(w => w.word !== word)).slice(0, 3).map(w => { const di = getWordInfo(w.word); return humanizePOS((di.def || '').split('；')[0]); });
   const options = shuffleArray([correctMeaning, ...distractors]);
   const labels = ['A', 'B', 'C', 'D'];
   area.innerHTML = `<div class="qq-type">论道 · 第${challenge.chId}章切磋</div>${buildQuizContext(word)}<div class="qq-word">${word}<button class="qq-speaker" onclick="speakWord('${word}')">🔊</button></div>${info.phonetic || info.pos ? `<div class="qq-hint" style="font-size:12px">${info.phonetic || ''}${info.pos && info.phonetic ? '  ' : ''}${humanizePOS(info.pos) || ''}</div>` : ''}<div class="qq-hint">择其义，胜过道友！</div>`;
@@ -3555,7 +3877,7 @@ function openTutorial() {
       <div class="tg-head">—— 战斗试炼 ——</div>
       <div class="tg-row"><b>试炼</b>章节 Boss 战：双方各 100 血，答题即出招</div>
       <div class="tg-row"><b>连击</b>连对叠伤害倍率（最高 2.5 倍），连对 3 题放大招+回血，答错清零</div>
-      <div class="tg-row"><b>秘境探索</b>全词库随机奇遇，任何词都能刷出一段剧情</div>
+      <div class="tg-row"><b>秘境探索</b>仙途剧情奇遇：只刷你当前章节的剧情词，遇到生词即收录仙册</div>
       <div class="tg-head">—— 境界与收集 ——</div>
       <div class="tg-row"><b>境界</b>按已学词数晋升：凡人→练气→…→飞升共十二阶</div>
       <div class="tg-row"><b>词灵阁</b>每掌握一词收服一只词灵（修士/秘境/法宝/奇遇/功法）</div>
@@ -3621,6 +3943,15 @@ initBusuanzi();
 function maybeWarnWeChat() {
   try {
     if (!/MicroMessenger/i.test(navigator.userAgent)) return;
+    // ① 固定提示条（首页顶部，手动关闭才消失）
+    const home = document.getElementById('page-home');
+    if (home && !home.querySelector('.wechat-banner')) {
+      const bar = document.createElement('div');
+      bar.className = 'wechat-banner';
+      bar.innerHTML = `<div>⚠️ <b>微信内打开</b>：导出/导入存档可能失败。请点右上角 <b>「⋯」→「在浏览器打开」</b> 再使用。</div><button class="wb-close" onclick="this.parentElement.remove()">✕</button>`;
+      home.insertBefore(bar, home.firstChild);
+    }
+    // ② Toast 兜底（延长到 4 秒）
     showToast('⚠️ 微信内可能无法导出/导入存档：点右上角「⋯」→ 在浏览器打开');
   } catch (e) {}
 }

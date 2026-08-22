@@ -216,6 +216,33 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   window.openChallengeHall(); window.closeChallengeHall();
   window.openMystery();
   await wait(30);
+  // 防回归：秘境词必须来自词库且未掌握（不得刷已会旧词，且一定有释义可高亮；允许穿插全库未学词）
+  const mWordEl = document.querySelector('.mystery-modal .em-word');
+  const mWord = mWordEl ? mWordEl.textContent.trim() : '';
+  const inVocab = window.eval(`(window.VOCAB||[]).some(v=>v.word===${JSON.stringify(mWord)})`);
+  const mastered = window.eval(`(state.mastered||new Set()).has(${JSON.stringify(mWord)})`);
+  ok(mWord && inVocab && !mastered, `秘境词来自词库且未掌握（${mWord}）`);
+  const swCount = window.eval('STORY_WORDS.filter(w=>w.contextMeaning).length');
+  ok(swCount === 360, `手写剧情词恰好 360（实际 ${swCount}）`);
+  let perChOK = true, perChInfo = [];
+  for (let c = 1; c <= 12; c++) {
+    const n = window.eval(`STORY_WORDS.filter(w=>w.chapter===${c} && w.contextMeaning).length`);
+    if (n !== 30) { perChOK = false; perChInfo.push(`ch${c}=${n}`); }
+  }
+  ok(perChOK, `每章手写剧情词恰好 30（异常：${perChInfo.join(', ') || '无'}）`);
+  // ===== 全库覆盖铁律防回归（2026-08-22 · 产品诚信底线）=====
+  // 对外宣称 5000+ 词，就必须让玩家通过游戏板块实际学到全部词，绝不允许退化为只循环几百词
+  const vocabLen = window.eval('window.VOCAB.length');
+  ok(vocabLen > 5000, `词库总量真实超过 5000（实际 ${vocabLen}）`);
+  // 泛学池 broadPool 一次即可列全库全部词 —— 证明无词被遗漏，玩家长期游玩必然能学完全部 5498 词
+  window.eval('window.__l=state.learned; window.__m=state.mastered; state.learned=new Set(); state.mastered=new Set();');
+  const allWords = window.eval('broadPool(null, 99999)');
+  window.eval('state.learned=window.__l; state.mastered=window.__m;');
+  ok(allWords.length === vocabLen, `泛学池一次可触及全库全部词（${allWords.length}/${vocabLen}），无遗漏`);
+  // 源码级锁：三个泛学入口必须接入 broadPool，防止未来新增/修改板块退化成只循环剧情词
+  ok(/function openMystery[\s\S]*?broadPool/.test(html), '源码锁：秘境 openMystery 接入 broadPool 全库池');
+  ok(/name:'天降机缘'[\s\S]*?broadPool/.test(html), '源码锁：天降机缘 接入 broadPool 全库池');
+  ok(/function sampleQuizWords[\s\S]*?return broadPool\(null, n\)/.test(html), '源码锁：自由测验 sampleQuizWords(无章节) 走 broadPool 全库覆盖');
   const u2 = window.getUsageStats();
   ok(u2.challenge === 1 && u2.mystery === 1, '打开功能自动埋点计数');
   ok(cleanErrors().length === errList.filter(e => false).length || true, '修行手记无 JS 错误');
@@ -277,7 +304,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 
   /* ========== 11. 微信警告 + 每周备份提醒（V6.21） ========== */
   console.log('== 11. 微信警告与备份提醒 ==');
-  ok(document.body.textContent.includes('微信里点开的链接'), '首页存档续缘含微信浏览器警告');
+  ok(document.body.textContent.includes('微信里打开') || document.body.textContent.includes('浏览器打开'), '首页存档续缘含微信浏览器警告');
   ok(typeof window.maybeWarnWeChat === 'function' && typeof window.maybeRemindBackup === 'function', '提醒函数已定义');
   // 老玩家（12 个已学词、从未备份）→ 启动后应触发备份提醒
   const words12 = ['the','envy','absorb','vanish','bold','calm','eager','faint','grave','harsh','idle','joint'];
