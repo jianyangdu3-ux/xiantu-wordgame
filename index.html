@@ -420,7 +420,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .battle-scene { position: relative; min-height: 280px; border-radius: 14px; overflow: hidden; background-size: cover; background-position: center; margin-bottom: 12px; border: 1px solid rgba(212,175,55,.35); }
 .battle-scene::after { content:''; position:absolute; inset:0; background: linear-gradient(180deg, rgba(20,10,20,.3), rgba(10,10,25,.65)); }
 .bs-enemy { position: absolute; top: 14px; right: 14px; left: 14px; display: flex; flex-direction: column; align-items: center; z-index: 2; }
-.bs-enemy-sigil { width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle, rgba(255,90,90,.9), rgba(120,20,20,.4) 60%, rgba(0,0,0,0) 72%); box-shadow: 0 0 30px rgba(255,80,80,.5); animation: enemyFloat 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.bs-enemy-sigil { width: 92px; height: 92px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.12), rgba(0,0,0,0) 55%), radial-gradient(circle, var(--ec) 0%, rgba(0,0,0,.65) 70%); box-shadow: 0 0 0 3px rgba(255,255,255,.08), 0 0 0 6px var(--eg), 0 0 28px var(--eg); animation: enemyFloat 3s ease-in-out infinite; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.7), 0 0 16px var(--ec); letter-spacing: 2px; font-family: 'Noto Serif SC','STSong','SimSun',serif; }
 .bs-enemy-name { margin-top: 8px; font-size: 13px; font-weight: 700; color: #ffd9d9; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
 .bs-player { position: absolute; bottom: 14px; left: 14px; z-index: 2; display: flex; flex-direction: column; align-items: center; }
 .bs-player-avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; border: 2px solid var(--gold); box-shadow: 0 0 14px rgba(212,175,55,.5); }
@@ -3157,7 +3157,21 @@ function handleChoiceTrial(sIdx, word, selected, correct) {
 
 // ============================================================ 战斗化试炼（Boss 战）
 const CHAPTER_ENEMY = { 1:'测灵长老', 2:'残魂试炼', 3:'柳如烟', 4:'幻月阵灵', 5:'心魔幻象', 6:'九重雷劫', 7:'上界敕令', 8:'柳家靠山', 9:'上界使者', 10:'顿悟心障', 11:'九霄天劫', 12:'执棋之人' };
-const ENEMY_ICON = { 1:'🧓', 2:'👻', 3:'🌸', 4:'🌙', 5:'😈', 6:'⚡', 7:'📜', 8:'🐉', 9:'🛐', 10:'🔮', 11:'🌩️', 12:'♟️' };
+// 敌人法印：{char: 印文, color: 主色, glow: 光晕色}
+const ENEMY_ICON = {
+  1:{char:'测', color:'#c9a84c', glow:'rgba(201,168,76,.55)'},
+  2:{char:'魂', color:'#5dade2', glow:'rgba(93,173,226,.55)'},
+  3:{char:'烟', color:'#e8a0bf', glow:'rgba(232,160,191,.55)'},
+  4:{char:'月', color:'#d5dbdb', glow:'rgba(213,219,219,.55)'},
+  5:{char:'魔', color:'#9b59b6', glow:'rgba(155,89,182,.55)'},
+  6:{char:'雷', color:'#3498db', glow:'rgba(52,152,219,.55)'},
+  7:{char:'敕', color:'#e67e22', glow:'rgba(230,126,34,.55)'},
+  8:{char:'山', color:'#27ae60', glow:'rgba(39,174,96,.55)'},
+  9:{char:'使', color:'#ecf0f1', glow:'rgba(236,240,241,.45)'},
+  10:{char:'障', color:'#c0392b', glow:'rgba(192,57,43,.55)'},
+  11:{char:'劫', color:'#8e44ad', glow:'rgba(142,68,173,.55)'},
+  12:{char:'棋', color:'#2c3e50', glow:'rgba(44,62,80,.55)'},
+};
 let battle = null, battlePool = [];
 
 function exitBattle() {
@@ -3193,10 +3207,10 @@ function renderBattleHUD() {
   let hud = document.getElementById('battle-hud');
   if (!hud) { hud = document.createElement('div'); hud.id = 'battle-hud'; pa.insertBefore(hud, pa.firstChild); }
   const cover = CHAPTER_COVER[battle.chId] || 'assets/covers/ch01.png';
-  const icon = ENEMY_ICON[battle.chId] || '👹';
+  const iconCfg = ENEMY_ICON[battle.chId] || {char:'敌', color:'#c9a84c', glow:'rgba(201,168,76,.55)'};
   hud.innerHTML = `
     <div class="battle-scene" style="background-image:url('${cover}')">
-      <div class="bs-enemy"><div class="bs-enemy-sigil">${icon}</div><div class="bs-enemy-name">⚔ ${battle.enemyName}</div></div>
+      <div class="bs-enemy"><div class="bs-enemy-sigil" style="--ec:${iconCfg.color};--eg:${iconCfg.glow}">${iconCfg.char}</div><div class="bs-enemy-name">⚔ ${battle.enemyName}</div></div>
       <div class="bs-player"><div class="bs-player-avatar"><img src="assets/characters/sumiao.png" alt="苏渺" onerror="this.style.display='none'"></div><div class="bs-player-name">苏渺</div></div>
       <div id="bs-fx"></div>
     </div>
