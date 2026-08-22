@@ -230,6 +230,25 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     if (n !== 30) { perChOK = false; perChInfo.push(`ch${c}=${n}`); }
   }
   ok(perChOK, `每章手写剧情词恰好 30（异常：${perChInfo.join(', ') || '无'}）`);
+  // ===== 插叙词扩容防回归（2026-08-22 V6.34 · 每章 25→50）=====
+  let insOK = true, insInfo = [];
+  for (let c = 1; c <= 12; c++) {
+    const n = window.eval(`(STORY_INSERT[${c}]||[]).length`);
+    if (n !== 50) { insOK = false; insInfo.push(`ch${c}=${n}`); }
+  }
+  ok(insOK, `每章插叙词恰好 50（异常：${insInfo.join(', ') || '无'}）`);
+  const rtTotal = window.eval('STORY_WORDS.length');
+  ok(rtTotal === 868, `运行时剧情词总量 868（手写360+插叙508去重后，实际 ${rtTotal}）`);
+  // 各章词池：30 手写 + 插叙（老25条中约半数与手写重复被去重 + 新25条全部生效），落点 67-79
+  let poolOK = true, poolInfo = [];
+  for (let c = 1; c <= 12; c++) {
+    const n = window.eval(`chapterWords(${c}).length`);
+    if (n < 60 || n > 80) { poolOK = false; poolInfo.push(`ch${c}=${n}`); }
+  }
+  ok(poolOK, `每章词池 60-80（异常：${poolInfo.join(', ') || '无'}）`);
+  // 源码锁：解锁门槛封顶 35，防止扩词后章节节奏拖沓
+  ok(/return learned >= Math\.min\(Math\.ceil\(prev\.length \* 0\.6\), 35\);/.test(html), '源码锁：isChapterUnlocked 门槛封顶 35');
+  ok(/learned >= Math\.min\(Math\.ceil\(w\.length \* 0\.6\), 35\)/.test(html), '源码锁：advanceUnlock 门槛封顶 35');
   // ===== 全库覆盖铁律防回归（2026-08-22 · 产品诚信底线）=====
   // 对外宣称 5000+ 词，就必须让玩家通过游戏板块实际学到全部词，绝不允许退化为只循环几百词
   const vocabLen = window.eval('window.VOCAB.length');
