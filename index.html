@@ -396,7 +396,9 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .mystery-modal { z-index: 9999; }
 .em-card { background: #ffffff; border: 1px solid rgba(0,0,0,.08); border-radius: 16px; width: 100%; max-width: 360px; padding: 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,.45); text-align: center; }
 .em-flavor { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 14px; }
-.em-word { font-size: 26px; font-weight: 700; color: var(--red-deep); margin-bottom: 4px; }
+.em-word { font-size: 26px; font-weight: 700; color: var(--red-deep); margin-bottom: 4px; display:flex; align-items:center; justify-content:center; gap:8px; }
+.em-speak-btn { flex-shrink:0; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--gold); background:transparent; color:var(--gold); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.em-speak-btn:active { transform:scale(.9); background:rgba(212,175,55,.15); }
 .em-phonetic { font-size: 13px; color: var(--text-light); font-style: italic; margin-bottom: 14px; }
 .em-q { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
 .em-opts { display: flex; flex-direction: column; gap: 8px; }
@@ -2513,12 +2515,13 @@ function openExplore(sIdx) {
   overlay.className = 'mystery-modal';
   overlay.innerHTML = `<div class="em-card">
     <div class="em-flavor">🔍 ${ev.flavor}</div>
-    <div class="em-word">${info.word}</div>
+    <div class="em-word">${info.word}<button class="em-speak-btn" onclick="speakWord('${esc(info.word)}')">🔊</button></div>
     ${info.phonetic ? `<div class="em-phonetic">${info.phonetic}</div>` : ''}
     <div class="em-q">择其义，方得机缘：</div>
     <div class="em-opts">${options.map((o,i)=>`<button onclick="handleExploreAnswer(this,'${esc(o)}','${esc(correct)}',${sIdx})">${labels[i]}. ${o}</button>`).join('')}</div>
     <div class="em-reward"></div>
   </div>`;
+  speakWord(info.word);
   document.body.appendChild(overlay);
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
@@ -2590,12 +2593,13 @@ function openMystery(chapter) {
   overlay.className = 'mystery-modal';
   overlay.innerHTML = `<div class="em-card">
     <div class="em-flavor">🌌 ${flavor}</div>
-    <div class="em-word">${v.word}</div>
+    <div class="em-word">${v.word}<button class="em-speak-btn" onclick="speakWord('${esc(v.word)}')">🔊</button></div>
     ${info.phonetic ? `<div class="em-phonetic">${info.phonetic}</div>` : ''}
     <div class="em-q">择其义，方得机缘：</div>
     <div class="em-opts">${options.map((o, i) => `<button onclick="handleMysteryAnswer(this,'${esc(o)}','${esc(correct)}','${esc(v.word)}')">${labels[i]}. ${o}</button>`).join('')}</div>
     <div class="em-reward"></div>
   </div>`;
+  speakWord(v.word);
   document.body.appendChild(overlay);
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }

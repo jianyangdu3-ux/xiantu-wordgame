@@ -218,7 +218,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   await wait(30);
   // 防回归：秘境词必须来自词库且未掌握（不得刷已会旧词，且一定有释义可高亮；允许穿插全库未学词）
   const mWordEl = document.querySelector('.mystery-modal .em-word');
-  const mWord = mWordEl ? mWordEl.textContent.trim() : '';
+  const mWord = mWordEl ? mWordEl.textContent.replace(/🔊/g,'').trim() : '';
   const inVocab = window.eval(`(window.VOCAB||[]).some(v=>v.word===${JSON.stringify(mWord)})`);
   const mastered = window.eval(`(state.mastered||new Set()).has(${JSON.stringify(mWord)})`);
   ok(mWord && inVocab && !mastered, `秘境词来自词库且未掌握（${mWord}）`);
