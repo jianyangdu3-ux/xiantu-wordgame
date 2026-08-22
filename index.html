@@ -2096,15 +2096,18 @@ function matchCtxQuote(word, pos) {
 // 题干语境：真实例句 > 引用句架 > 秘境场景（保证全词库有语境呈现）
 function buildQuizContext(word) {
   const info = getWordInfo(word);
+  const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const mask = txt => txt ? txt.replace(new RegExp('\\b' + esc(word) + '\\b', 'gi'), '____') : txt;
   if (info.example) {
-    return `<div class="qq-ctx"><span class="ctx-line">"${info.example}"</span>${info.exampleTrans ? `<span class="ctx-trans">${info.exampleTrans}</span>` : ''}</div>`;
+    // 例句中目标词打码，中文翻译不显示——避免直接暴露答案
+    return `<div class="qq-ctx"><span class="ctx-line">"${mask(info.example)}"</span></div>`;
   }
   const quote = matchCtxQuote(word, info.pos);
   if (quote) {
-    return `<div class="qq-ctx"><span class="ctx-line">${quote}</span><span class="ctx-trans">—— 出自秘境残卷 · 择其词义</span></div>`;
+    return `<div class="qq-ctx"><span class="ctx-line">${mask(quote)}</span><span class="ctx-trans">—— 出自秘境残卷 · 择其词义</span></div>`;
   }
   const sc = SCENE_TEMPLATES[Math.floor(Math.random() * SCENE_TEMPLATES.length)];
-  return `<div class="qq-ctx"><span class="ctx-line">📍 ${sc.place} · ${sc.pre.replace('{word}', word)}</span></div>`;
+  return `<div class="qq-ctx"><span class="ctx-line">📍 ${sc.place} · ${mask(sc.pre.replace('{word}', word))}</span></div>`;
 }
 
 // ============================================================ V6.11 主线剧情扩词（12章 × 25词 = 300词）

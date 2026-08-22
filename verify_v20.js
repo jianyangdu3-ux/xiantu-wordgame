@@ -108,7 +108,7 @@ function parseArgs(expr) {
   ok(!!withEx, '词库中存在带例句的词（' + (withEx ? withEx.word : '无') + '）');
   if (withEx) {
     const ctx1 = window.buildQuizContext(withEx.word);
-    ok(ctx1.includes('qq-ctx') && ctx1.includes(window.getWordInfo(withEx.word).example), '有例句 → 真实例句语境（第一级）');
+    ok(ctx1.includes('qq-ctx') && ctx1.includes('____'), '有例句 → 真实例句语境（目标词已打码）');
   }
   const noEx = VOCAB.filter(v => !window.getWordInfo(v.word).example);
   ok(noEx.length > 100, '无例句词 ≥100（' + noEx.length + '，走句架/场景降级）');
