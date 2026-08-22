@@ -424,6 +424,61 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < ch1Need; i++) domNew.window.eval(`markLearned('${ch1Words[i]}')`);
   ok(domNew.window.eval('isChapterUnlocked(2)'), `新玩家学完第 1 章 ${ch1Need}/${ch1Words.length} 词 → 第 2 章解锁`);
 
+  /* ========== 每日目标达成奖励（V6.31） ========== */
+  console.log('\n== 每日目标达成奖励 ==');
+  const domGoal = makeDom('http://localhost/?goal=1', false);
+  await wait(400);
+  const wG = domGoal.window;
+  const today = wG.eval('todayStr()');
+  ok(wG.eval('Object.keys(state.goalRewardDates).length') === 0, '初始：未达标无奖励记录');
+  ok(wG.eval('state.goalStreak.count') === 0, '初始：连击达成计数为 0');
+  // 首页 UI 元素存在
+  ok(domGoal.window.document.getElementById('tc-goal-streak') !== null, '首页显示「连击达成」计数');
+  // 目标设 20，学 5 词 → 未达标不发奖
+  wG.eval('setDailyGoal(20)');
+  const gWords = wG.eval('STORY_WORDS.map(w => w.word)').slice(0, 20);
+  for (let i = 0; i < 5; i++) wG.eval(`markLearned('${gWords[i]}')`);
+  wG.eval('updateStats()');
+  ok(wG.eval('Object.keys(state.goalRewardDates).length') === 0, '学 5/20 词未达标 → 不发奖');
+  // 学满 20 → 达标发奖（每天只领一次）
+  for (let i = 5; i < 20; i++) wG.eval(`markLearned('${gWords[i]}')`);
+  wG.eval('updateStats()');
+  ok(wG.eval('state.goalRewardDates[todayStr()]') === true, '学满 20/20 → 达标发奖（记录当日已领）');
+  ok(wG.eval('state.goalStreak.count') === 1, '首次达成 → 连击计数=1');
+  const rewardCount = wG.eval('Object.keys(state.goalRewardDates).length');
+  ok(rewardCount === 1, `每日只领一次（奖励记录 ${rewardCount} 条）`);
+  // 再学 5 词 → 不重复领
+  const moreWords = wG.eval('STORY_WORDS.map(w => w.word)').slice(20, 25);
+  for (const w of moreWords) wG.eval(`markLearned('${w}')`);
+  wG.eval('updateStats()');
+  ok(wG.eval('Object.keys(state.goalRewardDates).length') === 1, '达标后再学词不重复领奖');
+  // UI 文案更新为已达成
+  ok(domGoal.window.document.getElementById('tc-goal-text').textContent.includes('已达成'), '首页文案显示「已达成 · 奖励已领」');
+  // 存档持久化
+  const savedGoal = JSON.parse(wG.localStorage.getItem('xt12_state_v2') || '{}');
+  ok(savedGoal.goalRewardDates && savedGoal.goalRewardDates[today] === true, '存档已写入 goalRewardDates');
+  ok(savedGoal.goalStreak && savedGoal.goalStreak.count === 1, '存档已写入 goalStreak');
+
+  // 连击 ≥3 日 → 额外顿悟一词：构造昨日已连击 2 日 + 昨日已领，今日达标 → count=3 + mastered 多 1
+  const domCombo = makeDom('http://localhost/?combo=1', false, w => {
+    const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); })();
+    w.localStorage.setItem('xt12_state_v2', JSON.stringify({
+      learned: [], mastered: [], collectedCards: [1,2,3], madeChoices: {}, choiceTrial: {},
+      reviewSchedule: {}, lingRewarded: {}, dailyGoal: 20,
+      goalStreak: { lastDate: yesterday, count: 2 },
+      goalRewardDates: { [yesterday]: true },
+      learnedDates: {}, streak: { lastDate: '', count: 0 }, sfxOn: true
+    }));
+  });
+  await wait(400);
+  const wC = domCombo.window;
+  const cWords = wC.eval('STORY_WORDS.map(w => w.word)').slice(0, 20);
+  for (const w of cWords) wC.eval(`markLearned('${w}')`);
+  const masteredBefore = wC.eval('state.mastered.size');
+  wC.eval('updateStats()');
+  ok(wC.eval('state.goalStreak.count') === 3, `昨日连击 2 → 今日达成 → 连击=3（实际 ${wC.eval('state.goalStreak.count')}）`);
+  ok(wC.eval('state.mastered.size') > masteredBefore, `连击≥3 日 → 额外顿悟一词（mastered ${masteredBefore}→${wC.eval('state.mastered.size')}）`);
+
   console.log(`\n===== 论道台专项验证: ${pass} 通过 / ${fail} 失败 =====`);
   process.exit(fail ? 1 : 0);
 })();

@@ -616,7 +616,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
     <span class="ge-arrow">›</span>
   </div>
   <div class="today-card">
-    <div class="tc-head"><span class="tc-streak">🔥 连续打卡 <b id="tc-streak">0</b> 天</span><span>☀️ 今日修行</span></div>
+    <div class="tc-head"><span class="tc-streak">🔥 连续打卡 <b id="tc-streak">0</b> 天 · 🎯 连击达成 <b id="tc-goal-streak">0</b> 日</span><span>☀️ 今日修行</span></div>
     <div class="tc-bar"><div class="tc-fill" id="tc-fill" style="width:0%"></div></div>
     <div class="tc-text"><span>今日新学 <b id="tc-done" style="color:var(--gold-dark)">0</b> 词</span><span id="tc-goal-text">目标 50 词</span></div>
     <div class="tc-goal-btns">
@@ -624,6 +624,7 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
       <button class="tc-goal-btn active" data-goal="50" onclick="setDailyGoal(50)">目标 50</button>
       <button class="tc-goal-btn" data-goal="100" onclick="setDailyGoal(100)">目标 100</button>
     </div>
+    <div style="font-size:11px;color:var(--text-secondary);margin-top:6px;text-align:center">达标即得机缘奖励（每日一次）· 连击 3 日起额外顿悟一词</div>
   </div>
   <div class="progress-overview palace-pattern">
     <div class="section-header" style="margin-bottom:12px"><h2>我的道行</h2></div>
@@ -1576,6 +1577,8 @@ let state = {
   reviewSchedule: {}, // { word: { level:int, nextDue:timestamp } }
   lingRewarded: {}, // { familyName: true } 词灵家族集齐奖励已领
   dailyGoal: 50,           // 每日目标（20/50/100）
+  goalStreak: { lastDate: '', count: 0 }, // 连续达成每日目标的记录（count 含今日）
+  goalRewardDates: {},     // { 'YYYY-MM-DD': true } 每日目标奖励领取记录（每天只领一次）
   learnedDates: {},        // { word: 'YYYY-MM-DD' } 每个词学会的日期
   streak: { lastDate: '', count: 0 }, // 连续打卡（count 含今日）
   bookmarks: new Set(),    // ⭐ 生词本
@@ -1604,6 +1607,33 @@ function recordWrong(word) {
 }
 function todayLearnedCount() { const t = todayStr(); return Object.values(state.learnedDates).filter(d => d === t).length; }
 function setDailyGoal(n) { state.dailyGoal = n; saveState(); updateStats(); }
+// 每日目标达成检测：当天首次达标 → 领机缘奖励（每天只领一次）；连续达成 3 天起额外顿悟一词
+function checkGoalReward() {
+  try {
+    const t = todayStr();
+    if (state.goalRewardDates[t]) return;      // 今日已领
+    if (todayLearnedCount() < state.dailyGoal) return; // 尚未达标
+    // 达标：更新连续达成计数（断签则重置为 1）
+    if (state.goalStreak.lastDate !== t) {
+      state.goalStreak.count = (state.goalStreak.lastDate === yesterdayStr()) ? (state.goalStreak.count || 0) + 1 : 1;
+      state.goalStreak.lastDate = t;
+    }
+    state.goalRewardDates[t] = true;
+    // 基础奖励：一份随机机缘（顿悟/藏录/灵石……与秘境探索同池）
+    const reward = rollExploreReward();
+    const msg = reward.apply();
+    let extra = '';
+    // 连击加成：连续达成 ≥3 天，额外顿悟一个已学未精通词
+    if ((state.goalStreak.count || 0) >= 3) {
+      const cand = shuffleArray([...state.learned].filter(w => !state.mastered.has(w)));
+      if (cand[0]) { state.mastered.add(cand[0]); extra = ` · 🔥 连击${state.goalStreak.count}日，额外顿悟「${cand[0]}」`; }
+    }
+    saveState();
+    showToast(`🎯 每日目标达成！${reward.name} · ${msg}${extra}`);
+    sfx('unlock');
+    try { screenFlash(); } catch(e) {}
+  } catch(e) {}
+}
 function toggleBookmark(word) {
   if (state.bookmarks.has(word)) { state.bookmarks.delete(word); showToast('已移出生词本'); }
   else { state.bookmarks.add(word); if (!state.reviewSchedule[word]) scheduleReview(word, 0); showToast('⭐ 已收入生词本，明日进入温养'); }
@@ -1623,6 +1653,8 @@ function loadState() {
       state.reviewSchedule = p.reviewSchedule || {};
       state.lingRewarded = p.lingRewarded || {};
       state.dailyGoal = (typeof p.dailyGoal === 'number') ? p.dailyGoal : 50;
+      state.goalStreak = p.goalStreak || { lastDate: '', count: 0 };
+      state.goalRewardDates = p.goalRewardDates || {};
       state.learnedDates = p.learnedDates || {};
       state.streak = p.streak || { lastDate: '', count: 0 };
       state.bookmarks = new Set(p.bookmarks || []);
@@ -1642,7 +1674,8 @@ function saveState() {
       collectedCards: [...state.collectedCards], madeChoices: state.madeChoices,
       choiceTrial: state.choiceTrial,
       reviewSchedule: state.reviewSchedule, sfxOn: sfxOn, lingRewarded: state.lingRewarded,
-      dailyGoal: state.dailyGoal, learnedDates: state.learnedDates,
+      dailyGoal: state.dailyGoal, goalStreak: state.goalStreak, goalRewardDates: state.goalRewardDates,
+      learnedDates: state.learnedDates,
       streak: state.streak, bookmarks: [...state.bookmarks], wrongWords: state.wrongWords,
       unlockedChapter: state.unlockedChapter,
     }));
@@ -1789,10 +1822,16 @@ function updateStats() {
   const tcDone = document.getElementById('tc-done');
   const tcFill = document.getElementById('tc-fill');
   const tcStreak = document.getElementById('tc-streak');
-  if (tcGoal) tcGoal.textContent = `目标 ${state.dailyGoal} 词`;
+  if (tcGoal) tcGoal.textContent = (state.goalRewardDates && state.goalRewardDates[todayStr()]) ? `✅ 已达成 · 奖励已领` : `目标 ${state.dailyGoal} 词`;
   if (tcDone) tcDone.textContent = todayDone;
   if (tcFill) { tcFill.style.width = Math.min(100, Math.round(todayDone / Math.max(1, state.dailyGoal) * 100)) + '%'; tcFill.classList.toggle('done', todayDone >= state.dailyGoal); }
   if (tcStreak) tcStreak.textContent = state.streak.count || 0;
+  const tcGoalStreak = document.getElementById('tc-goal-streak');
+  if (tcGoalStreak) tcGoalStreak.textContent = state.goalStreak.count || 0;
+  // 达标检测：当天首次达标自动发奖（每天只领一次），达成后进度条上方文案同步更新
+  checkGoalReward();
+  const tcGoal2 = document.getElementById('tc-goal-text');
+  if (tcGoal2 && state.goalRewardDates[todayStr()]) tcGoal2.textContent = `✅ 已达成 · 奖励已领`;
   document.querySelectorAll('.tc-goal-btn').forEach(b => b.classList.toggle('active', Number(b.dataset.goal) === state.dailyGoal));
   const learned = state.learned.size, mastered = state.mastered.size;
   const total = TOTAL || 5491;
@@ -3999,7 +4038,7 @@ function openTutorial() {
       <div class="tg-head">—— 境界与收集 ——</div>
       <div class="tg-row"><b>境界</b>按已学词数晋升：凡人→练气→…→飞升共十二阶</div>
       <div class="tg-row"><b>词灵阁</b>每掌握一词收服一只词灵（修士/秘境/法宝/奇遇/功法）</div>
-      <div class="tg-row"><b>今日修行</b>每日目标 20/50/100 词，连续打卡</div>
+      <div class="tg-row"><b>今日修行</b>每日目标 20/50/100 词，达标得机缘奖励，连击 3 日额外顿悟</div>
       <div class="tg-head">—— 切磋与数据 ——</div>
       <div class="tg-row"><b>论道台</b>生成挑战码与战绩卡，与道友同关比词力</div>
       <div class="tg-row"><b>挑战码</b>如 XT-C5-90-128-15-A23，胜负比正确率→用时→连击</div>
