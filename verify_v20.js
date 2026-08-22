@@ -156,9 +156,10 @@ function parseArgs(expr) {
   if (winBtn) window.handleMysteryAnswer(winBtn, m2Correct, m2Correct, m2Word);
   ok(!!m2Word && st().learned.has(m2Word), '秘境答对后收录仙册（' + m2Word + '）');
   ok(document.getElementById('ling-hall-modal') !== null, '答对后词灵阁弹窗 DOM 未被误删');
-  await wait(2300);
-  ok(document.querySelectorAll('.mystery-modal').length === 0, '秘境答对后弹窗自动关闭（不再残留）');
-  ok(document.getElementById('ling-hall-modal') !== null, '关闭动作不误删词灵阁弹窗');
+  const m2Cont = m2 ? m2.querySelector('.em-continue-btn') : null;
+  ok(m2Cont !== null, '秘境答对后出现"继续探索"按钮（多轮连答模式）');
+  ok(document.querySelectorAll('.mystery-modal').length > 0, '秘境答对后弹窗保留（等待继续探索）');
+  ok(document.getElementById('ling-hall-modal') !== null, '弹窗保留不误删词灵阁弹窗');
 
   /* ================= E. 探索区双按钮 + 老存档兼容 ================= */
   window.eval('state.currentSection = 0; state.currentChapter = 1;');

@@ -247,6 +247,32 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
   ok(u2.challenge === 1 && u2.mystery === 1, '打开功能自动埋点计数');
   ok(cleanErrors().length === errList.filter(e => false).length || true, '修行手记无 JS 错误');
 
+  // ===== 秘境多轮连答模式（2026-08-22） =====
+  document.querySelectorAll('.mystery-modal').forEach(o => o.remove());
+  window.openMystery();
+  await wait(30);
+  const progEl = document.querySelector('.mystery-modal .em-progress');
+  ok(progEl !== null && /\/\s*5/.test(progEl.textContent), '秘境弹窗含进度指示器（X/5）');
+  // 答对第一词 → 出现"继续探索"按钮（不自动关闭）
+  const em1 = document.querySelector('.mystery-modal');
+  const em1Btns = em1 ? [...em1.querySelectorAll('.em-opts button')] : [];
+  if (em1 && em1Btns.length) {
+    const a1 = em1Btns[0].getAttribute('onclick');
+    const m1 = a1.match(/'([^']*)','([^']*)','([^']*)'/);
+    const c1 = m1[2], w1 = m1[3];
+    const winBtn1 = em1Btns.find(b => b.textContent.includes(c1));
+    if (winBtn1) window.handleMysteryAnswer(winBtn1, c1, c1, w1);
+    const contBtn = em1.querySelector('.em-continue-btn');
+    ok(contBtn !== null, '答对第一词后出现"继续探索"按钮');
+    ok(em1.parentNode !== null, '答对后弹窗保留（不自动关闭）');
+    // 点继续 → 进入下一轮
+    window.nextMysteryRound();
+    await wait(20);
+    const prog2 = document.querySelector('.mystery-modal .em-progress');
+    ok(prog2 !== null && /2\s*\/\s*5/.test(prog2.textContent), '继续后进入第 2 词（进度变为 2/5）');
+  }
+  document.querySelectorAll('.mystery-modal').forEach(o => o.remove());
+
   /* ========== 9.5 修行指北（新手引导） ========== */
   console.log('== 9.5 修行指北 ==');
   const guideEntry = document.querySelector('.guide-entry');

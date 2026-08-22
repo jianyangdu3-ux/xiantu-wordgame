@@ -407,6 +407,14 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 .em-opts button.correct { background: #d6f0d6; border-color: #2e9e57; }
 .em-opts button.wrong { background: #f6d6d6; border-color: #c0392b; }
 .em-reward { margin-top: 12px; font-size: 12px; color: var(--gold-dark); }
+.em-progress { font-size: 12px; color: var(--text-light); margin-bottom: 10px; letter-spacing: 1px; }
+.em-continue-btn { margin-top: 10px; padding: 10px 24px; border-radius: 10px; border: 1.5px solid var(--gold); background: rgba(212,175,55,.12); color: var(--gold-dark); font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; }
+.em-continue-btn:active { transform: scale(.95); }
+.em-continue-btn:hover { background: rgba(212,175,55,.2); }
+.em-result-title { font-size: 20px; font-weight: 700; color: var(--red-deep); margin-bottom: 12px; }
+.em-result-stats { font-size: 16px; color: var(--text-primary); margin-bottom: 6px; }
+.em-result-stats b { font-size: 24px; color: var(--red-deep); }
+.em-result-msg { font-size: 14px; color: var(--gold-dark); margin-bottom: 16px; }
 
 /* ====== 战斗场景画面 ====== */
 .battle-scene { position: relative; min-height: 280px; border-radius: 14px; overflow: hidden; background-size: cover; background-position: center; margin-bottom: 12px; border: 1px solid rgba(212,175,55,.35); }
@@ -1748,7 +1756,7 @@ function renderFeatureGrid() {
   const items = [
     { icon:'📖', title:'剧情悟词', desc:'边读边记红词', act:"switchTab('read')" },
     { icon:'⚔️', title:'章节试炼', desc:'Boss 战中考词', act:`quizChapter(${state.currentChapter})` },
-    { icon:'🌌', title:'秘境探索', desc:'仙途奇遇（本章词 + 全库仙缘）', act:`openMystery(${state.currentChapter})` },
+    { icon:'🌌', title:'秘境探索', desc:'5词连答奇遇', act:`openMystery(${state.currentChapter})` },
     { icon:'🔮', title:'词灵阁', desc:'收服词灵领奖', act:'openLingHall()' },
     { icon:'🔄', title:'温养复习', desc: due > 0 ? `${due} 词待复习` : '按遗忘曲线', act:"switchTab('quiz')", badge: due > 0 ? due : 0 },
     { icon:'⭐', title:'生词本', desc:'收藏的生词', act:"goVocabFilter('bookmark')", badge: bookmarks > 0 ? bookmarks : 0 },
@@ -2536,14 +2544,13 @@ function handleExploreAnswer(btn, sel, correct, sIdx) {
     const rewardMsg = reward.apply();
     saveState(); updateStats(); renderStoryContent(); renderCollectionCards();
     const rw = ov ? ov.querySelector('.em-reward') : null;
-    if (rw) rw.innerHTML = `✨ 机缘已得 · 该词已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span>`;
+    if (rw) rw.innerHTML = `✨ 机缘已得 · 该词已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span><br><button class="em-continue-btn" onclick="this.closest('.mystery-modal').remove(); openMystery(${state.currentChapter});">继续探索秘境 →</button>`;
     sfx('unlock'); screenFlash();
     try { const r = btn.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, 14); } catch (e) {}
-    setTimeout(() => { if (ov && ov.parentNode) ov.remove(); }, 2200);
   } else {
     btn.classList.add('wrong');
     const rw = ov ? ov.querySelector('.em-reward') : null;
-    if (rw) rw.textContent = '✗ 似是而非，再斟酌一二';
+    if (rw) rw.innerHTML = `✗ 似是而非，再斟酌一二<br><button class="em-continue-btn" onclick="this.closest('.mystery-modal').remove(); openMystery(${state.currentChapter});">继续探索秘境 →</button>`;
   }
 }
 
@@ -2562,36 +2569,52 @@ function broadPool(exclude, n) {
   const src = fresh.length ? fresh : V.filter(v => !state.mastered.has(v.word) && !ex.has(v.word));
   return shuffleArray(src).slice(0, n || 10).map(v => v.word);
 }
-// 随机秘境：当前章节剧情词 × 场景模板，并穿插全库未学词奇遇，让每个词都成为一段仙途机缘
+// 随机秘境：多轮连答（5 词一轮），当前章节剧情词 × 场景模板，并穿插全库未学词奇遇
+let mysterySession = null;
 function openMystery(chapter) {
   trackUsage('mystery');
-  const pool = contextualPool(chapter);
-  let v;
-  // 约 35% 概率遇到全库未学词（套仙途场景模板），持续覆盖 5000 词；其余走章节剧情词强关联
-  if (Math.random() < 0.35) {
-    const bw = broadPool(new Set(pool.map(x => x.word)), 1)[0];
-    if (bw) v = { word: bw };
+  const words = [];
+  const used = new Set();
+  for (let i = 0; i < 5; i++) {
+    let v;
+    if (Math.random() < 0.35) {
+      const bw = broadPool(new Set([...used, ...contextualPool(chapter).map(x => x.word)]), 1)[0];
+      if (bw) v = { word: bw };
+    }
+    if (!v) {
+      const pool = contextualPool(chapter).filter(x => !used.has(x.word));
+      const unmastered = pool.filter(x => !state.mastered.has(x.word));
+      const src = unmastered.length ? unmastered : pool;
+      if (src.length) v = src[Math.floor(Math.random() * src.length)];
+    }
+    if (v) { words.push(v); used.add(v.word); }
   }
-  if (!v) {
-    const unmastered = pool.filter(x => !state.mastered.has(x.word));
-    const src = unmastered.length ? unmastered : pool;
-    v = src[Math.floor(Math.random() * src.length)];
-  }
-  if (!v) return;
+  if (!words.length) return;
+  mysterySession = { chapter, round: 0, total: words.length, correct: 0, words, overlay: null };
+  showMysteryRound();
+}
+function showMysteryRound() {
+  if (!mysterySession) return;
+  const idx = mysterySession.round;
+  if (idx >= mysterySession.total) { showMysteryResult(); return; }
+  const v = mysterySession.words[idx];
   const info = getWordInfo(v.word);
   const sc = SCENE_TEMPLATES[Math.floor(Math.random() * SCENE_TEMPLATES.length)];
   const flavor = sc.pre.replace('{word}', v.word);
   const correctRaw = (info.def || '').split('；')[0];
   const posTag = info.pos;
   const correct = humanizePOS(posTag && !correctRaw.match(/^[a-zA-Z]+\./) ? `${posTag} ${correctRaw}` : correctRaw);
-  const distractorWords = pool.map(x => x.word).concat(broadPool(new Set([v.word]), 12)).filter(w => w !== v.word);
+  const distractorWords = contextualPool().map(x => x.word).concat(broadPool(new Set([v.word]), 12)).filter(w => w !== v.word);
   const distractors = shuffleArray(distractorWords).slice(0, 3).map(w => humanizePOS((getWordInfo(w).def || '').split('；')[0]));
   const options = shuffleArray([correct, ...distractors]);
   const labels = ['A', 'B', 'C', 'D'];
   const esc = s => String(s).replace(/'/g, "\\'");
+  if (mysterySession.overlay) mysterySession.overlay.remove();
   const overlay = document.createElement('div');
   overlay.className = 'mystery-modal';
+  mysterySession.overlay = overlay;
   overlay.innerHTML = `<div class="em-card">
+    <div class="em-progress">🌌 秘境 · 第 ${idx + 1} / ${mysterySession.total} 词</div>
     <div class="em-flavor">🌌 ${flavor}</div>
     <div class="em-word">${v.word}<button class="em-speak-btn" onclick="speakWord('${esc(v.word)}')">🔊</button></div>
     ${info.phonetic ? `<div class="em-phonetic">${info.phonetic}</div>` : ''}
@@ -2601,28 +2624,52 @@ function openMystery(chapter) {
   </div>`;
   speakWord(v.word);
   document.body.appendChild(overlay);
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); mysterySession = null; } };
 }
 function handleMysteryAnswer(btn, sel, correct, word) {
   if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
   const ov = btn.closest('.mystery-modal');
+  const isLast = mysterySession && mysterySession.round >= mysterySession.total - 1;
   if (sel === correct) {
     btn.classList.add('correct');
     markLearned(word);
+    if (mysterySession) mysterySession.correct++;
     const reward = rollExploreReward();
     const rewardMsg = reward.apply();
     saveState(); updateStats();
     const rw = ov ? ov.querySelector('.em-reward') : null;
-    if (rw) rw.innerHTML = `✨ 机缘已得 · 「${word}」已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span>`;
+    if (rw) rw.innerHTML = `✨ 机缘已得 · 「${word}」已收录仙册<br><span class="em-reward-drop">🎁 ${reward.name} · ${rewardMsg}</span><br><button class="em-continue-btn" onclick="nextMysteryRound()">${isLast ? '查看探索总结 →' : '继续探索 →'}</button>`;
     sfx('unlock'); screenFlash();
     try { const r = btn.getBoundingClientRect(); spawnBurst(r.left + r.width / 2, r.top + r.height / 2, 14); } catch (e) {}
-    setTimeout(() => { if (ov && ov.parentNode) ov.remove(); }, 2200);
   } else {
     btn.classList.add('wrong');
     if (ov) ov.querySelectorAll('.em-opts button').forEach(b => { if (b.textContent.includes(correct)) b.classList.add('correct'); });
     const rw = ov ? ov.querySelector('.em-reward') : null;
-    if (rw) rw.textContent = `✗ 正解：${correct} —— 此词已入温养，改日再战`;
+    if (rw) rw.innerHTML = `✗ 正解：${correct} —— 此词已入温养，改日再战<br><button class="em-continue-btn" onclick="nextMysteryRound()">${isLast ? '查看探索总结 →' : '继续探索 →'}</button>`;
   }
+}
+function nextMysteryRound() {
+  if (!mysterySession) return;
+  mysterySession.round++;
+  showMysteryRound();
+}
+function showMysteryResult() {
+  if (!mysterySession) return;
+  const s = mysterySession;
+  if (s.overlay) s.overlay.remove();
+  mysterySession = null;
+  const overlay = document.createElement('div');
+  overlay.className = 'mystery-modal';
+  const msg = s.correct === s.total ? '✨ 完美通关，秘境尽收！' : s.correct >= Math.ceil(s.total * 0.6) ? '👍 小有收获，不虚此行' : '💪 虽有波折，继续修行';
+  overlay.innerHTML = `<div class="em-card">
+    <div class="em-result-title">🌌 秘境探索完毕</div>
+    <div class="em-result-stats">答对 <b>${s.correct}</b> / ${s.total} 词</div>
+    <div class="em-result-msg">${msg}</div>
+    <button class="em-continue-btn" onclick="this.closest('.mystery-modal').remove();">返回</button>
+    <button class="em-continue-btn" style="margin-left:8px" onclick="this.closest('.mystery-modal').remove(); openMystery(${s.chapter});">再探一次</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
 
 function renderStoryContent() {
@@ -3891,7 +3938,7 @@ function openTutorial() {
   <div class="tc-step" data-step="3">
     <div class="tc-step-num">4</div>
     <div class="tc-step-title">🌌 秘境探索</div>
-    <div class="tc-step-desc">阅读页底部点「<b>🌌 秘境探索</b>」——任意词都会化作一段微型奇遇：试炼塔、灵泉、上古洞府……答对收录仙册，解锁专属机缘。</div>
+    <div class="tc-step-desc">阅读页底部点「<b>🌌 秘境探索</b>」——每次进入连续 5 词奇遇：试炼塔、灵泉、上古洞府……答对收录仙册并解锁机缘，答完有总结。</div>
     <div class="tc-step-img">🌌🗺️💫</div>
     <div class="tc-step-tip">💡 词库多大奇遇就有多少种，刷到的场景次次不重样！</div>
   </div>
@@ -3925,7 +3972,7 @@ function openTutorial() {
       <div class="tg-head">—— 战斗试炼 ——</div>
       <div class="tg-row"><b>试炼</b>章节 Boss 战：双方各 100 血，答题即出招</div>
       <div class="tg-row"><b>连击</b>连对叠伤害倍率（最高 2.5 倍），连对 3 题放大招+回血，答错清零</div>
-      <div class="tg-row"><b>秘境探索</b>仙途剧情奇遇：只刷你当前章节的剧情词，遇到生词即收录仙册</div>
+      <div class="tg-row"><b>秘境探索</b>每次 5 词连答奇遇：本章剧情词 + 全库仙缘混搭，答对收录仙册</div>
       <div class="tg-head">—— 境界与收集 ——</div>
       <div class="tg-row"><b>境界</b>按已学词数晋升：凡人→练气→…→飞升共十二阶</div>
       <div class="tg-row"><b>词灵阁</b>每掌握一词收服一只词灵（修士/秘境/法宝/奇遇/功法）</div>

@@ -110,7 +110,7 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
     ok(!st().learned.has(w), '秘境答错不入已学');
     ok([...em.querySelectorAll('.em-opts button')].some(b => b.classList.contains('correct')), '答错揭示正确项');
     ok($('ling-hall-modal') !== null, '词灵阁弹窗未被误删');
-    // 答对：收录仙册 + 弹窗自动关闭 + 词灵阁仍在
+    // 答对：收录仙册 + 弹窗保留（多轮连答模式）+ 出现"继续探索"按钮 + 词灵阁仍在
     document.querySelectorAll('.mystery-modal').forEach(o => o.remove());
     window.openMystery();
     const em2 = document.querySelector('.mystery-modal');
@@ -123,9 +123,10 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
       window.handleMysteryAnswer(winBtn, c2, c2, w2);
       ok(st().learned.has(w2), '秘境答对收录仙册');
       ok($('ling-hall-modal') !== null, '答对后词灵阁未被误删');
-      await wait(2300);
-      ok(document.querySelectorAll('.mystery-modal').length === 0, '答对后秘境弹窗自动关闭');
-      ok($('ling-hall-modal') !== null, '自动关闭不误删词灵阁');
+      const contBtn = em2.querySelector('.em-continue-btn');
+      ok(contBtn !== null, '答对后出现"继续探索"按钮（多轮连答模式）');
+      ok(em2.parentNode !== null, '答对后弹窗保留（等待用户继续探索）');
+      ok($('ling-hall-modal') !== null, '弹窗保留不误删词灵阁');
     }
   }
   ok(jsErrors.filter(e => !String(e).includes('HTMLMediaElement')).length === errBefore, '秘境流程无新增 JS 错误');
