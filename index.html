@@ -449,10 +449,11 @@ body { font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft
 @keyframes bhShake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
 /* 道之试炼（抉择前考词） */
-.choice-trial { margin-top: 14px; padding: 14px; background: rgba(40,30,20,.35); border: 1px solid rgba(212,175,107,.3); border-radius: 14px; }
+.choice-trial { margin-top: 14px; padding: 14px; background: rgba(40,30,20,.78); border: 1px solid rgba(212,175,107,.3); border-radius: 14px; }
 .choice-glow { animation: choiceGlow 1.8s ease; }
 @keyframes choiceGlow { 0%,100% { box-shadow: 0 0 0 rgba(212,175,107,0); } 25% { box-shadow: 0 0 26px 6px rgba(212,175,107,.7); } 60% { box-shadow: 0 0 12px 2px rgba(212,175,107,.4); } }
-.trial-word { font-size: 22px; font-weight: 800; color: #fff5e0; text-align: center; margin: 6px 0; }
+.trial-word { font-size: 22px; font-weight: 800; color: #fff5e0; text-align: center; margin: 6px 0; display: flex; align-items: center; justify-content: center; gap: 8px; text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+.trial-word .em-speak-btn { width: 32px; height: 32px; font-size: 14px; }
 .trial-q { text-align: center; font-size: 13px; color: #e9d7ad; margin: 8px 0 10px; }
 .trial-opt { margin-bottom: 8px; }
 
@@ -2723,8 +2724,8 @@ function renderStoryContent() {
       html += `<div class="choice-trial">
         <div class="cb-title">✦ 道之试炼 ✦</div>
         <div class="cb-sub">择此分支前，须先明本章一词真义</div>
-        <div class="trial-word">${qWord}</div>
-        ${info.phonetic ? `<div class="qq-hint" style="font-size:12px;text-align:center">${info.phonetic}</div>` : ''}
+        <div class="trial-word">${qWord}<button class="em-speak-btn" onclick="speakWord('${esc(qWord)}')">🔊</button></div>
+        ${info.phonetic ? `<div class="qq-hint" style="font-size:12px;text-align:center;color:#fff5e0;text-shadow:0 1px 3px rgba(0,0,0,.5)">${info.phonetic}</div>` : ''}
         <div class="trial-q">请择其义：</div>
         ${options.map((opt, i) => `<button class="q-option trial-opt" onclick="handleChoiceTrial(${sIdx}, '${esc(qWord)}', '${esc(opt)}', '${esc(correctMeaning)}')"><span class="opt-label">${labels[i]}</span><span>${renderMeaning(opt)}</span></button>`).join('')}
       </div>`;
@@ -2755,6 +2756,11 @@ function renderStoryContent() {
   const canUnlockNext = learnedInCh >= needForUnlock;
   html += `<div class="reader-footer"><div class="rf-title"><span>📖 本章修习进度</span><span style="font-size:11px">${canUnlockNext ? '✅ 已达解锁条件' : '🔒 还需 ' + (needForUnlock - learnedInCh) + ' 词'}</span></div><div class="rf-bar"><div class="rf-fill" style="width:${pctCh}%"></div></div><div class="rf-text">已学 ${learnedInCh} / ${totalCh} 词 · ${pctCh}%</div></div>`;
   container.innerHTML = html;
+  const trialWordEl = container.querySelector('.trial-word');
+  if (trialWordEl) {
+    const tw = trialWordEl.textContent.replace('🔊', '').trim();
+    if (tw) speakWord(tw);
+  }
   const learnedInStory = STORY_WORDS.filter(w => state.learned.has(w.word)).length;
   document.getElementById('reader-progress').textContent = `${learnedInStory}/${STORY_WORDS.length}`;
 }
